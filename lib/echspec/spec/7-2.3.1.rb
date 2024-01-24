@@ -9,9 +9,10 @@ module EchSpec
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7-2.3.1
         def send_illegal_inner_ech_type(socket, hostname, ech_config)
           TTTLS13::Logging.logger.level = Logger::WARN
-          tmp = TTTLS13::Message::Extension::ECHClientHelloType::INNER
-          TTTLS13::Message::Extension::ECHClientHelloType.const_set('INEER', "\x02")
 
+          inner_ech = IllegalEchClientHello.new(type: ILLEGAL_INNER)
+          exs = gen_extensions(hostname)
+          exs[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO] = inner_ech
           conn = TTTLS13::Connection.new(socket, :client)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
@@ -21,7 +22,7 @@ module EchSpec
                 TTTLS13::CipherSuite::TLS_AES_128_GCM_SHA256
               ]
             ),
-            extensions: gen_extensions(hostname)
+            extensions: exs
           )
 
           selector = method(:select_ech_hpke_cipher_suite)
@@ -32,9 +33,7 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           ))
           recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
-          return recv
-        ensure
-          TTTLS13::Message::Extension::ECHClientHelloType.const_set('INNER', tmp)
+          recv
         end
 
         private
@@ -79,6 +78,26 @@ module EchSpec
         def select_ech_hpke_cipher_suite(conf)
           TTTLS13::STANDARD_CLIENT_ECH_HPKE_SYMMETRIC_CIPHER_SUITES.find do |cs|
             conf.cipher_suites.include?(cs)
+          end
+        end
+
+        ILLEGAL_OUTER = "\x02"
+        ILLEGAL_INNER = "\x03"
+
+        class IllegalEchClientHello < TTTLS13::Message::Extension::ECHClientHello
+          using TTTLS13::Refinements
+          def serialize
+            case @type
+            when ILLEGAL_OUTER
+              binary = @type + @cipher_suite.encode + @config_id.to_uint8 \
+                       + @enc.prefix_uint16_length + @payload.prefix_uint16_length
+            when ILLEGAL_INNER
+              binary = @type
+            else
+              raise TTTLS13::Error::ErrorAlerts, :internal_error
+            end
+
+            @extension_type + binary.prefix_uint16_length
           end
         end
       end
