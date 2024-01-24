@@ -8,11 +8,9 @@ module EchSpec
         #
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7-2.3.1
         def send_illegal_inner_ech_type(socket, hostname, ech_config)
-          TTTLS13::Logging.logger.level = Logger::WARN
-
-          inner_ech = IllegalEchClientHello.new(type: ILLEGAL_INNER)
+          inner_ech = IllegalEchClientHello.new_inner
           exs = gen_extensions(hostname)
-          exs[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO] = inner_ech
+          exs.merge(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech)
           conn = TTTLS13::Connection.new(socket, :client)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
@@ -86,6 +84,11 @@ module EchSpec
 
         class IllegalEchClientHello < TTTLS13::Message::Extension::ECHClientHello
           using TTTLS13::Refinements
+
+          def self.new_inner
+            TTTLS13::Message::Extension::ECHClientHello.new(type: ILLEGAL_INNER)
+          end
+
           def serialize
             case @type
             when ILLEGAL_OUTER

@@ -4,6 +4,8 @@ module EchSpec
   module Spec
     class << self
       def run(fpath, port, hostname)
+        TTTLS13::Logging.logger.level = Logger::WARN
+
         # 9
         if fpath.nil?
           echconfigs = Spec9.resolve_echconfigs(hostname)
@@ -21,6 +23,7 @@ module EchSpec
           echconfigs.first
         )
         puts recv.type == TTTLS13::Message::ContentType::ALERT && recv.messages.first.description == TTTLS13::Message::ALERT_DESCRIPTION[:illegal_parameter] ? 'OK' : 'NG'
+        socket.close
       end
     end
   end
