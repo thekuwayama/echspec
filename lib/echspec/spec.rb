@@ -3,7 +3,7 @@ Dir[File.dirname(__FILE__) + '/spec/*.rb'].sort.each { |f| require f }
 module EchSpec
   module Spec
     class << self
-      def run(fpath, hostname)
+      def run(fpath, port, hostname)
         # 9
         if fpath.nil?
           echconfigs = Spec9.resolve_echconfigs(hostname)
@@ -14,7 +14,7 @@ module EchSpec
         puts Spec9.is_compliant_echconfigs?(echconfigs) ? 'OK' : 'NG'
 
         # 7-2.3.1
-        socket = TCPSocket.new(hostname, 8080)
+        socket = TCPSocket.new(hostname, port)
         recv = Spec7_2_3_1.send_illegal_inner_ech_type(
           socket,
           hostname,

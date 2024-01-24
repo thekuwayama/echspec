@@ -5,6 +5,7 @@ module EchSpec
 
       # default value
       fpath = nil
+      port = 443
 
       op.on(
         '-f',
@@ -12,6 +13,14 @@ module EchSpec
         'path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)'
       ) do |v|
         fpath = v
+      end
+
+      op.on(
+        '-p',
+        '--port VALUE',
+        'the name server port number       (default 443)'
+      ) do |v|
+        port = v
       end
 
       op.banner += ' name'
@@ -34,12 +43,12 @@ module EchSpec
         exit 1
       end
 
-      [fpath, args[0]]
+      [fpath, port, args[0]]
     end
 
     def run
-      fpath, name = parse_options
-      Spec.run(fpath, name)
+      fpath, port, name = parse_options
+      Spec.run(fpath, port, name)
     end
   end
 end
