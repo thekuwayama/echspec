@@ -117,7 +117,7 @@ module EchSpec
             when ILLEGAL_INNER
               binary = @type
             else
-              raise TTTLS13::Error::ErrorAlerts, :internal_error
+              raise 'failed to serialize ECHClientHello'
             end
 
             @extension_type + binary.prefix_uint16_length
