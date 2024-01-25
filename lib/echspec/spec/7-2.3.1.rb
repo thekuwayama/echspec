@@ -13,7 +13,7 @@ module EchSpec
         # @param echconfig [ECHConfig]
         #
         # @return [EchSpec::Ok or Err]
-        def run(hostname, port, echconfig)
+        def validate_illegal_inner_ech_type(hostname, port, echconfig)
           socket = TCPSocket.new(hostname, port)
           recv = send_illegal_inner_ech_type(socket, hostname, echconfig)
           socket.close

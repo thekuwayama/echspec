@@ -40,7 +40,7 @@ module EchSpec
         end
 
         # 7-2.3.1
-        case Spec7_2_3_1.run(hostname, port, echconfigs.first)
+        case Spec7_2_3_1.validate_illegal_inner_ech_type(hostname, port, echconfigs.first)
         in Ok(message)
           puts message.green
         in Err(message)
