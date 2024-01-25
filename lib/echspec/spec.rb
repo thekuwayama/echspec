@@ -1,3 +1,20 @@
+module EchSpec
+  module Spec
+    class << self
+      # @param record [TTTLS13::Message::Record]
+      # @param id [Symbol]
+      #
+      # @return [Boolean]
+      def expect_alert(record, desc)
+        description = TTTLS13::Message::ALERT_DESCRIPTION[desc]
+
+        record.type == TTTLS13::Message::ContentType::ALERT &&
+          record.messages.first.description == description
+      end
+    end
+  end
+end
+
 Dir[File.dirname(__FILE__) + '/spec/*.rb'].sort.each { |f| require f }
 
 module EchSpec
@@ -15,17 +32,20 @@ module EchSpec
           echconfigs = Spec9.parse_pem(File.open(fpath).read)
         end
 
-        puts Spec9.is_compliant_echconfigs?(echconfigs) ? 'OK'.green : 'NG'.red
+        case Spec9.validate_compliant_echconfigs(echconfigs)
+        in Ok(message)
+          puts message.green
+        in Err(message)
+          puts message.red
+        end
 
         # 7-2.3.1
-        socket = TCPSocket.new(hostname, port)
-        recv = Spec7_2_3_1.send_illegal_inner_ech_type(
-          socket,
-          hostname,
-          echconfigs.first
-        )
-        puts recv.type == TTTLS13::Message::ContentType::ALERT && recv.messages.first.description == TTTLS13::Message::ALERT_DESCRIPTION[:illegal_parameter] ? 'OK'.green : 'NG'.red
-        socket.close
+        case Spec7_2_3_1.run(hostname, port, echconfigs.first)
+        in Ok(message)
+          puts message.green
+        in Err(message)
+          puts message.red
+        end
       end
     end
   end

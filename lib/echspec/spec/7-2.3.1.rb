@@ -7,7 +7,27 @@ module EchSpec
         #   "illegal_parameter" alert.
         #
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7-2.3.1
-        def send_illegal_inner_ech_type(socket, hostname, ech_config)
+
+        # @param hostname [String]
+        # @param port [Integer]
+        # @param echconfig [ECHConfig]
+        #
+        # @return [EchSpec::Ok or Err]
+        def run(hostname, port, echconfig)
+          socket = TCPSocket.new(hostname, port)
+          recv = send_illegal_inner_ech_type(socket, hostname, echconfig)
+          socket.close
+          return Ok.new('OK') if Spec.expect_alert(recv, :illegal_parameter)
+
+          Err.new('NG')
+        end
+
+        # @param socket [TCPSocket]
+        # @param hostname [String]
+        # @param echconfig [ECHConfig]
+        #
+        # @return [TTTLS13::Message::Record]
+        def send_illegal_inner_ech_type(socket, hostname, echconfig)
           inner_ech = IllegalEchClientHello.new_inner
           exs = gen_extensions(hostname)
           exs.merge(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech)
@@ -24,7 +44,7 @@ module EchSpec
           )
 
           selector = method(:select_ech_hpke_cipher_suite)
-          ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
+          ch, = TTTLS13::Ech.offer_ech(inner, echconfig, selector)
           conn.send_record(TTTLS13::Message::Record.new(
             type: TTTLS13::Message::ContentType::HANDSHAKE,
             messages: [ch],

@@ -5,5 +5,6 @@ require 'tttls1.3'
 
 require 'echspec/version'
 require 'echspec/utils'
+require 'echspec/result'
 require 'echspec/spec'
 require 'echspec/cli'
