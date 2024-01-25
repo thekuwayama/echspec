@@ -3,6 +3,8 @@ Dir[File.dirname(__FILE__) + '/spec/*.rb'].sort.each { |f| require f }
 module EchSpec
   module Spec
     class << self
+      using Refinements
+
       def run(fpath, port, hostname)
         TTTLS13::Logging.logger.level = Logger::WARN
 
@@ -13,7 +15,7 @@ module EchSpec
           echconfigs = Spec9.parse_pem(File.open(fpath).read)
         end
 
-        puts Spec9.is_compliant_echconfigs?(echconfigs) ? 'OK' : 'NG'
+        puts Spec9.is_compliant_echconfigs?(echconfigs) ? 'OK'.green : 'NG'.red
 
         # 7-2.3.1
         socket = TCPSocket.new(hostname, port)
@@ -22,7 +24,7 @@ module EchSpec
           hostname,
           echconfigs.first
         )
-        puts recv.type == TTTLS13::Message::ContentType::ALERT && recv.messages.first.description == TTTLS13::Message::ALERT_DESCRIPTION[:illegal_parameter] ? 'OK' : 'NG'
+        puts recv.type == TTTLS13::Message::ContentType::ALERT && recv.messages.first.description == TTTLS13::Message::ALERT_DESCRIPTION[:illegal_parameter] ? 'OK'.green : 'NG'.red
         socket.close
       end
     end
