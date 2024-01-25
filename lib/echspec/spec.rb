@@ -2,7 +2,7 @@ module EchSpec
   module Spec
     class << self
       # @param record [TTTLS13::Message::Record]
-      # @param id [Symbol]
+      # @param desc [Symbol]
       #
       # @return [Boolean]
       def expect_alert(record, desc)
@@ -22,30 +22,32 @@ module EchSpec
     class << self
       using Refinements
 
+      # @param result [EchSpec::Ok or Err]
+      def print_result(result)
+        case result
+        in Ok(message)
+          puts message.green
+        in Err(message)
+          puts message.red
+        end
+      end
+
+      # @param fpath [String]
+      # @param port [Integer]
+      # @param hostname [String]
       def run(fpath, port, hostname)
         TTTLS13::Logging.logger.level = Logger::WARN
 
         # 9
-        if fpath.nil?
-          echconfigs = Spec9.resolve_echconfigs(hostname)
-        else
-          echconfigs = Spec9.parse_pem(File.open(fpath).read)
-        end
-
-        case Spec9.validate_compliant_echconfigs(echconfigs)
-        in Ok(message)
-          puts message.green
-        in Err(message)
-          puts message.red
-        end
+        echconfigs = if fpath.nil?
+                       Spec9.resolve_echconfigs(hostname)
+                     else
+                       Spec9.parse_pem(File.open(fpath).read)
+                     end
+        Spec9.validate_compliant_echconfigs(echconfigs).tap { |x| print_result(x) }
 
         # 7-2.3.1
-        case Spec7_2_3_1.validate_illegal_inner_ech_type(hostname, port, echconfigs.first)
-        in Ok(message)
-          puts message.green
-        in Err(message)
-          puts message.red
-        end
+        Spec7_2_3_1.validate_illegal_inner_ech_type(hostname, port, echconfigs.first).tap { |x| print_result(x) }
       end
     end
   end
