@@ -10,28 +10,32 @@ module EchSpec
 
         # @param hostname [String]
         # @param port [Integer]
-        # @param echconfig [ECHConfig]
+        # @param ech_config [ECHConfig]
         #
         # @return [EchSpec::Ok or Err]
-        def validate_illegal_inner_ech_type(hostname, port, echconfig)
+        def validate_illegal_inner_ech_type(hostname, port, ech_config)
           socket = TCPSocket.new(hostname, port)
-          recv = send_illegal_inner_ech_type(socket, hostname, echconfig)
+          recv = send_illegal_inner_ech_type(socket, hostname, ech_config)
           socket.close
-          return Ok.new('OK') if Spec.expect_alert(recv, :illegal_parameter)
+          return Err.new('NG') unless Spec.expect_alert(recv, :illegal_parameter)
 
-          Err.new('NG')
+          socket = TCPSocket.new(hostname, port)
+          recv = send_illegal_outer_ech_type(socket, hostname, ech_config)
+          socket.close
+          return Err.new('NG') unless Spec.expect_alert(recv, :illegal_parameter)
+
+          Ok.new('OK')
         end
 
         # @param socket [TCPSocket]
         # @param hostname [String]
-        # @param echconfig [ECHConfig]
+        # @param ech_config [ECHConfig]
         #
         # @return [TTTLS13::Message::Record]
-        def send_illegal_inner_ech_type(socket, hostname, echconfig)
+        def send_illegal_inner_ech_type(socket, hostname, ech_config)
+          conn = TTTLS13::Connection.new(socket, :client)
           inner_ech = IllegalEchClientHello.new_inner
           exs = gen_extensions(hostname)
-          exs.merge(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech)
-          conn = TTTLS13::Connection.new(socket, :client)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
               [
@@ -40,14 +44,97 @@ module EchSpec
                 TTTLS13::CipherSuite::TLS_AES_128_GCM_SHA256
               ]
             ),
-            extensions: exs
+            extensions: exs.merge(
+              TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
+            )
           )
 
           selector = method(:select_ech_hpke_cipher_suite)
-          ch, = TTTLS13::Ech.offer_ech(inner, echconfig, selector)
+          ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
           conn.send_record(TTTLS13::Message::Record.new(
             type: TTTLS13::Message::ContentType::HANDSHAKE,
             messages: [ch],
+            cipher: TTTLS13::Cryptograph::Passer.new
+          ))
+          recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
+          recv
+        end
+
+        # @param socket [TCPSocket]
+        # @param hostname [String]
+        # @param ech_config [ECHConfig]
+        #
+        # @return [TTTLS13::Message::Record]
+        def send_illegal_outer_ech_type(socket, hostname, ech_config)
+          conn = TTTLS13::Connection.new(socket, :client)
+          inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
+          exs = gen_extensions(hostname)
+          inner = TTTLS13::Message::ClientHello.new(
+            cipher_suites: TTTLS13::CipherSuites.new(
+              [
+                TTTLS13::CipherSuite::TLS_AES_256_GCM_SHA384,
+                TTTLS13::CipherSuite::TLS_CHACHA20_POLY1305_SHA256,
+                TTTLS13::CipherSuite::TLS_AES_128_GCM_SHA256
+              ]
+            ),
+            extensions: exs.merge(
+              TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
+            )
+          )
+
+          # offer_ech
+          selector = method(:select_ech_hpke_cipher_suite)
+
+          # Encrypted ClientHello Configuration
+          ech_state, enc = TTTLS13::Ech.encrypted_ech_config(
+            ech_config,
+            selector
+          )
+          encoded = TTTLS13::Ech.encode_ch_inner(inner, ech_state.maximum_name_length)
+          overhead_len = TTTLS13::Ech.aead_id2overhead_len(
+            ech_state.cipher_suite.aead_id.uint16
+          )
+
+          # Encoding the ClientHelloInner
+          aad_ech = IllegalEchClientHello.new_outer(
+            cipher_suite: ech_state.cipher_suite,
+            config_id: ech_state.config_id,
+            enc: enc,
+            payload: '0' * (encoded.length + overhead_len)
+          )
+          aad = TTTLS13::Message::ClientHello.new(
+            legacy_version: inner.legacy_version,
+            legacy_session_id: inner.legacy_session_id,
+            cipher_suites: inner.cipher_suites,
+            legacy_compression_methods: inner.legacy_compression_methods,
+            extensions: inner.extensions.merge(
+              TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => aad_ech,
+              TTTLS13::Message::ExtensionType::SERVER_NAME => \
+                TTTLS13::Message::Extension::ServerName.new(ech_state.public_name)
+            )
+          )
+
+          # Authenticating the ClientHelloOuter
+          # which does not include the Handshake structure's four byte header.
+          outer_ech = IllegalEchClientHello.new_outer(
+            cipher_suite: ech_state.cipher_suite,
+            config_id: ech_state.config_id,
+            enc: enc,
+            payload: ech_state.ctx.seal(aad.serialize[4..], encoded)
+          )
+          outer = TTTLS13::Message::ClientHello.new(
+            legacy_version: aad.legacy_version,
+            random: aad.random,
+            legacy_session_id: aad.legacy_session_id,
+            cipher_suites: aad.cipher_suites,
+            legacy_compression_methods: aad.legacy_compression_methods,
+            extensions: aad.extensions.merge(
+              TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => outer_ech
+            )
+          )
+          conn.send_record(TTTLS13::Message::Record.new(
+            type: TTTLS13::Message::ContentType::HANDSHAKE,
+            messages: [outer],
             cipher: TTTLS13::Cryptograph::Passer.new
           ))
           recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
@@ -106,7 +193,17 @@ module EchSpec
           using TTTLS13::Refinements
 
           def self.new_inner
-            TTTLS13::Message::Extension::ECHClientHello.new(type: ILLEGAL_INNER)
+            IllegalEchClientHello.new(type: ILLEGAL_INNER)
+          end
+
+          def self.new_outer(cipher_suite:, config_id:, enc:, payload:)
+            IllegalEchClientHello.new(
+              type: ILLEGAL_OUTER,
+              cipher_suite: cipher_suite,
+              config_id: config_id,
+              enc: enc,
+              payload: payload
+            )
           end
 
           def serialize
@@ -117,7 +214,7 @@ module EchSpec
             when ILLEGAL_INNER
               binary = @type
             else
-              raise 'failed to serialize ECHClientHello'
+              return super
             end
 
             @extension_type + binary.prefix_uint16_length
