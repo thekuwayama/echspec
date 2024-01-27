@@ -51,11 +51,13 @@ module EchSpec
 
           selector = method(:select_ech_hpke_cipher_suite)
           ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
-          conn.send_record(TTTLS13::Message::Record.new(
-            type: TTTLS13::Message::ContentType::HANDSHAKE,
-            messages: [ch],
-            cipher: TTTLS13::Cryptograph::Passer.new
-          ))
+          conn.send_record(
+            TTTLS13::Message::Record.new(
+              type: TTTLS13::Message::ContentType::HANDSHAKE,
+              messages: [ch],
+              cipher: TTTLS13::Cryptograph::Passer.new
+            )
+          )
           recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
           recv
         end
@@ -132,11 +134,13 @@ module EchSpec
               TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => outer_ech
             )
           )
-          conn.send_record(TTTLS13::Message::Record.new(
-            type: TTTLS13::Message::ContentType::HANDSHAKE,
-            messages: [outer],
-            cipher: TTTLS13::Cryptograph::Passer.new
-          ))
+          conn.send_record(
+            TTTLS13::Message::Record.new(
+              type: TTTLS13::Message::ContentType::HANDSHAKE,
+              messages: [outer],
+              cipher: TTTLS13::Cryptograph::Passer.new
+            )
+          )
           recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
           recv
         end
