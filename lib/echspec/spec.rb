@@ -54,6 +54,23 @@ module EchSpec
         exs
       end
 
+      def gen_new_ch_extensions(ch1, hrr)
+        exs = TTTLS13::Message::Extensions.new
+        # key_share
+        if hrr.extensions.include?(TTTLS13::Message::ExtensionType::KEY_SHARE)
+          group = hrr.extensions[TTTLS13::Message::ExtensionType::KEY_SHARE]
+                     .key_share_entry.first.group
+          key_share, = TTTLS13::Message::Extension::KeyShare.gen_ch_key_share([group])
+          exs << key_share
+        end
+
+        # cookie
+        exs << hrr.extensions[TTTLS13::Message::ExtensionType::COOKIE] \
+          if hrr.extensions.include?(TTTLS13::Message::ExtensionType::COOKIE)
+
+        ch1.extensions.merge(exs)
+      end
+
       def select_ech_hpke_cipher_suite(conf)
         TTTLS13::STANDARD_CLIENT_ECH_HPKE_SYMMETRIC_CIPHER_SUITES.find do |cs|
           conf.cipher_suites.include?(cs)

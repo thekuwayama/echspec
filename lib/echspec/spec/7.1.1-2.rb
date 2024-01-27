@@ -63,7 +63,7 @@ module EchSpec
           # send 2nd ClientHello without ech
           ch1 = ch
           hrr = recv.messages.first
-          new_exs = gen_new_ch_extensions(ch1, hrr)
+          new_exs = Spec.gen_new_ch_extensions(ch1, hrr)
           new_exs.delete(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO)
           ch = TTTLS13::Message::ClientHello.new(
             legacy_version: ch1.legacy_version,
@@ -86,23 +86,6 @@ module EchSpec
           recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new) \
             if recv.type == TTTLS13::Message::ContentType::CCS
           recv
-        end
-
-        def gen_new_ch_extensions(ch1, hrr)
-          exs = TTTLS13::Message::Extensions.new
-          # key_share
-          if hrr.extensions.include?(TTTLS13::Message::ExtensionType::KEY_SHARE)
-            group = hrr.extensions[TTTLS13::Message::ExtensionType::KEY_SHARE]
-                       .key_share_entry.first.group
-            key_share, = TTTLS13::Message::Extension::KeyShare.gen_ch_key_share([group])
-            exs << key_share
-          end
-
-          # cookie
-          exs << hrr.extensions[TTTLS13::Message::ExtensionType::COOKIE] \
-            if hrr.extensions.include?(TTTLS13::Message::ExtensionType::COOKIE)
-
-          ch1.extensions.merge(exs)
         end
       end
     end
