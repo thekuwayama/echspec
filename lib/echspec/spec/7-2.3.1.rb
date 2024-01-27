@@ -45,7 +45,7 @@ module EchSpec
         def send_illegal_inner_ech_type(socket, hostname, ech_config)
           conn = TTTLS13::Connection.new(socket, :client)
           inner_ech = IllegalEchClientHello.new_inner
-          exs = gen_extensions(hostname)
+          exs = Spec.gen_ch_extensions(hostname)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
               [
@@ -59,7 +59,7 @@ module EchSpec
             )
           )
 
-          selector = method(:select_ech_hpke_cipher_suite)
+          selector = proc { |x| EchSpec::Spec.select_ech_hpke_cipher_suite(x) }
           ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
           conn.send_record(
             TTTLS13::Message::Record.new(
@@ -80,7 +80,7 @@ module EchSpec
         def send_illegal_outer_ech_type(socket, hostname, ech_config)
           conn = TTTLS13::Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
-          exs = gen_extensions(hostname)
+          exs = Spec.gen_ch_extensions(hostname)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
               [
@@ -95,7 +95,7 @@ module EchSpec
           )
 
           # offer_ech
-          selector = method(:select_ech_hpke_cipher_suite)
+          selector = proc { |x| EchSpec::Spec.select_ech_hpke_cipher_suite(x) }
 
           # Encrypted ClientHello Configuration
           ech_state, enc = TTTLS13::Ech.encrypted_ech_config(
@@ -156,49 +156,6 @@ module EchSpec
         end
 
         private
-
-        def gen_extensions(hostname)
-          exs = TTTLS13::Message::Extensions.new
-          # server_name
-          exs << TTTLS13::Message::Extension::ServerName.new(hostname)
-
-          # supported_versions: only TLS 1.3
-          exs << TTTLS13::Message::Extension::SupportedVersions.new(
-            msg_type: TTTLS13::Message::HandshakeType::CLIENT_HELLO
-          )
-
-          # signature_algorithms
-          exs << TTTLS13::Message::Extension::SignatureAlgorithms.new(
-            [
-              TTTLS13::SignatureScheme::ECDSA_SECP256R1_SHA256,
-              TTTLS13::SignatureScheme::ECDSA_SECP384R1_SHA384,
-              TTTLS13::SignatureScheme::ECDSA_SECP521R1_SHA512,
-              TTTLS13::SignatureScheme::RSA_PSS_RSAE_SHA256,
-              TTTLS13::SignatureScheme::RSA_PSS_RSAE_SHA384,
-              TTTLS13::SignatureScheme::RSA_PSS_RSAE_SHA512,
-              TTTLS13::SignatureScheme::RSA_PKCS1_SHA256,
-              TTTLS13::SignatureScheme::RSA_PKCS1_SHA384,
-              TTTLS13::SignatureScheme::RSA_PKCS1_SHA512
-            ]
-          )
-
-          # supported_groups
-          exs << TTTLS13::Message::Extension::SupportedGroups.new(
-            [
-              TTTLS13::NamedGroup::SECP256R1,
-              TTTLS13::NamedGroup::SECP384R1,
-              TTTLS13::NamedGroup::SECP521R1
-            ]
-          )
-
-          exs
-        end
-
-        def select_ech_hpke_cipher_suite(conf)
-          TTTLS13::STANDARD_CLIENT_ECH_HPKE_SYMMETRIC_CIPHER_SUITES.find do |cs|
-            conf.cipher_suites.include?(cs)
-          end
-        end
 
         ILLEGAL_OUTER = "\x02"
         ILLEGAL_INNER = "\x03"

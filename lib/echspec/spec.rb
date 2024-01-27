@@ -11,6 +11,54 @@ module EchSpec
         record.type == TTTLS13::Message::ContentType::ALERT &&
           record.messages.first.description == description
       end
+
+      def gen_ch_extensions(hostname)
+        exs = TTTLS13::Message::Extensions.new
+        # server_name
+        exs << TTTLS13::Message::Extension::ServerName.new(hostname)
+
+        # supported_versions: only TLS 1.3
+        exs << TTTLS13::Message::Extension::SupportedVersions.new(
+          msg_type: TTTLS13::Message::HandshakeType::CLIENT_HELLO
+        )
+
+        # signature_algorithms
+        exs << TTTLS13::Message::Extension::SignatureAlgorithms.new(
+          [
+            TTTLS13::SignatureScheme::ECDSA_SECP256R1_SHA256,
+            TTTLS13::SignatureScheme::ECDSA_SECP384R1_SHA384,
+            TTTLS13::SignatureScheme::ECDSA_SECP521R1_SHA512,
+            TTTLS13::SignatureScheme::RSA_PSS_RSAE_SHA256,
+            TTTLS13::SignatureScheme::RSA_PSS_RSAE_SHA384,
+            TTTLS13::SignatureScheme::RSA_PSS_RSAE_SHA512,
+            TTTLS13::SignatureScheme::RSA_PKCS1_SHA256,
+            TTTLS13::SignatureScheme::RSA_PKCS1_SHA384,
+            TTTLS13::SignatureScheme::RSA_PKCS1_SHA512
+          ]
+        )
+
+        # supported_groups
+        groups = [
+          TTTLS13::NamedGroup::SECP256R1,
+          TTTLS13::NamedGroup::SECP384R1,
+          TTTLS13::NamedGroup::SECP521R1
+        ]
+        exs << TTTLS13::Message::Extension::SupportedGroups.new(groups)
+
+        # key_share
+        key_share, = TTTLS13::Message::Extension::KeyShare.gen_ch_key_share(
+          groups
+        )
+        exs << key_share
+
+        exs
+      end
+
+      def select_ech_hpke_cipher_suite(conf)
+        TTTLS13::STANDARD_CLIENT_ECH_HPKE_SYMMETRIC_CIPHER_SUITES.find do |cs|
+          conf.cipher_suites.include?(cs)
+        end
+      end
     end
   end
 end
@@ -48,6 +96,9 @@ module EchSpec
 
         # 7-2.3.1
         Spec7_2_3_1.validate_illegal_ech_type(hostname, port, echconfigs.first).each { |x| print_result(x) }
+
+        # 7.1.1-2
+        Spec7_1_1_2.validate_hrr_missing_ech(hostname, port, echconfigs.first).tap { |x| print_result(x) }
       end
     end
   end
