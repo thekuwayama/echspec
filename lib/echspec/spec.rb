@@ -47,7 +47,7 @@ module EchSpec
         Spec9.validate_compliant_echconfigs(echconfigs).tap { |x| print_result(x) }
 
         # 7-2.3.1
-        Spec7_2_3_1.validate_illegal_inner_ech_type(hostname, port, echconfigs.first).tap { |x| print_result(x) }
+        Spec7_2_3_1.validate_illegal_ech_type(hostname, port, echconfigs.first).each { |x| print_result(x) }
       end
     end
   end

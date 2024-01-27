@@ -14,7 +14,7 @@ module EchSpec
 
         # @param [Array of ECHConfig]
         #
-        # @return [EchSpec::Ok or Err]
+        # @return [EchSpec::Ok | Err]
         def validate_compliant_echconfigs(echconfigs)
           echconfigs.any? do |c|
             kconfig = c.echconfig_contents.key_config

@@ -11,6 +11,7 @@ module EchSpec
         # abort the handshake with an "illegal_parameter" alert.
         #
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1.1-2
+      end
     end
   end
 end

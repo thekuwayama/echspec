@@ -12,19 +12,29 @@ module EchSpec
         # @param port [Integer]
         # @param ech_config [ECHConfig]
         #
-        # @return [EchSpec::Ok or Err]
-        def validate_illegal_inner_ech_type(hostname, port, ech_config)
+        # @return [Array of EchSpec::Ok | Err]
+        def validate_illegal_ech_type(hostname, port, ech_config)
+          res = []
+
           socket = TCPSocket.new(hostname, port)
           recv = send_illegal_inner_ech_type(socket, hostname, ech_config)
           socket.close
-          return Err.new('NG') unless Spec.expect_alert(recv, :illegal_parameter)
+          if Spec.expect_alert(recv, :illegal_parameter)
+            res.append(Ok.new('OK'))
+          else
+            res.append(Err.new('NG'))
+          end
 
           socket = TCPSocket.new(hostname, port)
           recv = send_illegal_outer_ech_type(socket, hostname, ech_config)
           socket.close
-          return Err.new('NG') unless Spec.expect_alert(recv, :illegal_parameter)
+          if Spec.expect_alert(recv, :illegal_parameter)
+            res.append(Ok.new('OK'))
+          else
+            res.append(Err.new('NG'))
+          end
 
-          Ok.new('OK')
+          res
         end
 
         # @param socket [TCPSocket]
