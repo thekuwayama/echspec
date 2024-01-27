@@ -59,7 +59,7 @@ module EchSpec
             )
           )
 
-          selector = proc { |x| EchSpec::Spec.select_ech_hpke_cipher_suite(x) }
+          selector = proc { |x| Spec.select_ech_hpke_cipher_suite(x) }
           ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
           conn.send_record(
             TTTLS13::Message::Record.new(
@@ -95,7 +95,7 @@ module EchSpec
           )
 
           # offer_ech
-          selector = proc { |x| EchSpec::Spec.select_ech_hpke_cipher_suite(x) }
+          selector = proc { |x| Spec.select_ech_hpke_cipher_suite(x) }
 
           # Encrypted ClientHello Configuration
           ech_state, enc = TTTLS13::Ech.encrypted_ech_config(
