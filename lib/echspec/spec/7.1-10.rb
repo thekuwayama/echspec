@@ -31,7 +31,7 @@ module EchSpec
           # supported_versions: only TLS 1.2
           versions = TTTLS13::Message::Extension::SupportedVersions.new(
             msg_type: TTTLS13::Message::HandshakeType::CLIENT_HELLO,
-            versions: [TTTLS13::Message::ProtocolVersion::TLS_1_3]
+            versions: [TTTLS13::Message::ProtocolVersion::TLS_1_2]
           )
           exs[TTTLS13::Message::ExtensionType::SUPPORTED_VERSIONS] = versions
           inner = TTTLS13::Message::ClientHello.new(
