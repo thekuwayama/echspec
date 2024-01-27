@@ -16,7 +16,7 @@ module EchSpec
         # @param port [Integer]
         # @param ech_config [ECHConfig]
         #
-        # @return [EchSpec::Ok or Err]
+        # @return [EchSpec::Ok | Err]
         def validate_hrr_missing_ech(hostname, port, ech_config)
           socket = TCPSocket.new(hostname, port)
           recv = send_hrr_missing_ech(socket, hostname, ech_config)

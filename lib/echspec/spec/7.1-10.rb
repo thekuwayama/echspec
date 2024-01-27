@@ -14,7 +14,7 @@ module EchSpec
         # @param port [Integer]
         # @param ech_config [ECHConfig]
         #
-        # @return [Array of EchSpec::Ok | Err]
+        # @return [EchSpec::Ok | Err]
         def validate_ech_with_tls12(hostname, port, ech_config)
           socket = TCPSocket.new(hostname, port)
           recv = send_ch_ech_with_tls12(socket, hostname, ech_config)
