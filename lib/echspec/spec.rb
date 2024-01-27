@@ -116,6 +116,9 @@ module EchSpec
 
         # 7.1.1-2
         Spec7_1_1_2.validate_hrr_missing_ech(hostname, port, echconfigs.first).tap { |x| print_result(x) }
+
+        # 7.1-10
+        Spec7_1_10.validate_ech_with_tls12(hostname, port, echconfigs.first).tap { |x| print_result(x) }
       end
     end
   end
