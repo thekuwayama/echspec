@@ -87,7 +87,7 @@ module EchSpec
     class << self
       using Refinements
 
-      # @param result [EchSpec::Ok or Err]
+      # @param result [EchSpec::Ok | Err]
       def print_result(result)
         case result
         in Ok(message)
