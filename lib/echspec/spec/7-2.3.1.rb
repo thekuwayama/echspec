@@ -17,7 +17,7 @@ module EchSpec
           res = []
 
           socket = TCPSocket.new(hostname, port)
-          recv = send_illegal_inner_ech_type(socket, hostname, ech_config)
+          recv = send_ch_illegal_inner_ech_type(socket, hostname, ech_config)
           socket.close
           if Spec.expect_alert(recv, :illegal_parameter)
             res.append(Ok.new('OK'))
@@ -26,7 +26,7 @@ module EchSpec
           end
 
           socket = TCPSocket.new(hostname, port)
-          recv = send_illegal_outer_ech_type(socket, hostname, ech_config)
+          recv = send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
           socket.close
           if Spec.expect_alert(recv, :illegal_parameter)
             res.append(Ok.new('OK'))
@@ -42,7 +42,7 @@ module EchSpec
         # @param ech_config [ECHConfig]
         #
         # @return [TTTLS13::Message::Record]
-        def send_illegal_inner_ech_type(socket, hostname, ech_config)
+        def send_ch_illegal_inner_ech_type(socket, hostname, ech_config)
           conn = TTTLS13::Connection.new(socket, :client)
           inner_ech = IllegalEchClientHello.new_inner
           exs = Spec.gen_ch_extensions(hostname)
@@ -77,7 +77,7 @@ module EchSpec
         # @param ech_config [ECHConfig]
         #
         # @return [TTTLS13::Message::Record]
-        def send_illegal_outer_ech_type(socket, hostname, ech_config)
+        def send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
           conn = TTTLS13::Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
           exs = Spec.gen_ch_extensions(hostname)
