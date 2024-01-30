@@ -28,9 +28,9 @@ module EchSpec
 
         def send_hrr_missing_ech(socket, hostname, ech_config)
           # send 1st ClientHello
-          conn = TTTLS13::Connection.new(socket, :client)
+          conn = Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
-          exs = Spec.gen_ch_extensions(hostname)
+          exs, = Spec.gen_ch_extensions(hostname)
           exs.delete(TTTLS13::Message::ExtensionType::KEY_SHARE) # for HRR
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
@@ -56,13 +56,13 @@ module EchSpec
           )
 
           # receive HelloRetryRequest
-          recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
+          recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
           raise 'not received HelloRetryRequest' \
-            unless recv.messages.first.hrr?
+            unless recv.hrr?
 
           # send 2nd ClientHello without ech
           ch1 = ch
-          hrr = recv.messages.first
+          hrr = recv
           new_exs = Spec.gen_new_ch_extensions(ch1, hrr)
           new_exs.delete(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO)
           ch = TTTLS13::Message::ClientHello.new(
@@ -81,10 +81,9 @@ module EchSpec
             )
           )
 
-          # skip ChangeCipherSpec
-          recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
-          recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new) \
-            if recv.type == TTTLS13::Message::ContentType::CCS
+          recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+          recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new) \
+            if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
           recv
         end
       end

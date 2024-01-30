@@ -1,17 +1,49 @@
 module EchSpec
   module Spec
+    class Connection < TTTLS13::Connection
+      # @param socket [Socket]
+      # @param side [:client or :server]
+      def initialize(socket, side)
+        super(socket, side)
+      end
+
+      # @param cipher [TTTLS13::Cryptograph::$Object]
+      #
+      # @return [TTTLS13::Message::$Object]
+      # @return [String]
+      def recv_message(cipher)
+        return @message_queue.shift unless @message_queue.empty?
+
+        messages = nil
+        orig_msgs = []
+        loop do
+          record, orig_msgs = recv_record(cipher)
+          messages = record.messages
+          break unless messages.empty?
+        end
+
+        @message_queue += messages[1..].zip(orig_msgs[1..])
+        message = messages.first
+        orig_msg = orig_msgs.first
+
+        [message, orig_msg]
+      end
+    end
+
     class << self
       # @param record [TTTLS13::Message::Record]
       # @param desc [Symbol]
       #
       # @return [Boolean]
-      def expect_alert(record, desc)
-        description = TTTLS13::Message::ALERT_DESCRIPTION[desc]
-
-        record.type == TTTLS13::Message::ContentType::ALERT &&
-          record.messages.first.description == description
+      def expect_alert(msg, desc)
+        msg.is_a?(TTTLS13::Message::Alert) &&
+          msg.description == TTTLS13::Message::ALERT_DESCRIPTION[desc]
       end
 
+      # @param hostname [String]
+      #
+      # @return [TTTLS13::Message::Extensions]
+      # @return [Hash of NamedGroup => OpenSSL::PKey::EC.$Object]
       def gen_ch_extensions(hostname)
         exs = TTTLS13::Message::Extensions.new
         # server_name
@@ -46,14 +78,18 @@ module EchSpec
         exs << TTTLS13::Message::Extension::SupportedGroups.new(groups)
 
         # key_share
-        key_share, = TTTLS13::Message::Extension::KeyShare.gen_ch_key_share(
+        key_share, priv_keys = TTTLS13::Message::Extension::KeyShare.gen_ch_key_share(
           groups
         )
         exs << key_share
 
-        exs
+        [exs, priv_keys]
       end
 
+      # @param ch1 [TTTLS13::Message::ClientHello]
+      # @param hrr [TTTLS13::Message::ServerHello]
+      #
+      # @return [TTTLS13::Message::Extensions]
       def gen_new_ch_extensions(ch1, hrr)
         exs = TTTLS13::Message::Extensions.new
         # key_share
@@ -71,6 +107,9 @@ module EchSpec
         ch1.extensions.merge(exs)
       end
 
+      # @param conf [ECHConfig::ECHConfigContents::HpkeKeyConfig]
+      #
+      # @return [Boolean]
       def select_ech_hpke_cipher_suite(conf)
         TTTLS13::STANDARD_CLIENT_ECH_HPKE_SYMMETRIC_CIPHER_SUITES.find do |cs|
           conf.cipher_suites.include?(cs)
@@ -119,6 +158,8 @@ module EchSpec
 
         # 7.1-10
         Spec7_1_10.validate_ech_with_tls12(hostname, port, echconfigs.first).tap { |x| print_result(x) }
+
+        Spec7_1_13_2_1.valid_ee_retry_configs(hostname, port).tap { |x| print_result(x) }
       end
     end
   end

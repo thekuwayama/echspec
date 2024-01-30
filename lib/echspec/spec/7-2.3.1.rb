@@ -43,9 +43,9 @@ module EchSpec
         #
         # @return [TTTLS13::Message::Record]
         def send_ch_illegal_inner_ech_type(socket, hostname, ech_config)
-          conn = TTTLS13::Connection.new(socket, :client)
+          conn = Connection.new(socket, :client)
           inner_ech = IllegalEchClientHello.new_inner
-          exs = Spec.gen_ch_extensions(hostname)
+          exs, = Spec.gen_ch_extensions(hostname)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
               [
@@ -68,7 +68,7 @@ module EchSpec
               cipher: TTTLS13::Cryptograph::Passer.new
             )
           )
-          recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
+          recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
           recv
         end
 
@@ -78,9 +78,9 @@ module EchSpec
         #
         # @return [TTTLS13::Message::Record]
         def send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
-          conn = TTTLS13::Connection.new(socket, :client)
+          conn = Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
-          exs = Spec.gen_ch_extensions(hostname)
+          exs, = Spec.gen_ch_extensions(hostname)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
               [
@@ -151,7 +151,7 @@ module EchSpec
               cipher: TTTLS13::Cryptograph::Passer.new
             )
           )
-          recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
+          recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
           recv
         end
 

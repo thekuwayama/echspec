@@ -25,9 +25,9 @@ module EchSpec
         end
 
         def send_ch_ech_with_tls12(socket, hostname, ech_config)
-          conn = TTTLS13::Connection.new(socket, :client)
+          conn = Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
-          exs = Spec.gen_ch_extensions(hostname)
+          exs, = Spec.gen_ch_extensions(hostname)
           # supported_versions: only TLS 1.2
           versions = TTTLS13::Message::Extension::SupportedVersions.new(
             msg_type: TTTLS13::Message::HandshakeType::CLIENT_HELLO,
@@ -55,7 +55,7 @@ module EchSpec
               cipher: TTTLS13::Cryptograph::Passer.new
             )
           )
-          recv, = conn.recv_record(TTTLS13::Cryptograph::Passer.new)
+          recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
           recv
         end
       end
