@@ -31,6 +31,8 @@ module EchSpec
     end
 
     class << self
+      using Refinements
+
       # @param record [TTTLS13::Message::Record]
       # @param desc [Symbol]
       #
@@ -38,6 +40,16 @@ module EchSpec
       def expect_alert(msg, desc)
         msg.is_a?(TTTLS13::Message::Alert) &&
           msg.description == TTTLS13::Message::ALERT_DESCRIPTION[desc]
+      end
+
+      # @param result [EchSpec::Ok | Err]
+      def print_result(result)
+        case result
+        in Ok(message)
+          puts message.green
+        in Err(message)
+          puts message.red
+        end
       end
 
       # @param hostname [String]
@@ -124,18 +136,6 @@ Dir[File.dirname(__FILE__) + '/spec/*.rb'].sort.each { |f| require f }
 module EchSpec
   module Spec
     class << self
-      using Refinements
-
-      # @param result [EchSpec::Ok | Err]
-      def print_result(result)
-        case result
-        in Ok(message)
-          puts message.green
-        in Err(message)
-          puts message.red
-        end
-      end
-
       # @param fpath [String]
       # @param port [Integer]
       # @param hostname [String]
