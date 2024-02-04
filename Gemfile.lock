@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/thekuwayama/tttls1.3
-  revision: 576500d72c130b0f9f7649d2f9c163315c06b322
-  ref: 576500d
+  revision: 92c88e31e34e094f51633978d118b4a8e3a38c38
+  ref: 92c88e3
   specs:
     tttls1.3 (0.3.1)
       ech_config (~> 0.0.3)
