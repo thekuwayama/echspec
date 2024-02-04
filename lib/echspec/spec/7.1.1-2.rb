@@ -28,9 +28,9 @@ module EchSpec
 
         def send_hrr_missing_ech(socket, hostname, ech_config)
           # send 1st ClientHello
-          conn = Connection.new(socket, :client)
+          conn = TLS13Client::Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
-          exs, = Spec.gen_ch_extensions(hostname)
+          exs, = TLS13Client.gen_ch_extensions(hostname)
           exs.delete(TTTLS13::Message::ExtensionType::KEY_SHARE) # for HRR
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
@@ -45,7 +45,7 @@ module EchSpec
             )
           )
 
-          selector = proc { |x| Spec.select_ech_hpke_cipher_suite(x) }
+          selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
           ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
           conn.send_record(
             TTTLS13::Message::Record.new(
@@ -63,7 +63,7 @@ module EchSpec
           # send 2nd ClientHello without ech
           ch1 = ch
           hrr = recv
-          new_exs = Spec.gen_new_ch_extensions(ch1, hrr)
+          new_exs = TLS13Client.gen_new_ch_extensions(ch1, hrr)
           new_exs.delete(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO)
           ch = TTTLS13::Message::ClientHello.new(
             legacy_version: ch1.legacy_version,

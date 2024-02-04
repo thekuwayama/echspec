@@ -36,9 +36,9 @@ module EchSpec
         # @return [TTTLS13::Message::EncryptedExtensions]
         def send_ch_with_undecryptable_ech(socket, hostname)
           # send ClientHello
-          conn = Connection.new(socket, :client)
+          conn = TLS13Client::Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
-          exs, priv_keys = Spec.gen_ch_extensions(hostname)
+          exs, priv_keys = TLS13Client.gen_ch_extensions(hostname)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
               [

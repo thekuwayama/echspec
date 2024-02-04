@@ -43,9 +43,9 @@ module EchSpec
         #
         # @return [TTTLS13::Message::Record]
         def send_ch_illegal_inner_ech_type(socket, hostname, ech_config)
-          conn = Connection.new(socket, :client)
+          conn = TLS13Client::Connection.new(socket, :client)
           inner_ech = IllegalEchClientHello.new_inner
-          exs, = Spec.gen_ch_extensions(hostname)
+          exs, = TLS13Client.gen_ch_extensions(hostname)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
               [
@@ -59,7 +59,7 @@ module EchSpec
             )
           )
 
-          selector = proc { |x| Spec.select_ech_hpke_cipher_suite(x) }
+          selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
           ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
           conn.send_record(
             TTTLS13::Message::Record.new(
@@ -78,9 +78,9 @@ module EchSpec
         #
         # @return [TTTLS13::Message::Record]
         def send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
-          conn = Connection.new(socket, :client)
+          conn = TLS13Client::Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
-          exs, = Spec.gen_ch_extensions(hostname)
+          exs, = TLS13Client.gen_ch_extensions(hostname)
           inner = TTTLS13::Message::ClientHello.new(
             cipher_suites: TTTLS13::CipherSuites.new(
               [
@@ -95,7 +95,7 @@ module EchSpec
           )
 
           # offer_ech
-          selector = proc { |x| Spec.select_ech_hpke_cipher_suite(x) }
+          selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
 
           # Encrypted ClientHello Configuration
           ech_state, enc = TTTLS13::Ech.encrypted_ech_config(
@@ -154,8 +154,6 @@ module EchSpec
           recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
           recv
         end
-
-        private
 
         ILLEGAL_OUTER = "\x02"
         ILLEGAL_INNER = "\x03"
