@@ -13,12 +13,23 @@ module EchSpec
       end
 
       # @param result [EchSpec::Ok | Err]
-      def print_result(result)
+      def print_summarize(result)
         case result
         in Ok(description)
-          puts "\t" + description.green
+          puts "\t#{description.green}"
         in Err(description, _)
-          puts "\t" + description.red
+          puts "\t#{description.red}"
+        end
+      end
+
+      # @param result [EchSpec::Ok | Err]
+      # @param idx [Integer]
+      def print_failed_details(result, idx)
+        case result
+        in Ok(_)
+        in Err(description, details)
+          puts "\t(#{idx + 1}) #{description}"
+          puts "\t\t#{details}"
         end
       end
     end
@@ -42,13 +53,18 @@ module EchSpec
                      else
                        Spec9.parse_pem(File.open(fpath).read)
                      end
-        Spec9.validate_compliant_echconfigs(echconfigs).tap { |x| print_result(x) }
+        Spec9.validate_compliant_echconfigs(echconfigs).tap { |x| print_summarize(x) }
         ech_config = echconfigs.first
 
         # 7
-        [Spec7_2_3_1, Spec7_1_1_2, Spec7_1_10, Spec7_1_13_2_1]
-          .flat_map { |spec| spec.run(hostname, port, ech_config) }
-          .each { |x| print_result(x) }
+        results = [Spec7_2_3_1, Spec7_1_1_2, Spec7_1_10, Spec7_1_13_2_1]
+                  .flat_map { |spec| spec.run(hostname, port, ech_config) }
+        results.each { |x| print_summarize(x) }
+
+        return if results.all? { |r| r.is_a? Ok }
+
+        puts 'Failures:'
+        results.each.with_index { |r, idx| print_failed_details(r, idx) }
       end
     end
   end
