@@ -10,6 +10,11 @@ module EchSpec
         #
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1-10
 
+        # @return [String]
+        def description
+          'MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below.'
+        end
+
         # @param hostname [String]
         # @param port [Integer]
         # @param ech_config [ECHConfig]
@@ -19,9 +24,9 @@ module EchSpec
           socket = TCPSocket.new(hostname, port)
           recv = send_ch_ech_with_tls12(socket, hostname, ech_config)
           socket.close
-          return Err.new('NG') unless Spec.expect_alert(recv, :illegal_parameter)
+          return Err.new(description, 'NG') unless Spec.expect_alert(recv, :illegal_parameter)
 
-          Ok.new('OK')
+          Ok.new(description)
         end
 
         def send_ch_ech_with_tls12(socket, hostname, ech_config)

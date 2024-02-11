@@ -8,6 +8,11 @@ module EchSpec
         #
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7-2.3.1
 
+        # @return [String]
+        def description
+          'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType.'
+        end
+
         # @param hostname [String]
         # @param port [Integer]
         # @param ech_config [ECHConfig]
@@ -20,18 +25,18 @@ module EchSpec
           recv = send_ch_illegal_inner_ech_type(socket, hostname, ech_config)
           socket.close
           if Spec.expect_alert(recv, :illegal_parameter)
-            res.append(Ok.new('OK'))
+            res.append(Ok.new(description))
           else
-            res.append(Err.new('NG'))
+            res.append(Err.new(description, 'NG'))
           end
 
           socket = TCPSocket.new(hostname, port)
           recv = send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
           socket.close
           if Spec.expect_alert(recv, :illegal_parameter)
-            res.append(Ok.new('OK'))
+            res.append(Ok.new(description))
           else
-            res.append(Err.new('NG'))
+            res.append(Err.new(description, 'NG'))
           end
 
           res

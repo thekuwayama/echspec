@@ -15,10 +15,10 @@ module EchSpec
       # @param result [EchSpec::Ok | Err]
       def print_result(result)
         case result
-        in Ok(message)
-          puts message.green
-        in Err(message)
-          puts message.red
+        in Ok(description)
+          puts "\t" + description.green
+        in Err(description, _)
+          puts "\t" + description.red
         end
       end
     end
@@ -55,7 +55,7 @@ module EchSpec
         Spec7_1_10.validate_ech_with_tls12(hostname, port, ech_config).tap { |x| print_result(x) }
 
         # 7.1-13.2.1
-        Spec7_1_13_2_1.valid_ee_retry_configs(hostname, port).tap { |x| print_result(x) }
+        Spec7_1_13_2_1.validate_ee_retry_configs(hostname, port).tap { |x| print_result(x) }
       end
     end
   end

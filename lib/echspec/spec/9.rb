@@ -12,6 +12,11 @@ module EchSpec
         #
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
 
+        # @return [String]
+        def description
+          'MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.'
+        end
+
         # @param [Array of ECHConfig]
         #
         # @return [EchSpec::Ok | Err]
@@ -22,9 +27,9 @@ module EchSpec
             valid_cipher_suite = kconfig.cipher_suites.any? do |cs|
               cs.kdf_id.uint16 == 0x0001 && cs.aead_id.uint16 == 0x0001
             end
-            return Ok.new('OK') if valid_kem_id && valid_cipher_suite
+            return Ok.new(description) if valid_kem_id && valid_cipher_suite
 
-            Err.new('NG')
+            Err.new(description, 'NG')
           end
         end
 

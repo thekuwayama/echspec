@@ -14,20 +14,25 @@ module EchSpec
         #
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1-13.2.1
 
+        # @return [String]
+        def description
+          'MUST include the "encrypted_client_hello" extension in its EncryptedExtensions with the "retry_configs" field set to one or more ECHConfig.'
+        end
+
         # @param hostname [String]
         # @param port [Integer]
         #
         # @return [EchSpec::Ok | Err]
-        def valid_ee_retry_configs(hostname, port)
+        def validate_ee_retry_configs(hostname, port)
           socket = TCPSocket.new(hostname, port)
           recv = send_ch_with_undecryptable_ech(socket, hostname)
           socket.close
           ex = recv.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
-          return Err.new('NG') \
+          return Err.new(description, 'NG') \
             unless ex.is_a?(TTTLS13::Message::Extension::ECHEncryptedExtensions)
-          return Err.new('NG') if ex.retry_configs.nil? || ex.retry_configs.empty?
+          return Err.new(description, 'NG') if ex.retry_configs.nil? || ex.retry_configs.empty?
 
-          Ok.new('OK')
+          Ok.new(description)
         end
 
         # @param hostname [String]

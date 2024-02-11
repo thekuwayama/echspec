@@ -1,25 +1,27 @@
 module EchSpec
   class Ok
-    attr_accessor :message
+    attr_reader :description
 
-    def initialize(message)
-      @message = message
+    def initialize(description)
+      @description = description
     end
 
     def deconstruct
-      [@message]
+      [@description]
     end
   end
 
   class Err
-    attr_accessor :message
+    attr_reader :description
+    attr_reader :details
 
-    def initialize(message)
-      @message = message
+    def initialize(description, details)
+      @description = description
+      @details = details
     end
 
     def deconstruct
-      [@message]
+      [@description, @details]
     end
   end
 end

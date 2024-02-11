@@ -12,6 +12,11 @@ module EchSpec
         #
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1.1-2
 
+        # @return [String]
+        def description
+          'MUST abort with an "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension.'
+        end
+
         # @param hostname [String]
         # @param port [Integer]
         # @param ech_config [ECHConfig]
@@ -21,9 +26,9 @@ module EchSpec
           socket = TCPSocket.new(hostname, port)
           recv = send_hrr_missing_ech(socket, hostname, ech_config)
           socket.close
-          return Err.new('NG') unless Spec.expect_alert(recv, :missing_extension)
+          return Err.new(description, 'NG') unless Spec.expect_alert(recv, :missing_extension)
 
-          Ok.new('OK')
+          Ok.new(description)
         end
 
         def send_hrr_missing_ech(socket, hostname, ech_config)
