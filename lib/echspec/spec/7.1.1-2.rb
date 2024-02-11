@@ -1,20 +1,21 @@
 module EchSpec
   module Spec
     class Spec7_1_1_2
+      # If the client-facing server accepted ECH, it checks the second
+      # ClientHelloOuter also contains the "encrypted_client_hello"
+      # extension. If not, it MUST abort the handshake with a
+      # "missing_extension" alert. Otherwise, it checks that
+      # ECHClientHello.cipher_suite and ECHClientHello.config_id are
+      # unchanged, and that ECHClientHello.enc is empty. If not, it MUST
+      # abort the handshake with an "illegal_parameter" alert.
+      #
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1.1-2
+      @section = '7.1.1-2'
+      @description = 'MUST abort with an "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension'
       class << self
-        # If the client-facing server accepted ECH, it checks the second
-        # ClientHelloOuter also contains the "encrypted_client_hello"
-        # extension. If not, it MUST abort the handshake with a
-        # "missing_extension" alert. Otherwise, it checks that
-        # ECHClientHello.cipher_suite and ECHClientHello.config_id are
-        # unchanged, and that ECHClientHello.enc is empty. If not, it MUST
-        # abort the handshake with an "illegal_parameter" alert.
-        #
-        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1.1-2
-
         # @return [String]
         def description
-          'MUST abort with an "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension.'
+          "#{@description} [#{@section}]"
         end
 
         # @param hostname [String]

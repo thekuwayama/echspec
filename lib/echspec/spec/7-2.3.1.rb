@@ -1,16 +1,17 @@
 module EchSpec
   module Spec
     class Spec7_2_3_1
+      # * Otherwise, if ECHClientHello.type is not a valid
+      #   ECHClientHelloType, then the server MUST abort with an
+      #   "illegal_parameter" alert.
+      #
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7-2.3.1
+      @section = '7-2.3.1'
+      @description = 'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType'
       class << self
-        # * Otherwise, if ECHClientHello.type is not a valid
-        #   ECHClientHelloType, then the server MUST abort with an
-        #   "illegal_parameter" alert.
-        #
-        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7-2.3.1
-
         # @return [String]
         def description
-          'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType.'
+          "#{@description} [#{@section}]"
         end
 
         # @param hostname [String]

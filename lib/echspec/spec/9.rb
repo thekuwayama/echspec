@@ -1,20 +1,21 @@
 module EchSpec
   module Spec
     class Spec9
+      # In the absence of an application profile standard specifying
+      # otherwise, a compliant ECH application MUST implement the following
+      # HPKE cipher suite:
+      #
+      # * KEM: DHKEM(X25519, HKDF-SHA256) (see Section 7.1 of [HPKE])
+      # * KDF: HKDF-SHA256 (see Section 7.2 of [HPKE])
+      # * AEAD: AES-128-GCM (see Section 7.3 of [HPKE])
+      #
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
+      @section = '9'
+      @description = 'MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.'
       class << self
-        # In the absence of an application profile standard specifying
-        # otherwise, a compliant ECH application MUST implement the following
-        # HPKE cipher suite:
-        #
-        # * KEM: DHKEM(X25519, HKDF-SHA256) (see Section 7.1 of [HPKE])
-        # * KDF: HKDF-SHA256 (see Section 7.2 of [HPKE])
-        # * AEAD: AES-128-GCM (see Section 7.3 of [HPKE])
-        #
-        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
-
         # @return [String]
         def description
-          'MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.'
+          "#{@description} [#{@section}]"
         end
 
         # @param [Array of ECHConfig]

@@ -1,18 +1,19 @@
 module EchSpec
   module Spec
     class Spec7_1_10
+      # Upon determining the ClientHelloInner, the client-facing server
+      # checks that the message includes a well-formed
+      # "encrypted_client_hello" extension of type inner and that it does not
+      # offer TLS 1.2 or below. If either of these checks fails, the client-
+      # facing server MUST abort with an "illegal_parameter" alert.
+      #
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1-10
+      @section = '7.1-10'
+      @description = 'MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below'
       class << self
-        # Upon determining the ClientHelloInner, the client-facing server
-        # checks that the message includes a well-formed
-        # "encrypted_client_hello" extension of type inner and that it does not
-        # offer TLS 1.2 or below. If either of these checks fails, the client-
-        # facing server MUST abort with an "illegal_parameter" alert.
-        #
-        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1-10
-
         # @return [String]
         def description
-          'MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below.'
+          "#{@description} [#{@section}]"
         end
 
         # @param hostname [String]
