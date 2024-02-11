@@ -21,6 +21,15 @@ module EchSpec
 
         # @param hostname [String]
         # @param port [Integer]
+        # @param _
+        #
+        # @return [Array of EchSpec::Ok | Err]
+        def run(hostname, port, _)
+          [validate_ee_retry_configs(hostname, port)]
+        end
+
+        # @param hostname [String]
+        # @param port [Integer]
         #
         # @return [EchSpec::Ok | Err]
         def validate_ee_retry_configs(hostname, port)

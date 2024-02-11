@@ -19,6 +19,15 @@ module EchSpec
         # @param port [Integer]
         # @param ech_config [ECHConfig]
         #
+        # @return [Array of EchSpec::Ok | Err]
+        def run(hostname, port, ech_config)
+          [validate_ech_with_tls12(hostname, port, ech_config)]
+        end
+
+        # @param hostname [String]
+        # @param port [Integer]
+        # @param ech_config [ECHConfig]
+        #
         # @return [EchSpec::Ok | Err]
         def validate_ech_with_tls12(hostname, port, ech_config)
           socket = TCPSocket.new(hostname, port)

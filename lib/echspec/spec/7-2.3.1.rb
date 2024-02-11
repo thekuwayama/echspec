@@ -18,6 +18,15 @@ module EchSpec
         # @param ech_config [ECHConfig]
         #
         # @return [Array of EchSpec::Ok | Err]
+        def run(hostname, port, ech_config)
+          validate_illegal_ech_type(hostname, port, ech_config)
+        end
+
+        # @param hostname [String]
+        # @param port [Integer]
+        # @param ech_config [ECHConfig]
+        #
+        # @return [Array of EchSpec::Ok | Err]
         def validate_illegal_ech_type(hostname, port, ech_config)
           res = []
 

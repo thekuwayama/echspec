@@ -45,17 +45,10 @@ module EchSpec
         Spec9.validate_compliant_echconfigs(echconfigs).tap { |x| print_result(x) }
         ech_config = echconfigs.first
 
-        # 7-2.3.1
-        Spec7_2_3_1.validate_illegal_ech_type(hostname, port, ech_config).each { |x| print_result(x) }
-
-        # 7.1.1-2
-        Spec7_1_1_2.validate_hrr_missing_ech(hostname, port, ech_config).tap { |x| print_result(x) }
-
-        # 7.1-10
-        Spec7_1_10.validate_ech_with_tls12(hostname, port, ech_config).tap { |x| print_result(x) }
-
-        # 7.1-13.2.1
-        Spec7_1_13_2_1.validate_ee_retry_configs(hostname, port).tap { |x| print_result(x) }
+        # 7
+        [Spec7_2_3_1, Spec7_1_1_2, Spec7_1_10, Spec7_1_13_2_1]
+          .flat_map { |spec| spec.run(hostname, port, ech_config) }
+          .each { |x| print_result(x) }
       end
     end
   end
