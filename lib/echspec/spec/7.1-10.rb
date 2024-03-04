@@ -34,9 +34,9 @@ module EchSpec
           socket = TCPSocket.new(hostname, port)
           recv = send_ch_ech_with_tls12(socket, hostname, ech_config)
           socket.close
-          return Err.new(description, 'NG') unless Spec.expect_alert(recv, :illegal_parameter)
+          return Err.new('NG') unless Spec.expect_alert(recv, :illegal_parameter)
 
-          Ok.new(description)
+          Ok.new(nil)
         end
 
         def send_ch_ech_with_tls12(socket, hostname, ech_config)

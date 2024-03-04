@@ -36,9 +36,9 @@ module EchSpec
           socket = TCPSocket.new(hostname, port)
           recv = send_hrr_missing_ech(socket, hostname, ech_config)
           socket.close
-          return Err.new(description, 'NG') unless Spec.expect_alert(recv, :missing_extension)
+          return Err.new('NG') unless Spec.expect_alert(recv, :missing_extension)
 
-          Ok.new(description)
+          Ok.new(nil)
         end
 
         def send_hrr_missing_ech(socket, hostname, ech_config)

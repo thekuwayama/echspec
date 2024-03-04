@@ -13,22 +13,25 @@ module EchSpec
       end
 
       # @param result [EchSpec::Ok | Err]
-      def print_summarize(result)
+      # @param desc [String]
+      def print_summarize(result, desc)
         case result
-        in Ok(description)
-          puts "\t#{description.green}"
-        in Err(description, _)
-          puts "\t#{description.red}"
+        in Ok(_)
+          puts "\t#{desc.green}"
+        in Err(_)
+          puts "\t#{desc.red}"
         end
       end
 
       # @param result [EchSpec::Ok | Err]
       # @param idx [Integer]
-      def print_failed_details(result, idx)
+      # @param desc [String]
+      def print_failed_details(result, idx, desc)
         case result
         in Ok(_)
-        in Err(description, details)
-          puts "\t(#{idx + 1}) #{description}"
+          return
+        in Err(details)
+          puts "\t(#{idx + 1}) #{desc}"
           puts "\t\t#{details}"
         end
       end
@@ -53,18 +56,30 @@ module EchSpec
                      else
                        Spec9.parse_pem(File.open(fpath).read)
                      end
-        Spec9.validate_compliant_echconfigs(echconfigs).tap { |x| print_summarize(x) }
-        ech_config = echconfigs.first
+        result = Spec9.validate_compliant_echconfigs(echconfigs)
+        result.tap { |r| print_summarize(r, Spec9.description) }
+        ech_config = nil
+        if result.is_a? Ok
+          ech_config = result.obj
+        else
+          puts "\t\t#{result.details}"
+          return
+        end
 
         # 7
-        results = [Spec7_2_3_1, Spec7_1_1_2, Spec7_1_10, Spec7_1_13_2_1]
-                  .flat_map { |spec| spec.run(hostname, port, ech_config) }
-        results.each { |x| print_summarize(x) }
+        specs = [Spec7_2_3_1, Spec7_1_1_2, Spec7_1_10, Spec7_1_13_2_1]
+        results = specs.flat_map do |spec|
+          desc = spec.description
+          spec.run(hostname, port, ech_config).map do |r|
+            { result: r, desc: desc }
+          end
+        end
 
-        return if results.all? { |r| r.is_a? Ok }
+        results.each { |h| print_summarize(h[:result], h[:desc]) }
+        return if results.all? { |h| h[:result].is_a? Ok }
 
         puts 'Failures:'
-        results.each.with_index { |r, idx| print_failed_details(r, idx) }
+        results.each.with_index { |h, idx| print_failed_details(h[:result], idx, h[:desc]) }
       end
     end
   end

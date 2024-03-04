@@ -38,11 +38,11 @@ module EchSpec
           recv = send_ch_with_undecryptable_ech(socket, hostname)
           socket.close
           ex = recv.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
-          return Err.new(description, 'NG') \
+          return Err.new('NG') \
             unless ex.is_a?(TTTLS13::Message::Extension::ECHEncryptedExtensions)
-          return Err.new(description, 'NG') if ex.retry_configs.nil? || ex.retry_configs.empty?
+          return Err.new('NG') if ex.retry_configs.nil? || ex.retry_configs.empty?
 
-          Ok.new(description)
+          Ok.new(nil)
         end
 
         # @param hostname [String]

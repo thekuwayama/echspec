@@ -1,27 +1,25 @@
 module EchSpec
   class Ok
-    attr_reader :description
+    attr_reader :obj
 
-    def initialize(description)
-      @description = description
+    def initialize(obj)
+      @obj = obj
     end
 
     def deconstruct
-      [@description]
+      [@obj]
     end
   end
 
   class Err
-    attr_reader :description
     attr_reader :details
 
-    def initialize(description, details)
-      @description = description
+    def initialize(details)
       @details = details
     end
 
     def deconstruct
-      [@description, @details]
+      [@details]
     end
   end
 end

@@ -35,18 +35,18 @@ module EchSpec
           recv = send_ch_illegal_inner_ech_type(socket, hostname, ech_config)
           socket.close
           if Spec.expect_alert(recv, :illegal_parameter)
-            res.append(Ok.new(description))
+            res.append(Ok.new(nil))
           else
-            res.append(Err.new(description, 'NG'))
+            res.append(Err.new('NG'))
           end
 
           socket = TCPSocket.new(hostname, port)
           recv = send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
           socket.close
           if Spec.expect_alert(recv, :illegal_parameter)
-            res.append(Ok.new(description))
+            res.append(Ok.new(nil))
           else
-            res.append(Err.new(description, 'NG'))
+            res.append(Err.new('NG'))
           end
 
           res

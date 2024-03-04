@@ -22,8 +22,7 @@ module EchSpec
         #
         # @return [EchSpec::Ok | Err]
         def validate_compliant_echconfigs(echconfigs)
-          return Ok.new(description) \
-            if echconfigs.any? do |c|
+          ech_config = echconfigs.find do |c|
             kconfig = c.echconfig_contents.key_config
             valid_kem_id = kconfig.kem_id.uint16 == 0x0020
             valid_cipher_suite = kconfig.cipher_suites.any? do |cs|
@@ -32,8 +31,9 @@ module EchSpec
 
             valid_kem_id && valid_cipher_suite
           end
+          return Ok.new(ech_config) unless ech_config.nil?
 
-          Err.new(description, 'NG')
+          Err.new('NG')
         end
 
         # @param hostname [String]
