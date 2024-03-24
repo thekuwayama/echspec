@@ -6,7 +6,7 @@ module EchSpec
       # default value
       fpath = nil
       port = 443
-      force_compliant = false
+      force_compliant = true
 
       op.on(
         '-f',
@@ -25,10 +25,11 @@ module EchSpec
       end
 
       op.on(
-        '--force-compliant-ech-config',
-        'force compliant ECHConfig         (default false)'
+        '-n',
+        '--no-force-compliant-ech-config',
+        'not force compliant ECHConfig     (default false)'
       ) do
-        force_compliant = true
+        force_compliant = false
       end
 
       op.banner += ' name'

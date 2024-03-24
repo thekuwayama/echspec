@@ -10,7 +10,14 @@ module EchSpec
       # * AEAD: AES-128-GCM (see Section 7.3 of [HPKE])
       #
       # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
+      @section = '9'
+      @description = 'MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.'
       class << self
+        # @return [String]
+        def description
+          "#{@description} [#{@section}]"
+        end
+
         # @param fpath [String]
         # @param hostname [String]
         # @param force_compliant [Boolean]
