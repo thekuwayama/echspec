@@ -71,9 +71,12 @@ module EchSpec
               hostname,
               Resolv::DNS::Resource::IN::HTTPS
             )
-          rescue ResolvError => e
+          rescue Resolv::ResolvError => e
             return Err.new(e.message)
           end
+
+          return Err.new('HTTPS resource record does NOT have ech SvcParams') \
+            if rr.svc_params['ech'].nil?
 
           Ok.new(rr.svc_params['ech'].echconfiglist)
         end

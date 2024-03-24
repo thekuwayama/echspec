@@ -52,10 +52,9 @@ module EchSpec
         TTTLS13::Logging.logger.level = Logger::WARN
 
         # 9
-        result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
-        result.tap { |r| print_summarize(r, Spec9.description) }
-        case result
+        case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
         in Ok(obj)
+          result.tap { |r| print_summarize(r, Spec9.description) }
           ech_config = obj
         in Err(details)
           puts "\t\t#{details}"
