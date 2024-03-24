@@ -1,14 +1,3 @@
-GIT
-  remote: https://github.com/thekuwayama/tttls1.3
-  revision: 92c88e31e34e094f51633978d118b4a8e3a38c38
-  ref: 92c88e3
-  specs:
-    tttls1.3 (0.3.1)
-      ech_config (~> 0.0.3)
-      hpke
-      logger
-      openssl
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -18,9 +7,14 @@ GEM
       openssl (~> 3.0.0)
     logger (1.6.0)
     openssl (3.0.2)
-    sorbet-runtime (0.5.11178)
+    sorbet-runtime (0.5.11305)
     svcb_rr_patch (0.0.6)
       ech_config
+    tttls1.3 (0.3.2)
+      ech_config (~> 0.0.3)
+      hpke
+      logger
+      openssl
 
 PLATFORMS
   arm64-darwin-23
@@ -28,7 +22,7 @@ PLATFORMS
 DEPENDENCIES
   openssl
   svcb_rr_patch
-  tttls1.3!
+  tttls1.3
 
 BUNDLED WITH
    2.4.22
