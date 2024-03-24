@@ -26,14 +26,15 @@ module EchSpec
           result = if fpath.nil?
                      resolve_ech_configs(hostname)
                    else
-                     Spec9.parse_pem(File.open(fpath).read)
+                     parse_pem(File.open(fpath).read)
                    end
+
           ech_configs = case result
-                       in Ok(ech_configs)
-                         ech_configs
-                       in Err(details)
-                         return result
-                       end
+                        in Ok(ech_configs)
+                          ech_configs
+                        in Err(details)
+                          return result
+                        end
 
           validate_compliant_ech_configs(ech_configs)
         end
