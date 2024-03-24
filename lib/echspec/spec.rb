@@ -51,18 +51,13 @@ module EchSpec
         TTTLS13::Logging.logger.level = Logger::WARN
 
         # 9
-        echconfigs = if fpath.nil?
-                       Spec9.resolve_echconfigs(hostname)
-                     else
-                       Spec9.parse_pem(File.open(fpath).read)
-                     end
-        result = Spec9.validate_compliant_echconfigs(echconfigs)
+        result = Spec9.try_get_ech_config(fpath, hostname)
         result.tap { |r| print_summarize(r, Spec9.description) }
-        ech_config = nil
-        if result.is_a? Ok
-          ech_config = result.obj
-        else
-          puts "\t\t#{result.details}"
+        case result
+        in Ok(obj)
+          ech_config = obj
+        in Err(details)
+          puts "\t\t#{details}"
           return
         end
 
