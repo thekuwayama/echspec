@@ -26,8 +26,8 @@ module EchSpec
 
       op.on(
         '-n',
-        '--no-force-compliant-ech-config',
-        'not force compliant ECHConfig     (default false)'
+        '--not-force-compliant-hpke',
+        'not force compliant ECHConfig HPKE cipher suite'
       ) do
         force_compliant = false
       end
