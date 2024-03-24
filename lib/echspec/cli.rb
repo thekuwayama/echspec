@@ -6,6 +6,7 @@ module EchSpec
       # default value
       fpath = nil
       port = 443
+      force_compliant = false
 
       op.on(
         '-f',
@@ -21,6 +22,13 @@ module EchSpec
         'the name server port number       (default 443)'
       ) do |v|
         port = v
+      end
+
+      op.on(
+        '--force-compliant-ech-config',
+        'force compliant ECHConfig         (default false)'
+      ) do
+        force_compliant = true
       end
 
       op.banner += ' name'
@@ -43,12 +51,12 @@ module EchSpec
         exit 1
       end
 
-      [fpath, port, args[0]]
+      [fpath, port, force_compliant, args[0]]
     end
 
     def run
-      fpath, port, name = parse_options
-      Spec.run(fpath, port, name)
+      fpath, port, force_compliant, name = parse_options
+      Spec.run(fpath, port, name, force_compliant)
     end
   end
 end

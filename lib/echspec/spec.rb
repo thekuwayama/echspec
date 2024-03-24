@@ -47,13 +47,12 @@ module EchSpec
       # @param fpath [String]
       # @param port [Integer]
       # @param hostname [String]
-      def run(fpath, port, hostname)
+      # @param force_compliant [Boolean]
+      def run(fpath, port, hostname, force_compliant)
         TTTLS13::Logging.logger.level = Logger::WARN
 
         # 9
-        result = Spec9.try_get_ech_config(fpath, hostname)
-        result.tap { |r| print_summarize(r, Spec9.description) }
-        case result
+        case Spec9.try_get_ech_config(fpath, hostname, force_compliant)
         in Ok(obj)
           ech_config = obj
         in Err(details)

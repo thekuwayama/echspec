@@ -10,19 +10,13 @@ module EchSpec
       # * AEAD: AES-128-GCM (see Section 7.3 of [HPKE])
       #
       # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
-      @section = '9'
-      @description = 'MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.'
       class << self
-        # @return [String]
-        def description
-          "#{@description} [#{@section}]"
-        end
-
         # @param fpath [String]
         # @param hostname [String]
+        # @param force_compliant [Boolean]
         #
         # @return [EchSpec::Ok<ECHConfig> | Err]
-        def try_get_ech_config(fpath, hostname)
+        def try_get_ech_config(fpath, hostname, force_compliant)
           result = if fpath.nil?
                      resolve_ech_configs(hostname)
                    else
@@ -36,7 +30,11 @@ module EchSpec
                           return result
                         end
 
-          validate_compliant_ech_configs(ech_configs)
+          if force_compliant
+            validate_compliant_ech_configs(ech_configs)
+          else
+            Ok.new(ech_configs.first)
+          end
         end
 
         # @param [Array of ECHConfig]
@@ -54,7 +52,7 @@ module EchSpec
           end
           return Ok.new(ech_config) unless ech_config.nil?
 
-          Err.new('EchConfigs does not include HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.')
+          Err.new('EchConfigs does NOT include HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.')
         end
 
         # @param hostname [String]
