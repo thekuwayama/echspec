@@ -29,27 +29,17 @@ module EchSpec
         #
         # @return [Array of EchSpec::Ok | Err]
         def validate_illegal_ech_type(hostname, port, ech_config)
-          res = []
-
-          socket = TCPSocket.new(hostname, port)
-          recv = send_ch_illegal_inner_ech_type(socket, hostname, ech_config)
-          socket.close
-          if Spec.expect_alert(recv, :illegal_parameter)
-            res.append(Ok.new(nil))
-          else
-            res.append(Err.new('NG'))
+          fns = [method(:send_ch_illegal_inner_ech_type), method(:send_ch_illegal_outer_ech_type)]
+          fns.map do |fn|
+            socket = TCPSocket.new(hostname, port)
+            recv = fn.call(socket, hostname, ech_config)
+            socket.close
+            if Spec.expect_alert(recv, :illegal_parameter)
+              Ok.new(nil)
+            else
+              Err.new('did not send expected alert: illegal_parameter')
+            end
           end
-
-          socket = TCPSocket.new(hostname, port)
-          recv = send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
-          socket.close
-          if Spec.expect_alert(recv, :illegal_parameter)
-            res.append(Ok.new(nil))
-          else
-            res.append(Err.new('NG'))
-          end
-
-          res
         rescue Timeout::Error
           [Err.new("#{hostname}:#{port} connection timeout")]
         rescue Errno::ECONNREFUSED
