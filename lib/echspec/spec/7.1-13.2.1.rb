@@ -43,6 +43,10 @@ module EchSpec
           return Err.new('NG') if ex.retry_configs.nil? || ex.retry_configs.empty?
 
           Ok.new(nil)
+        rescue Timeout::Error
+          Err.new("#{hostname}:#{port} connection timeout")
+        rescue Errno::ECONNREFUSED
+          Err.new("#{hostname}:#{port} connection refused")
         end
 
         # @param hostname [String]

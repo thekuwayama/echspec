@@ -37,6 +37,10 @@ module EchSpec
           return Err.new('NG') unless Spec.expect_alert(recv, :illegal_parameter)
 
           Ok.new(nil)
+        rescue Timeout::Error
+          Err.new("#{hostname}:#{port} connection timeout")
+        rescue Errno::ECONNREFUSED
+          Err.new("#{hostname}:#{port} connection refused")
         end
 
         def send_ch_ech_with_tls12(socket, hostname, ech_config)

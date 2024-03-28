@@ -1,6 +1,7 @@
 require 'optparse'
 require 'resolv'
 require 'svcb_rr_patch'
+require 'timeout'
 require 'tttls1.3'
 
 require 'echspec/version'

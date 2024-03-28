@@ -50,6 +50,10 @@ module EchSpec
           end
 
           res
+        rescue Timeout::Error
+          [Err.new("#{hostname}:#{port} connection timeout")]
+        rescue Errno::ECONNREFUSED
+          [Err.new("#{hostname}:#{port} connection refused")]
         end
 
         # @param socket [TCPSocket]

@@ -39,6 +39,10 @@ module EchSpec
           return Err.new('NG') unless Spec.expect_alert(recv, :missing_extension)
 
           Ok.new(nil)
+        rescue Timeout::Error
+          Err.new("#{hostname}:#{port} connection timeout")
+        rescue Errno::ECONNREFUSED
+          Err.new("#{hostname}:#{port} connection refused")
         end
 
         def send_hrr_missing_ech(socket, hostname, ech_config)
