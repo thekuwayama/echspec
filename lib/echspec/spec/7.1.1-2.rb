@@ -36,7 +36,8 @@ module EchSpec
           socket = TCPSocket.new(hostname, port)
           recv = send_hrr_missing_ech(socket, hostname, ech_config)
           socket.close
-          return Err.new('NG') unless Spec.expect_alert(recv, :missing_extension)
+          return Err.new('did not send expected alert: missing_extension') \
+            unless Spec.expect_alert(recv, :missing_extension)
 
           Ok.new(nil)
         rescue Timeout::Error
