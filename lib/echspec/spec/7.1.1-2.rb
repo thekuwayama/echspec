@@ -24,7 +24,7 @@ module EchSpec
         #
         # @return [Array of EchSpec::Ok | Err]
         def run(hostname, port, ech_config)
-          [validate_hrr_missing_ech(hostname, port, ech_config)]
+          [validate_2nd_ch_missing_ech(hostname, port, ech_config)]
         end
 
         # @param hostname [String]
@@ -32,9 +32,9 @@ module EchSpec
         # @param ech_config [ECHConfig]
         #
         # @return [EchSpec::Ok | Err]
-        def validate_hrr_missing_ech(hostname, port, ech_config)
+        def validate_2nd_ch_missing_ech(hostname, port, ech_config)
           socket = TCPSocket.new(hostname, port)
-          recv = send_hrr_missing_ech(socket, hostname, ech_config)
+          recv = send_2nd_ch_missing_ech(socket, hostname, ech_config)
           socket.close
           return Err.new('did not send expected alert: missing_extension') \
             unless Spec.expect_alert(recv, :missing_extension)
@@ -46,7 +46,7 @@ module EchSpec
           Err.new("#{hostname}:#{port} connection refused")
         end
 
-        def send_hrr_missing_ech(socket, hostname, ech_config)
+        def send_2nd_ch_missing_ech(socket, hostname, ech_config)
           # send 1st ClientHello
           conn = TLS13Client::Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
