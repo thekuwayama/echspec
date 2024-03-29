@@ -74,7 +74,9 @@ module EchSpec
         return if results.all? { |h| h[:result].is_a? Ok }
 
         puts 'Failures:'
-        results.each.with_index { |h, idx| print_failed_details(h[:result], idx, h[:desc]) }
+        results.filter { |h| h[:result].is_a? Err }
+               .each
+               .with_index { |h, idx| print_failed_details(h[:result], idx, h[:desc]) }
       end
     end
   end
