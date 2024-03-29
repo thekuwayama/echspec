@@ -38,9 +38,10 @@ module EchSpec
           recv = send_ch_with_undecryptable_ech(socket, hostname)
           socket.close
           ex = recv.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
-          return Err.new('NG') \
+          return Err.new('did not send expected alert: encrypted_client_hello') \
             unless ex.is_a?(TTTLS13::Message::Extension::ECHEncryptedExtensions)
-          return Err.new('NG') if ex.retry_configs.nil? || ex.retry_configs.empty?
+          return Err.new('ECHConfigs did not have "retry_configs"') \
+            if ex.retry_configs.nil? || ex.retry_configs.empty?
 
           Ok.new(nil)
         rescue Timeout::Error
