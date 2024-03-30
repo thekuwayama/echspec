@@ -46,12 +46,10 @@ module EchSpec
           Err.new("#{hostname}:#{port} connection timeout")
         rescue Errno::ECONNREFUSED
           Err.new("#{hostname}:#{port} connection refused")
+        rescue Error::BeforeTargetSituationError => e
+          Err.new(e.message)
         end
 
-        # @param hostname [String]
-        # @param port [Integer]
-        #
-        # @return [TTTLS13::Message::EncryptedExtensions]
         def send_ch_with_undecryptable_ech(socket, hostname)
           # send ClientHello
           conn = TLS13Client::Connection.new(socket, :client)
@@ -80,7 +78,7 @@ module EchSpec
 
           # receive ServerHello
           recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
-          raise 'not received ServerHello' \
+          raise Error::BeforeTargetSituationError, 'not received ServerHello' \
             if !recv.is_a?(TTTLS13::Message::ServerHello) || recv.hrr?
 
           # receive EncryptedExtensions
@@ -109,7 +107,7 @@ module EchSpec
           recv, = conn.recv_message(hs_rcipher)
           recv, = conn.recv_message(hs_rcipher) \
             if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
-          raise 'not received EncryptedExtensions' \
+          raise BeforeTargetSituationError 'not received EncryptedExtensions' \
             unless recv.is_a?(TTTLS13::Message::EncryptedExtensions)
 
           recv

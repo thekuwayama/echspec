@@ -45,6 +45,8 @@ module EchSpec
           Err.new("#{hostname}:#{port} connection timeout")
         rescue Errno::ECONNREFUSED
           Err.new("#{hostname}:#{port} connection refused")
+        rescue Error::BeforeTargetSituationError => e
+          Err.new(e.message)
         end
 
         # @param hostname [String]
@@ -64,6 +66,8 @@ module EchSpec
           Err.new("#{hostname}:#{port} connection timeout")
         rescue Errno::ECONNREFUSED
           Err.new("#{hostname}:#{port} connection refused")
+        rescue Error::BeforeTargetSituationError => e
+          Err.new(e.message)
         end
 
         def recv_hrr(socket, hostname, ech_config)
@@ -97,7 +101,7 @@ module EchSpec
 
           # receive HelloRetryRequest
           recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
-          raise 'not received HelloRetryRequest' \
+          raise Error::BeforeTargetSituationError, 'not received HelloRetryRequest' \
             unless recv.hrr?
 
           [conn, ch, recv]
