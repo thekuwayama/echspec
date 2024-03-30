@@ -36,6 +36,15 @@ module EchSpec
         end
       end
 
+      # @param socket [TCPSocket]
+      # @param hostname [String]
+      # @param ech_config [ECHConfig]
+      #
+      # @raise [EchSpec::Error::BeforeTargetSituationError]
+      #
+      # @return [EchSpec::TLS13Client::Connection]
+      # @return [TTTLS13::Message::ClientHello]
+      # @return [TTTLS13::Message::ServerHello] HelloRetryRequest
       def recv_hrr(socket, hostname, ech_config)
         # send 1st ClientHello
         conn = TLS13Client::Connection.new(socket, :client)
