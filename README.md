@@ -5,7 +5,7 @@ $ bundle install
 ```
 
 ```bash
-$ bundle exec ruby exe/echspec -f spec/fixtures/echconfigs.pem -p 4433 localhost
+$ bundle exec ruby exe/echspec -f fixtures/echconfigs.pem -p 4433 localhost
 ```
 
 ```bash
