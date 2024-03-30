@@ -33,7 +33,7 @@ module EchSpec
         # @return [EchSpec::Ok | Err]
         def validate_ee_retry_configs(hostname, port, _)
           socket = TCPSocket.new(hostname, port)
-          recv = send_ch_with_undecryptable_ech(socket, hostname)
+          recv = send_ch_with_greased_ech(socket, hostname)
           socket.close
           ex = recv.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
           return Err.new('did not send expected alert: encrypted_client_hello') \
@@ -50,7 +50,7 @@ module EchSpec
           Err.new(e.message)
         end
 
-        def send_ch_with_undecryptable_ech(socket, hostname)
+        def send_ch_with_greased_ech(socket, hostname)
           # send ClientHello
           conn = TLS13Client::Connection.new(socket, :client)
           inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
