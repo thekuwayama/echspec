@@ -17,7 +17,7 @@ module EchSpec
             '7.1.1-2',
             [
               SpecCase.new(
-                'MUST abort with an "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension',
+                'MUST abort with a "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension',
                 method(:validate_2nd_ch_missing_ech)
               ),
               SpecCase.new(
