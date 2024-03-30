@@ -70,45 +70,8 @@ module EchSpec
           Err.new(e.message)
         end
 
-        def recv_hrr(socket, hostname, ech_config)
-          # send 1st ClientHello
-          conn = TLS13Client::Connection.new(socket, :client)
-          inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
-          exs, = TLS13Client.gen_ch_extensions(hostname)
-          exs.delete(TTTLS13::Message::ExtensionType::KEY_SHARE) # for HRR
-          inner = TTTLS13::Message::ClientHello.new(
-            cipher_suites: TTTLS13::CipherSuites.new(
-              [
-                TTTLS13::CipherSuite::TLS_AES_256_GCM_SHA384,
-                TTTLS13::CipherSuite::TLS_CHACHA20_POLY1305_SHA256,
-                TTTLS13::CipherSuite::TLS_AES_128_GCM_SHA256
-              ]
-            ),
-            extensions: exs.merge(
-              TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
-            )
-          )
-
-          selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
-          ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
-          conn.send_record(
-            TTTLS13::Message::Record.new(
-              type: TTTLS13::Message::ContentType::HANDSHAKE,
-              messages: [ch],
-              cipher: TTTLS13::Cryptograph::Passer.new
-            )
-          )
-
-          # receive HelloRetryRequest
-          recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
-          raise Error::BeforeTargetSituationError, 'not received HelloRetryRequest' \
-            unless recv.hrr?
-
-          [conn, ch, recv]
-        end
-
         def send_2nd_ch_missing_ech(socket, hostname, ech_config)
-          conn, ch1, hrr = recv_hrr(socket, hostname, ech_config)
+          conn, ch1, hrr = Spec.recv_hrr(socket, hostname, ech_config)
           # send 2nd ClientHello without ech
           new_exs = TLS13Client.gen_new_ch_extensions(ch1, hrr)
           new_exs.delete(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO)
@@ -135,7 +98,7 @@ module EchSpec
         end
 
         def send_2nd_ch_unchanged_ech(socket, hostname, ech_config)
-          conn, ch1, hrr = recv_hrr(socket, hostname, ech_config)
+          conn, ch1, hrr = Spec.recv_hrr(socket, hostname, ech_config)
           # send 2nd ClientHello with unchanged ech
           new_exs = TLS13Client.gen_new_ch_extensions(ch1, hrr)
           new_exs[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO] =
