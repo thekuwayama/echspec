@@ -6,44 +6,71 @@ module EchSpec
       #   "illegal_parameter" alert.
       #
       # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7-2.3.1
-      @section = '7-2.3.1'
-      @description = 'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType'
       class << self
-        # @return [String]
-        def description
-          "#{@description} [#{@section}]"
+        # @return [SpecGroup]
+        def spec_group
+          SpecGroup.new(
+            '7-2.3.1',
+            [
+              SpecCase.new(
+                'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloInner',
+                method(:validate_illegal_inner_ech_type)
+              ),
+              SpecCase.new(
+                'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloOuter',
+                method(:validate_illegal_outer_ech_type)
+              )
+            ]
+          )
         end
 
         # @param hostname [String]
         # @param port [Integer]
         # @param ech_config [ECHConfig]
         #
-        # @return [Array of EchSpec::Ok | Err]
-        def run(hostname, port, ech_config)
-          validate_illegal_ech_type(hostname, port, ech_config)
+        # @return [EchSpec::Ok | Err]
+        def validate_illegal_inner_ech_type(hostname, port, ech_config)
+          do_validate_illegal_ech_type(
+            hostname,
+            port,
+            ech_config,
+            method(:send_ch_illegal_inner_ech_type)
+          )
         end
 
         # @param hostname [String]
         # @param port [Integer]
         # @param ech_config [ECHConfig]
         #
-        # @return [Array of EchSpec::Ok | Err]
-        def validate_illegal_ech_type(hostname, port, ech_config)
-          fns = [method(:send_ch_illegal_inner_ech_type), method(:send_ch_illegal_outer_ech_type)]
-          fns.map do |fn|
-            socket = TCPSocket.new(hostname, port)
-            recv = fn.call(socket, hostname, ech_config)
-            socket.close
-            if Spec.expect_alert(recv, :illegal_parameter)
-              Ok.new(nil)
-            else
-              Err.new('did not send expected alert: illegal_parameter')
-            end
+        # @return [EchSpec::Ok | Err]
+        def validate_illegal_outer_ech_type(hostname, port, ech_config)
+          do_validate_illegal_ech_type(
+            hostname,
+            port,
+            ech_config,
+            method(:send_ch_illegal_outer_ech_type)
+          )
+        end
+
+        # @param hostname [String]
+        # @param port [Integer]
+        # @param ech_config [ECHConfig]
+        # @param method [Method]
+        #
+        # @return [EchSpec::Ok | Err]
+        def do_validate_illegal_ech_type(hostname, port, ech_config, method)
+          socket = TCPSocket.new(hostname, port)
+          recv = method.call(socket, hostname, ech_config)
+          socket.close
+          if Spec.expect_alert(recv, :illegal_parameter)
+            Ok.new(nil)
+          else
+            Err.new('did not send expected alert: illegal_parameter')
           end
         rescue Timeout::Error
-          [Err.new("#{hostname}:#{port} connection timeout")]
+          Err.new("#{hostname}:#{port} connection timeout")
         rescue Errno::ECONNREFUSED
-          [Err.new("#{hostname}:#{port} connection refused")]
+          Err.new("#{hostname}:#{port} connection refused")
         end
 
         # @param socket [TCPSocket]

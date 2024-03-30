@@ -12,28 +12,26 @@ module EchSpec
       #   structures with up-to-date keys.
       #
       # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1-13.2.1
-      @section = '7.1-13.2.1'
-      @description = 'MUST include the "encrypted_client_hello" extension in its EncryptedExtensions with the "retry_configs" field set to one or more ECHConfig'
       class << self
-        # @return [String]
-        def description
-          "#{@description} [#{@section}]"
+        # @return [SpecGroup]
+        def spec_group
+          SpecGroup.new(
+            '7.1-13.2.1',
+            [
+              SpecCase.new(
+                'MUST include the "encrypted_client_hello" extension in its EncryptedExtensions with the "retry_configs" field set to one or more ECHConfig',
+                method(:validate_ee_retry_configs)
+              )
+            ]
+          )
         end
 
         # @param hostname [String]
         # @param port [Integer]
-        # @param _
-        #
-        # @return [Array of EchSpec::Ok | Err]
-        def run(hostname, port, _)
-          [validate_ee_retry_configs(hostname, port)]
-        end
-
-        # @param hostname [String]
-        # @param port [Integer]
+        # @param _ [ECHConfig]
         #
         # @return [EchSpec::Ok | Err]
-        def validate_ee_retry_configs(hostname, port)
+        def validate_ee_retry_configs(hostname, port, _)
           socket = TCPSocket.new(hostname, port)
           recv = send_ch_with_undecryptable_ech(socket, hostname)
           socket.close

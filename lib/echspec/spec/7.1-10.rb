@@ -8,21 +8,18 @@ module EchSpec
       # facing server MUST abort with an "illegal_parameter" alert.
       #
       # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1-10
-      @section = '7.1-10'
-      @description = 'MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below'
       class << self
-        # @return [String]
-        def description
-          "#{@description} [#{@section}]"
-        end
-
-        # @param hostname [String]
-        # @param port [Integer]
-        # @param ech_config [ECHConfig]
-        #
-        # @return [Array of EchSpec::Ok | Err]
-        def run(hostname, port, ech_config)
-          [validate_ech_with_tls12(hostname, port, ech_config)]
+        # @return [SpecGroup]
+        def spec_group
+          SpecGroup.new(
+            '7.1-10',
+            [
+              SpecCase.new(
+                'MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below',
+                method(:validate_ech_with_tls12)
+              )
+            ]
+          )
         end
 
         # @param hostname [String]

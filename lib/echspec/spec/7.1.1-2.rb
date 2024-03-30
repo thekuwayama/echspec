@@ -10,24 +10,22 @@ module EchSpec
       # abort the handshake with an "illegal_parameter" alert.
       #
       # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1.1-2
-      @section = '7.1.1-2'
-      @description = 'MUST abort with an "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension'
       class << self
-        # @return [String]
-        def description
-          "#{@description} [#{@section}]"
-        end
-
-        # @param hostname [String]
-        # @param port [Integer]
-        # @param ech_config [ECHConfig]
-        #
-        # @return [Array of EchSpec::Ok | Err]
-        def run(hostname, port, ech_config)
-          [
-            validate_2nd_ch_missing_ech(hostname, port, ech_config),
-            validate_2nd_ch_unchanged_ech(hostname, port, ech_config)
-          ]
+        # @return [SpecGroup]
+        def spec_group
+          SpecGroup.new(
+            '7.1.1-2',
+            [
+              SpecCase.new(
+                'MUST abort with an "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension',
+                method(:validate_2nd_ch_missing_ech)
+              ),
+              SpecCase.new(
+                'MUST abort with an "illegal_parameter" alert, if 2nd ClientHelloOuter "encrypted_client_hello" enc is empty',
+                method(:validate_2nd_ch_unchanged_ech)
+              )
+            ]
+          )
         end
 
         # @param hostname [String]

@@ -62,14 +62,14 @@ module EchSpec
         end
 
         # 7
-        specs = [Spec7_2_3_1, Spec7_1_1_2, Spec7_1_10, Spec7_1_13_2_1]
-        results = specs.flat_map do |spec|
-          desc = spec.description
-          spec.run(hostname, port, ech_config).map do |r|
-            { result: r, desc: desc }
+        groups = [Spec7_2_3_1, Spec7_1_1_2, Spec7_1_10, Spec7_1_13_2_1].map(&:spec_group)
+        results = groups.flat_map do |g|
+          g.spec_cases.map do |sc|
+            d = "#{sc.description} [#{g.section}]"
+            r = sc.method.call(hostname, port, ech_config)
+            { result: r, desc: d }
           end
         end
-
         results.each { |h| print_summarize(h[:result], h[:desc]) }
         return if results.all? { |h| h[:result].is_a? Ok }
 
