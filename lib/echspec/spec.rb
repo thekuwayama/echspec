@@ -62,7 +62,7 @@ module EchSpec
         end
 
         # 7
-        groups = [Spec7_2_3_1, Spec7_1_1_2, Spec7_1_10, Spec7_1_13_2_1].map(&:spec_group)
+        groups = [Spec7_2_3_1, Spec7_1_10, Spec7_1_13_2_1, Spec7_1_1_2].map(&:spec_group)
         results = groups.flat_map do |g|
           g.spec_cases.map do |sc|
             d = "#{sc.description} [#{g.section}]"
