@@ -81,7 +81,7 @@ module EchSpec
       # @param hrr [TTTLS13::Message::ServerHello]
       #
       # @return [TTTLS13::Message::Extensions]
-      def gen_new_ch_extensions(ch1, hrr)
+      def gen_newch_extensions(ch1, hrr)
         exs = TTTLS13::Message::Extensions.new
         # key_share
         if hrr.extensions.include?(TTTLS13::Message::ExtensionType::KEY_SHARE)
