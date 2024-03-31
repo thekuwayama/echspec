@@ -106,6 +106,52 @@ module EchSpec
           conf.cipher_suites.include?(cs)
         end
       end
+
+      # @param socket [TCPSocket]
+      # @param hostname [String]
+      # @param ech_config [ECHConfig]
+      #
+      # @raise [EchSpec::Error::BeforeTargetSituationError]
+      #
+      # @return [EchSpec::TLS13Client::Connection]
+      # @return [TTTLS13::Message::ClientHello]
+      # @return [TTTLS13::Message::ServerHello] HelloRetryRequest
+      def recv_hrr(socket, hostname, ech_config)
+        # send 1st ClientHello
+        conn = TLS13Client::Connection.new(socket, :client)
+        inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
+        exs, = TLS13Client.gen_ch_extensions(hostname)
+        exs.delete(TTTLS13::Message::ExtensionType::KEY_SHARE) # for HRR
+        inner = TTTLS13::Message::ClientHello.new(
+          cipher_suites: TTTLS13::CipherSuites.new(
+            [
+              TTTLS13::CipherSuite::TLS_AES_256_GCM_SHA384,
+              TTTLS13::CipherSuite::TLS_CHACHA20_POLY1305_SHA256,
+              TTTLS13::CipherSuite::TLS_AES_128_GCM_SHA256
+            ]
+          ),
+          extensions: exs.merge(
+            TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
+          )
+        )
+
+        selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
+        ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
+        conn.send_record(
+          TTTLS13::Message::Record.new(
+            type: TTTLS13::Message::ContentType::HANDSHAKE,
+            messages: [ch],
+            cipher: TTTLS13::Cryptograph::Passer.new
+          )
+        )
+
+        # receive HelloRetryRequest
+        recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        raise Error::BeforeTargetSituationError, 'not received HelloRetryRequest' \
+          unless recv.hrr?
+
+        [conn, ch, recv]
+      end
     end
   end
 end
