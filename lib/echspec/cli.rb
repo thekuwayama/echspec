@@ -19,7 +19,7 @@ module EchSpec
       op.on(
         '-p',
         '--port VALUE',
-        'the name server port number       (default 443)'
+        'server port number                (default 443)'
       ) do |v|
         port = v
       end
@@ -32,7 +32,7 @@ module EchSpec
         force_compliant = false
       end
 
-      op.banner += ' name'
+      op.banner += ' hostname'
       begin
         args = op.parse(argv)
       rescue OptionParser::InvalidOption, OptionParser::MissingArgument => e
@@ -48,7 +48,7 @@ module EchSpec
 
       if args.size != 1
         warn op
-        warn '** `name` argument is not specified'
+        warn '** `hostname` argument is not specified'
         exit 1
       end
 
@@ -56,8 +56,8 @@ module EchSpec
     end
 
     def run
-      fpath, port, force_compliant, name = parse_options
-      Spec.run(fpath, port, name, force_compliant)
+      fpath, port, force_compliant, hostname = parse_options
+      Spec.run(fpath, port, hostname, force_compliant)
     end
   end
 end

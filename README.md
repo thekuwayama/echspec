@@ -19,9 +19,9 @@ $ bundle exec ruby exe/echspec --help
 ## Usage
 
 ```sh-session
-Usage: echspec [options] name
+Usage: echspec [options] hostname
     -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
-    -p, --port VALUE                 the name server port number       (default 443)
+    -p, --port VALUE                 server port number                (default 443)
     -n, --not-force-compliant-hpke   not force compliant ECHConfig HPKE cipher suite
 ```
 
