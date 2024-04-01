@@ -1,13 +1,11 @@
 module EchSpec
-  module Spec
-    class SpecCase
-      attr_reader :description
-      attr_reader :method
+  class SpecCase
+    attr_reader :description
+    attr_reader :method
 
-      def initialize(description, method)
-        @description = description
-        @method = method
-      end
+    def initialize(description, method)
+      @description = description
+      @method = method
     end
   end
 end
