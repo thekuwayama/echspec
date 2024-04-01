@@ -7,7 +7,7 @@ module EchSpec
       #
       # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7-2.3.1
       class << self
-        # @return [SpecGroup]
+        # @return [EchSpec::SpecGroup]
         def spec_group
           SpecGroup.new(
             '7-2.3.1',
