@@ -71,7 +71,7 @@ module EchSpec
         end
 
         def send_2nd_ch_missing_ech(socket, hostname, ech_config)
-          conn, ch1, hrr = TLS13Client.recv_hrr(socket, hostname, ech_config)
+          conn, ch1, hrr, = TLS13Client.recv_hrr(socket, hostname, ech_config)
           # send 2nd ClientHello without ech
           new_exs = TLS13Client.gen_newch_extensions(ch1, hrr)
           new_exs.delete(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO)
@@ -98,7 +98,7 @@ module EchSpec
         end
 
         def send_2nd_ch_unchanged_ech(socket, hostname, ech_config)
-          conn, ch1, hrr = TLS13Client.recv_hrr(socket, hostname, ech_config)
+          conn, ch1, hrr, = TLS13Client.recv_hrr(socket, hostname, ech_config)
           # send 2nd ClientHello with unchanged ech
           new_exs = TLS13Client.gen_newch_extensions(ch1, hrr)
           new_exs[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO] =
