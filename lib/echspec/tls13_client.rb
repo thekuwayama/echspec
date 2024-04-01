@@ -44,7 +44,7 @@ module EchSpec
         exs << TTTLS13::Message::Extension::SupportedVersions.new(
           msg_type: TTTLS13::Message::HandshakeType::CLIENT_HELLO
         )
-      
+
         # signature_algorithms
         exs << TTTLS13::Message::Extension::SignatureAlgorithms.new(
           [
