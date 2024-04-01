@@ -23,17 +23,12 @@ module EchSpec
         end
       end
 
-      # @param result [EchSpec::Ok | Err]
+      # @param result [EchSpec::Err]
       # @param idx [Integer]
       # @param desc [String]
-      def print_failed_details(result, idx, desc)
-        case result
-        in Ok(_)
-          return
-        in Err(details)
-          puts "\t(#{idx + 1}) #{desc}"
-          puts "\t\t#{details}"
-        end
+      def print_err_details(err, idx, desc)
+        puts "\t(#{idx + 1}) #{desc}"
+        puts "\t\t#{err.details}"
       end
     end
   end
@@ -76,7 +71,7 @@ module EchSpec
         puts 'Failures:'
         results.filter { |h| h[:result].is_a? Err }
                .each
-               .with_index { |h, idx| print_failed_details(h[:result], idx, h[:desc]) }
+               .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc]) }
       end
     end
   end
