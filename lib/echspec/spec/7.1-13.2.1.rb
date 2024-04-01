@@ -79,7 +79,7 @@ module EchSpec
           # receive ServerHello
           recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
           raise Error::BeforeTargetSituationError, 'not received ServerHello' \
-            if !recv.is_a?(TTTLS13::Message::ServerHello) || recv.hrr?
+            unless recv.is_a?(TTTLS13::Message::ServerHello) && !recv.hrr?
 
           # receive EncryptedExtensions
           transcript = TTTLS13::Transcript.new

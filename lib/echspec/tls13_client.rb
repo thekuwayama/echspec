@@ -149,7 +149,7 @@ module EchSpec
         # receive HelloRetryRequest
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
         raise Error::BeforeTargetSituationError, 'not received HelloRetryRequest' \
-          unless recv.hrr?
+          unless recv.is_a?(TTTLS13::Message::ServerHello) && recv.hrr?
 
         [conn, ch, recv, ech_state]
       end
