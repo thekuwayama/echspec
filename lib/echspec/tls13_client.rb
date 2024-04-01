@@ -116,6 +116,7 @@ module EchSpec
       # @return [EchSpec::TLS13Client::Connection]
       # @return [TTTLS13::Message::ClientHello]
       # @return [TTTLS13::Message::ServerHello] HelloRetryRequest
+      # @return [TTTLS13::EchState]
       def recv_hrr(socket, hostname, ech_config)
         # send 1st ClientHello
         conn = TLS13Client::Connection.new(socket, :client)
@@ -136,7 +137,7 @@ module EchSpec
         )
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
-        ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
+        ch, _inner, ech_state = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
         conn.send_record(
           TTTLS13::Message::Record.new(
             type: TTTLS13::Message::ContentType::HANDSHAKE,
@@ -150,7 +151,7 @@ module EchSpec
         raise Error::BeforeTargetSituationError, 'not received HelloRetryRequest' \
           unless recv.hrr?
 
-        [conn, ch, recv]
+        [conn, ch, recv, ech_state]
       end
     end
   end
