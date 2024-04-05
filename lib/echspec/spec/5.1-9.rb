@@ -39,8 +39,6 @@ module EchSpec
         Err.new("#{hostname}:#{port} connection timeout")
       rescue Errno::ECONNREFUSED
         Err.new("#{hostname}:#{port} connection refused")
-      rescue Error::BeforeTargetSituationError => e
-        Err.new(e.message)
       end
 
       def self.send_nonzero_padding_encoded_ch_inner(socket, hostname, ech_config)
