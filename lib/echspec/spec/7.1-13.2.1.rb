@@ -33,24 +33,33 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def self.validate_ee_retry_configs(hostname, port, _)
         socket = TCPSocket.new(hostname, port)
-        recv = send_ch_with_greased_ech(socket, hostname)
+        spec = Spec7_1_13_2_1.new
+        recv = spec.send_ch_with_greased_ech(socket, hostname)
         socket.close
         ex = recv.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
-        return Err.new('did not send expected alert: encrypted_client_hello') \
+        return Err.new('did not send expected alert: encrypted_client_hello', spec.message_stack) \
           unless ex.is_a?(TTTLS13::Message::Extension::ECHEncryptedExtensions)
-        return Err.new('ECHConfigs did not have "retry_configs"') \
+        return Err.new('ECHConfigs did not have "retry_configs"', spec.message_stack) \
           if ex.retry_configs.nil? || ex.retry_configs.empty?
 
         Ok.new(nil)
       rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout")
+        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
       rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused")
+        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
       rescue Error::BeforeTargetSituationError => e
-        Err.new(e.message)
+        Err.new(e.message, spec.message_stack)
       end
 
-      def self.send_ch_with_greased_ech(socket, hostname)
+      def initialize
+        @stack = Log::MessageStack.new
+      end
+
+      def message_stack
+        @stack.marshal
+      end
+
+      def send_ch_with_greased_ech(socket, hostname)
         # send ClientHello
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
@@ -67,6 +76,8 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
+        @stack.set_ch_inner(inner)
+
         ch, = TTTLS13::Ech.new_greased_ch(inner, TTTLS13::Ech.new_grease_ech)
         conn.send_record(
           TTTLS13::Message::Record.new(
@@ -75,9 +86,11 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        @stack << ch
 
         # receive ServerHello
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        @stack << recv
         raise Error::BeforeTargetSituationError, 'not received ServerHello' \
           unless recv.is_a?(TTTLS13::Message::ServerHello) && !recv.hrr?
 
@@ -105,6 +118,8 @@ module EchSpec
           key_schedule.server_handshake_write_iv
         )
         recv, = conn.recv_message(hs_rcipher)
+        @stack << recv
+
         recv, = conn.recv_message(hs_rcipher) \
           if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
         raise BeforeTargetSituationError 'not received EncryptedExtensions' \

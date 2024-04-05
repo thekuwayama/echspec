@@ -1,10 +1,13 @@
 module EchSpec
   module Log
     class MessageStack
-      # @param inner [TTTLS13::Message::ClientHello]
-      def initialize(inner)
-        @inner = inner
+      def initialize
         @stack = []
+      end
+
+      # @param inner [TTTLS13::Message::ClientHello]
+      def set_ch_inner(ch_inner)
+        @ch_inner = ch_inner
       end
 
       # @param msg [TTTLS13::Message::$Object]
@@ -13,7 +16,8 @@ module EchSpec
       end
 
       def marshal
-        arr = ["\"ClientHelloInner\":#{obj2json(@inner)}"]
+        arr = []
+        arr << "\"ClientHelloInner\":#{obj2json(@ch_inner)}" unless @ch_inner.nil?
         arr = @stack.reduce(arr) { |sum, msg| sum << "\"#{msg2string(msg)}\":#{obj2json(msg)}" }
         "{#{arr.join(',')}}"
       end
