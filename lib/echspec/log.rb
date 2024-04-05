@@ -18,11 +18,11 @@ module EchSpec
       def marshal
         arr = []
         arr << "\"ClientHelloInner\":#{obj2json(@ch_inner)}" unless @ch_inner.nil?
-        arr = @stack.reduce(arr) { |sum, msg| sum << "\"#{msg2string(msg)}\":#{obj2json(msg)}" }
+        arr = @stack.reduce(arr) { |sum, msg| sum << "\"#{msg2name(msg)}\":#{obj2json(msg)}" }
         "{#{arr.join(',')}}"
       end
 
-      def msg2string(msg)
+      def msg2name(msg)
         case msg
         in TTTLS13::Message::ClientHello
           'ClientHello'
