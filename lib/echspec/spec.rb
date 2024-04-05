@@ -26,9 +26,11 @@ module EchSpec
       # @param result [EchSpec::Err]
       # @param idx [Integer]
       # @param desc [String]
-      def print_err_details(err, idx, desc)
+      # @param verbose [Boolean]
+      def print_err_details(err, idx, desc, verbose)
         puts "\t(#{idx + 1}) #{desc}"
         puts "\t\t#{err.details}"
+        puts "\t\tmessge stack: #{err.message_stack}" if verbose
       end
     end
   end
@@ -43,7 +45,8 @@ module EchSpec
       # @param port [Integer]
       # @param hostname [String]
       # @param force_compliant [Boolean]
-      def run(fpath, port, hostname, force_compliant)
+      # @param verbose [Boolean]
+      def run(fpath, port, hostname, force_compliant, verbose)
         TTTLS13::Logging.logger.level = Logger::WARN
 
         # 9
@@ -76,7 +79,7 @@ module EchSpec
         puts 'Failures:'
         results.filter { |h| h[:result].is_a? Err }
                .each
-               .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc]) }
+               .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc], verbose) }
       end
     end
   end
