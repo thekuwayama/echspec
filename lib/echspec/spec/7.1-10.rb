@@ -29,19 +29,28 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def self.validate_ech_with_tls12(hostname, port, ech_config)
         socket = TCPSocket.new(hostname, port)
-        recv = send_ch_ech_with_tls12(socket, hostname, ech_config)
+        spec = Spec7_1_10.new
+        recv = spec.send_ch_ech_with_tls12(socket, hostname, ech_config)
         socket.close
-        return Err.new('did not send expected alert: illegal_parameter') \
+        return Err.new('did not send expected alert: illegal_parameter', spec.message_stack) \
           unless Spec.expect_alert(recv, :illegal_parameter)
 
         Ok.new(nil)
       rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout")
+        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
       rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused")
+        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
       end
 
-      def self.send_ch_ech_with_tls12(socket, hostname, ech_config)
+      def initialize
+        @stack = Log::MessageStack.new
+      end
+
+      def message_stack
+        @stack.marshal
+      end
+
+      def send_ch_ech_with_tls12(socket, hostname, ech_config)
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
         exs, = TLS13Client.gen_ch_extensions(hostname)
@@ -63,6 +72,8 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
+        @stack.set_ch_inner(inner)
+
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
         ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
         conn.send_record(
@@ -72,7 +83,11 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        @stack << ch
+
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        @stack << recv
+
         recv
       end
     end

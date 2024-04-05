@@ -29,19 +29,28 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def self.validate_nonzero_padding_encoded_ch_inner(hostname, port, ech_config)
         socket = TCPSocket.new(hostname, port)
-        recv = send_nonzero_padding_encoded_ch_inner(socket, hostname, ech_config)
+        spec = Spec5_1_9.new
+        recv = spec.send_nonzero_padding_encoded_ch_inner(socket, hostname, ech_config)
         socket.close
-        return Err.new('did not send expected alert: illegal_parameter') \
+        return Err.new('did not send expected alert: illegal_parameter', spec.message_stack) \
           unless Spec.expect_alert(recv, :illegal_parameter)
 
         Ok.new(nil)
       rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout")
+        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
       rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused")
+        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
       end
 
-      def self.send_nonzero_padding_encoded_ch_inner(socket, hostname, ech_config)
+      def initialize
+        @stack = Log::MessageStack.new
+      end
+
+      def message_stack
+        @stack.marshal
+      end
+
+      def send_nonzero_padding_encoded_ch_inner(socket, hostname, ech_config)
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
         exs, = TLS13Client.gen_ch_extensions(hostname)
@@ -57,6 +66,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
+        @stack.set_ch_inner(inner)
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
         ch, = NonzeroPaddingEch.offer_ech(inner, ech_config, selector)
@@ -67,7 +77,11 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        @stack << ch
+
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        @stack << recv
+
         recv
       end
 

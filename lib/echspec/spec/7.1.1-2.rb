@@ -35,18 +35,19 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def self.validate_2nd_ch_missing_ech(hostname, port, ech_config)
         socket = TCPSocket.new(hostname, port)
-        recv = send_2nd_ch_missing_ech(socket, hostname, ech_config)
+        spec = Spec7_1_1_2.new
+        recv = spec.send_2nd_ch_missing_ech(socket, hostname, ech_config)
         socket.close
-        return Err.new('did not send expected alert: missing_extension') \
+        return Err.new('did not send expected alert: missing_extension', spec.message_stack) \
           unless Spec.expect_alert(recv, :missing_extension)
 
         Ok.new(nil)
       rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout")
+        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
       rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused")
+        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
       rescue Error::BeforeTargetSituationError => e
-        Err.new(e.message)
+        Err.new(e.message, spec.message_stack)
       end
 
       # @param hostname [String]
@@ -56,22 +57,31 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def self.validate_2nd_ch_unchanged_ech(hostname, port, ech_config)
         socket = TCPSocket.new(hostname, port)
-        recv = send_2nd_ch_unchanged_ech(socket, hostname, ech_config)
+        spec = Spec7_1_1_2.new
+        recv = spec.send_2nd_ch_unchanged_ech(socket, hostname, ech_config)
         socket.close
-        return Err.new('did not send expected alert: illegal_parameter') \
+        return Err.new('did not send expected alert: illegal_parameter', spec.message_stack) \
           unless Spec.expect_alert(recv, :illegal_parameter)
 
         Ok.new(nil)
       rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout")
+        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
       rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused")
+        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
       rescue Error::BeforeTargetSituationError => e
-        Err.new(e.message)
+        Err.new(e.message, spec.message_stack)
       end
 
-      def self.send_2nd_ch_missing_ech(socket, hostname, ech_config)
-        conn, ch1, hrr, = TLS13Client.recv_hrr(socket, hostname, ech_config)
+      def initialize
+        @stack = Log::MessageStack.new
+      end
+
+      def message_stack
+        @stack.marshal
+      end
+
+      def send_2nd_ch_missing_ech(socket, hostname, ech_config)
+        conn, ch1, hrr, = TLS13Client.recv_hrr(socket, hostname, ech_config, @stack)
         # send 2nd ClientHello without ech
         new_exs = TLS13Client.gen_newch_extensions(ch1, hrr)
         new_exs.delete(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO)
@@ -90,15 +100,18 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        @stack << ch
 
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        @stack << recv
+
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new) \
           if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
         recv
       end
 
-      def self.send_2nd_ch_unchanged_ech(socket, hostname, ech_config)
-        conn, ch1, hrr, = TLS13Client.recv_hrr(socket, hostname, ech_config)
+      def send_2nd_ch_unchanged_ech(socket, hostname, ech_config)
+        conn, ch1, hrr, = TLS13Client.recv_hrr(socket, hostname, ech_config, @stack)
         # send 2nd ClientHello with unchanged ech
         new_exs = TLS13Client.gen_newch_extensions(ch1, hrr)
         new_exs[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO] =
@@ -118,8 +131,11 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        @stack << ch
 
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        @stack << recv
+
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new) \
           if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
         recv

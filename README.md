@@ -23,6 +23,7 @@ Usage: echspec [options] hostname
     -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
     -p, --port VALUE                 server port number                (default 443)
     -n, --not-force-compliant-hpke   not force compliant ECHConfig HPKE cipher suite
+    -v, --verbose                    verbose mode; prints message stack if raised an error
 ```
 
 ```sh-session

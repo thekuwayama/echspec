@@ -14,7 +14,7 @@ module EchSpec
           [
             SpecCase.new(
               'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloInner',
-                method(:validate_illegal_inner_ech_type)
+              method(:validate_illegal_inner_ech_type)
             ),
             SpecCase.new(
               'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloOuter',
@@ -34,7 +34,7 @@ module EchSpec
           hostname,
           port,
           ech_config,
-          method(:send_ch_illegal_inner_ech_type)
+          :send_ch_illegal_inner_ech_type
         )
       end
 
@@ -48,7 +48,7 @@ module EchSpec
           hostname,
           port,
           ech_config,
-          method(:send_ch_illegal_outer_ech_type)
+          :send_ch_illegal_outer_ech_type
         )
       end
 
@@ -60,17 +60,26 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def self.do_validate_illegal_ech_type(hostname, port, ech_config, method)
         socket = TCPSocket.new(hostname, port)
-        recv = method.call(socket, hostname, ech_config)
+        spec = Spec7_2_3_1.new
+        recv = spec.send(method, socket, hostname, ech_config)
         socket.close
         if Spec.expect_alert(recv, :illegal_parameter)
           Ok.new(nil)
         else
-          Err.new('did not send expected alert: illegal_parameter')
+          Err.new('did not send expected alert: illegal_parameter', spec.message_stack)
         end
       rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout")
+        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
       rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused")
+        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
+      end
+
+      def initialize
+        @stack = Log::MessageStack.new
+      end
+
+      def message_stack
+        @stack.marshal
       end
 
       # @param socket [TCPSocket]
@@ -78,7 +87,7 @@ module EchSpec
       # @param ech_config [ECHConfig]
       #
       # @return [TTTLS13::Message::Record]
-      def self.send_ch_illegal_inner_ech_type(socket, hostname, ech_config)
+      def send_ch_illegal_inner_ech_type(socket, hostname, ech_config)
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = IllegalEchClientHello.new_inner
         exs, = TLS13Client.gen_ch_extensions(hostname)
@@ -94,6 +103,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
+        @stack.set_ch_inner(inner)
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
         ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
@@ -104,7 +114,11 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        @stack << ch
+
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        @stack << recv
+
         recv
       end
 
@@ -113,7 +127,7 @@ module EchSpec
       # @param ech_config [ECHConfig]
       #
       # @return [TTTLS13::Message::Record]
-      def self.send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
+      def send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
         exs, = TLS13Client.gen_ch_extensions(hostname)
@@ -129,6 +143,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
+        @stack.set_ch_inner(inner)
 
         # offer_ech
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
@@ -187,7 +202,11 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        @stack << outer
+
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        @stack << recv
+
         recv
       end
 
@@ -196,7 +215,7 @@ module EchSpec
 
       class IllegalEchClientHello < TTTLS13::Message::Extension::ECHClientHello
         using TTTLS13::Refinements
-        
+
         def self.new_inner
           IllegalEchClientHello.new(type: ILLEGAL_INNER)
         end

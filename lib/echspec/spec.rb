@@ -16,9 +16,9 @@ module EchSpec
       # @param desc [String]
       def print_summarize(result, desc)
         case result
-        in Ok(_)
+        in Ok
           puts "\t#{desc.green}"
-        in Err(_)
+        in Err
           puts "\t#{desc.red}"
         end
       end
@@ -26,9 +26,12 @@ module EchSpec
       # @param result [EchSpec::Err]
       # @param idx [Integer]
       # @param desc [String]
-      def print_err_details(err, idx, desc)
+      # @param verbose [Boolean]
+      def print_err_details(err, idx, desc, verbose)
         puts "\t(#{idx + 1}) #{desc}"
-        puts "\t\t#{err.details}"
+        details =  "\t\t#{err.details}"
+        details += ", messge stack: #{err.message_stack}" if verbose
+        puts details
       end
     end
   end
@@ -43,7 +46,8 @@ module EchSpec
       # @param port [Integer]
       # @param hostname [String]
       # @param force_compliant [Boolean]
-      def run(fpath, port, hostname, force_compliant)
+      # @param verbose [Boolean]
+      def run(fpath, port, hostname, force_compliant, verbose)
         TTTLS13::Logging.logger.level = Logger::WARN
 
         # 9
@@ -51,7 +55,7 @@ module EchSpec
         in Ok(obj)
           result.tap { |r| print_summarize(r, Spec9.description) }
           ech_config = obj
-        in Err(details)
+        in Err(details, _)
           puts "\t\t#{details}"
           return
         end
@@ -76,7 +80,7 @@ module EchSpec
         puts 'Failures:'
         results.filter { |h| h[:result].is_a? Err }
                .each
-               .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc]) }
+               .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc], verbose) }
       end
     end
   end

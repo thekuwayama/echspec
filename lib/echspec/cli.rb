@@ -7,6 +7,7 @@ module EchSpec
       fpath = nil
       port = 443
       force_compliant = true
+      verbose = false
 
       op.on(
         '-f',
@@ -32,6 +33,14 @@ module EchSpec
         force_compliant = false
       end
 
+      op.on(
+        '-v',
+        '--verbose',
+        'verbose mode; prints message stack if raised an error'
+      ) do
+        verbose = true
+      end
+
       op.banner += ' hostname'
       begin
         args = op.parse(argv)
@@ -52,12 +61,12 @@ module EchSpec
         exit 1
       end
 
-      [fpath, port, force_compliant, args[0]]
+      [fpath, port, force_compliant, verbose, args[0]]
     end
 
     def run
-      fpath, port, force_compliant, hostname = parse_options
-      Spec.run(fpath, port, hostname, force_compliant)
+      fpath, port, force_compliant, verbose, hostname = parse_options
+      Spec.run(fpath, port, hostname, force_compliant, verbose)
     end
   end
 end

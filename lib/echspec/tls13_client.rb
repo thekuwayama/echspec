@@ -110,6 +110,7 @@ module EchSpec
       # @param socket [TCPSocket]
       # @param hostname [String]
       # @param ech_config [ECHConfig]
+      # @param stack [EchSpec::Log::MessageStack]
       #
       # @raise [EchSpec::Error::BeforeTargetSituationError]
       #
@@ -117,7 +118,7 @@ module EchSpec
       # @return [TTTLS13::Message::ClientHello]
       # @return [TTTLS13::Message::ServerHello] HelloRetryRequest
       # @return [TTTLS13::EchState]
-      def recv_hrr(socket, hostname, ech_config)
+      def recv_hrr(socket, hostname, ech_config, stack)
         # send 1st ClientHello
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
@@ -135,6 +136,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
+        stack.set_ch_inner(inner)
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
         ch, _inner, ech_state = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
@@ -145,9 +147,11 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        stack << ch
 
         # receive HelloRetryRequest
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        stack << recv
         raise Error::BeforeTargetSituationError, 'not received HelloRetryRequest' \
           unless recv.is_a?(TTTLS13::Message::ServerHello) && recv.hrr?
 

@@ -6,6 +6,7 @@ require 'tttls1.3'
 
 require 'echspec/version'
 require 'echspec/utils'
+require 'echspec/log'
 require 'echspec/error'
 require 'echspec/result'
 require 'echspec/tls13_client'
