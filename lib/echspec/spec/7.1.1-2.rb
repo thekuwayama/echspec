@@ -131,7 +131,7 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
-        @stack << recv
+        @stack << ch
 
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
         @stack << recv

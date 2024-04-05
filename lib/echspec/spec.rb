@@ -29,8 +29,9 @@ module EchSpec
       # @param verbose [Boolean]
       def print_err_details(err, idx, desc, verbose)
         puts "\t(#{idx + 1}) #{desc}"
-        puts "\t\t#{err.details}"
-        puts "\t\tmessge stack: #{err.message_stack}" if verbose
+        details =  "\t\t#{err.details}"
+        details += ", messge stack: #{err.message_stack}" if verbose
+        puts details
       end
     end
   end

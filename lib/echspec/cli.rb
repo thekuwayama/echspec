@@ -36,7 +36,7 @@ module EchSpec
       op.on(
         '-v',
         '--verbose',
-        'verbose mode; prints message stack raised an error'
+        'verbose mode; prints message stack if raised an error'
       ) do
         verbose = true
       end
