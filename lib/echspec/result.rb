@@ -13,13 +13,15 @@ module EchSpec
 
   class Err
     attr_reader :details
+    attr_reader :message_stack
 
-    def initialize(details)
+    def initialize(details, message_stack)
       @details = details
+      @message_stack = message_stack
     end
 
     def deconstruct
-      [@details]
+      [@details, @message_stack]
     end
   end
 end

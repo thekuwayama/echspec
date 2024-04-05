@@ -16,9 +16,9 @@ module EchSpec
       # @param desc [String]
       def print_summarize(result, desc)
         case result
-        in Ok(_)
+        in Ok
           puts "\t#{desc.green}"
-        in Err(_)
+        in Err
           puts "\t#{desc.red}"
         end
       end
@@ -51,7 +51,7 @@ module EchSpec
         in Ok(obj)
           result.tap { |r| print_summarize(r, Spec9.description) }
           ech_config = obj
-        in Err(details)
+        in Err(details, _)
           puts "\t\t#{details}"
           return
         end
