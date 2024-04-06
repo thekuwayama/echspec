@@ -21,7 +21,7 @@ module EchSpec
       op.on(
         '-p',
         '--port VALUE',
-        'server port number                (default 443)'
+        "server port number                (default #{port})"
       ) do |v|
         port = v
       end
