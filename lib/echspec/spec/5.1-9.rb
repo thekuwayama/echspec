@@ -86,6 +86,8 @@ module EchSpec
       end
 
       class NonzeroPaddingEch < TTTLS13::Ech
+        NON_ZERO = "\x11".freeze
+
         # @param s [String]
         # @param server_name_length [Integer]
         # @param maximum_name_length [Integer]
@@ -102,7 +104,7 @@ module EchSpec
             end
 
           padding_len = 31 - ((s.length + padding_len - 1) % 32)
-          s + "\x11" * padding_len # padding with non-zero value
+          s + NON_ZERO * padding_len # padding with non-zero value
         end
       end
     end

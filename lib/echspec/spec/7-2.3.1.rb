@@ -214,11 +214,11 @@ module EchSpec
       # rubocop: enable Metrics/AbcSize
       # rubocop: enable Metrics/MethodLength
 
-      ILLEGAL_OUTER = "\x02".freeze
-      ILLEGAL_INNER = "\x03".freeze
-
       class IllegalEchClientHello < TTTLS13::Message::Extension::ECHClientHello
         using TTTLS13::Refinements
+
+        ILLEGAL_OUTER = "\x02".freeze
+        ILLEGAL_INNER = "\x03".freeze
 
         def self.new_inner
           IllegalEchClientHello.new(type: ILLEGAL_INNER)
