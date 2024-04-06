@@ -12,21 +12,50 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    ast (2.4.2)
     ech_config (0.0.3)
       sorbet-runtime
     hpke (0.1.0)
       openssl (~> 3.0.0)
+    json (2.7.2)
+    language_server-protocol (3.17.0.3)
     logger (1.6.0)
     openssl (3.0.2)
+    parallel (1.24.0)
+    parser (3.3.0.5)
+      ast (~> 2.4.1)
+      racc
+    racc (1.7.3)
+    rainbow (3.1.1)
+    rake (13.2.1)
+    regexp_parser (2.9.0)
+    rexml (3.2.6)
+    rubocop (1.62.0)
+      json (~> 2.3)
+      language_server-protocol (>= 3.17.0)
+      parallel (~> 1.10)
+      parser (>= 3.3.0.2)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
+      rexml (>= 3.2.5, < 4.0)
+      rubocop-ast (>= 1.31.1, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 2.4.0, < 3.0)
+    rubocop-ast (1.31.2)
+      parser (>= 3.3.0.4)
+    ruby-progressbar (1.13.0)
     sorbet-runtime (0.5.11305)
     svcb_rr_patch (0.0.6)
       ech_config
+    unicode-display_width (2.5.0)
 
 PLATFORMS
   arm64-darwin-23
 
 DEPENDENCIES
   openssl
+  rake (= 13.2.1)
+  rubocop (= 1.62.0)
   svcb_rr_patch
   tttls1.3!
 

@@ -1,5 +1,6 @@
 module EchSpec
   class CLI
+    # rubocop: disable Metrics/MethodLength
     def parse_options(argv = ARGV)
       op = OptionParser.new
 
@@ -63,6 +64,7 @@ module EchSpec
 
       [fpath, port, force_compliant, verbose, args[0]]
     end
+    # rubocop: enable Metrics/MethodLength
 
     def run
       fpath, port, force_compliant, verbose, hostname = parse_options

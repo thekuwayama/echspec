@@ -37,7 +37,7 @@ module EchSpec
   end
 end
 
-Dir[File.dirname(__FILE__) + '/spec/*.rb'].sort.each { |f| require f }
+Dir["#{File.dirname(__FILE__)}/spec/*.rb"].sort.each { |f| require f }
 
 module EchSpec
   module Spec
@@ -47,27 +47,13 @@ module EchSpec
       # @param hostname [String]
       # @param force_compliant [Boolean]
       # @param verbose [Boolean]
+      # rubocop: disable Metrics/AbcSize
+      # rubocop: disable Metrics/CyclomaticComplexity
       def run(fpath, port, hostname, force_compliant, verbose)
         TTTLS13::Logging.logger.level = Logger::WARN
+        ech_config = try_get_ech_config(fpath, hostname, force_compliant)
 
-        # 9
-        case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
-        in Ok(obj)
-          result.tap { |r| print_summarize(r, Spec9.description) }
-          ech_config = obj
-        in Err(details, _)
-          puts "\t\t#{details}"
-          return
-        end
-
-        # 5
-        groups = [Spec5_1_9]
-
-        # 7
-        groups += [Spec7_2_3_1, Spec7_1_10, Spec7_1_13_2_1, Spec7_1_1_2, Spec7_1_1_5]
-
-        groups = groups.map(&:spec_group)
-        results = groups.flat_map do |g|
+        results = spec_groups.flat_map do |g|
           g.spec_cases.map do |sc|
             d = "#{sc.description} [#{g.section}]"
             r = sc.method.call(hostname, port, ech_config)
@@ -81,6 +67,30 @@ module EchSpec
         results.filter { |h| h[:result].is_a? Err }
                .each
                .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc], verbose) }
+      end
+      # rubocop: enable Metrics/AbcSize
+      # rubocop: enable Metrics/CyclomaticComplexity
+
+      def try_get_ech_config(fpath, hostname, force_compliant)
+        # 9
+        case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
+        in Ok(obj)
+          result.tap { |r| print_summarize(r, Spec9.description) }
+          obj
+        in Err(details, _)
+          puts "\t\t#{details}"
+          exit 1
+        end
+      end
+
+      def spec_groups
+        # 5
+        groups = [Spec5_1_9]
+
+        # 7
+        groups += [Spec7_2_3_1, Spec7_1_10, Spec7_1_13_2_1, Spec7_1_1_2, Spec7_1_1_5]
+
+        groups.map(&:spec_group)
       end
     end
   end

@@ -6,7 +6,7 @@ module EchSpec
       end
 
       # @param inner [TTTLS13::Message::ClientHello]
-      def set_ch_inner(ch_inner)
+      def ch_inner(ch_inner)
         @ch_inner = ch_inner
       end
 
@@ -22,6 +22,8 @@ module EchSpec
         "{#{arr.join(',')}}"
       end
 
+      # rubocop: disable Metrics/CyclomaticComplexity
+      # rubocop: disable Metrics/PerceivedComplexity
       def msg2name(msg)
         case msg
         in TTTLS13::Message::ClientHello
@@ -44,7 +46,12 @@ module EchSpec
           'Alert'
         end
       end
+      # rubocop: enable Metrics/CyclomaticComplexity
+      # rubocop: enable Metrics/PerceivedComplexity
 
+      # rubocop: disable Metrics/AbcSize
+      # rubocop: disable Metrics/CyclomaticComplexity
+      # rubocop: disable Metrics/PerceivedComplexity
       def obj2json(obj)
         if obj.is_a?(OpenSSL::X509::Certificate)
           obj.to_pem.gsub("\n", '\n')
@@ -73,6 +80,9 @@ module EchSpec
           "\"$#{obj.class.name}\""
         end
       end
+      # rubocop: enable Metrics/AbcSize
+      # rubocop: enable Metrics/CyclomaticComplexity
+      # rubocop: enable Metrics/PerceivedComplexity
     end
   end
 end

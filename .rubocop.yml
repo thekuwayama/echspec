@@ -1,0 +1,29 @@
+AllCops:
+  TargetRubyVersion: 3.2
+
+Layout/LineLength:
+  Max: 200
+
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/MethodLength:
+  Max: 30
+
+Naming/MethodParameterName:
+  MinNameLength: 1
+
+Naming/FileName:
+  Enabled: false
+
+Naming/ClassAndModuleCamelCase:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false

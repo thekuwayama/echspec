@@ -3,9 +3,6 @@ module EchSpec
     class Connection < TTTLS13::Connection
       # @param socket [Socket]
       # @param side [:client or :server]
-      def initialize(socket, side)
-        super(socket, side)
-      end
 
       # @param cipher [TTTLS13::Cryptograph::$Object]
       #
@@ -118,6 +115,7 @@ module EchSpec
       # @return [TTTLS13::Message::ClientHello]
       # @return [TTTLS13::Message::ServerHello] HelloRetryRequest
       # @return [TTTLS13::EchState]
+      # rubocop: disable Metrics/MethodLength
       def recv_hrr(socket, hostname, ech_config, stack)
         # send 1st ClientHello
         conn = TLS13Client::Connection.new(socket, :client)
@@ -136,7 +134,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
-        stack.set_ch_inner(inner)
+        stack.ch_inner(inner)
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
         ch, _inner, ech_state = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
@@ -157,6 +155,7 @@ module EchSpec
 
         [conn, ch, recv, ech_state]
       end
+      # rubocop: enable Metrics/MethodLength
     end
   end
 end

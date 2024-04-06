@@ -66,7 +66,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
-        @stack.set_ch_inner(inner)
+        @stack.ch_inner(inner)
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
         ch, = NonzeroPaddingEch.offer_ech(inner, ech_config, selector)

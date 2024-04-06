@@ -103,7 +103,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
-        @stack.set_ch_inner(inner)
+        @stack.ch_inner(inner)
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
         ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
@@ -127,6 +127,8 @@ module EchSpec
       # @param ech_config [ECHConfig]
       #
       # @return [TTTLS13::Message::Record]
+      # rubocop: disable Metrics/AbcSize
+      # rubocop: disable Metrics/MethodLength
       def send_ch_illegal_outer_ech_type(socket, hostname, ech_config)
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
@@ -143,7 +145,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
-        @stack.set_ch_inner(inner)
+        @stack.ch_inner(inner)
 
         # offer_ech
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
@@ -162,7 +164,7 @@ module EchSpec
         aad_ech = IllegalEchClientHello.new_outer(
           cipher_suite: ech_state.cipher_suite,
           config_id: ech_state.config_id,
-          enc: enc,
+          enc:,
           payload: '0' * (encoded.length + overhead_len)
         )
         aad = TTTLS13::Message::ClientHello.new(
@@ -182,7 +184,7 @@ module EchSpec
         outer_ech = IllegalEchClientHello.new_outer(
           cipher_suite: ech_state.cipher_suite,
           config_id: ech_state.config_id,
-          enc: enc,
+          enc:,
           payload: ech_state.ctx.seal(aad.serialize[4..], encoded)
         )
         outer = TTTLS13::Message::ClientHello.new(
@@ -209,9 +211,11 @@ module EchSpec
 
         recv
       end
+      # rubocop: enable Metrics/AbcSize
+      # rubocop: enable Metrics/MethodLength
 
-      ILLEGAL_OUTER = "\x02"
-      ILLEGAL_INNER = "\x03"
+      ILLEGAL_OUTER = "\x02".freeze
+      ILLEGAL_INNER = "\x03".freeze
 
       class IllegalEchClientHello < TTTLS13::Message::Extension::ECHClientHello
         using TTTLS13::Refinements
@@ -223,10 +227,10 @@ module EchSpec
         def self.new_outer(cipher_suite:, config_id:, enc:, payload:)
           IllegalEchClientHello.new(
             type: ILLEGAL_OUTER,
-            cipher_suite: cipher_suite,
-            config_id: config_id,
-            enc: enc,
-            payload: payload
+            cipher_suite:,
+            config_id:,
+            enc:,
+            payload:
           )
         end
 
