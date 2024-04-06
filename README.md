@@ -1,6 +1,7 @@
 # echspec
 
 [![Actions Status](https://github.com/thekuwayama/echspec/actions/workflows/ci.yml/badge.svg)](https://github.com/thekuwayama/echspec/actions/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/thekuwayama/echspec/main/LICENSE.txt)
 
 `echspec` is a conformance testing tool for ECH implementation.
 
