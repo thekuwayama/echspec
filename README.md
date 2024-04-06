@@ -1,5 +1,7 @@
 # echspec
 
+[![Actions Status](https://github.com/thekuwayama/echspec/actions/workflows/ci.yml/badge.svg)](https://github.com/thekuwayama/echspec/actions/workflows/ci.yml)
+
 `echspec` is a conformance testing tool for ECH implementation.
 
 - https://datatracker.ietf.org/doc/draft-ietf-tls-esni/
