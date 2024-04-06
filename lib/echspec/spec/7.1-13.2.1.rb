@@ -59,6 +59,8 @@ module EchSpec
         @stack.marshal
       end
 
+      # rubocop: disable Metrics/AbcSize
+      # rubocop: disable Metrics/MethodLength
       def send_ch_with_greased_ech(socket, hostname)
         # send ClientHello
         conn = TLS13Client::Connection.new(socket, :client)
@@ -76,7 +78,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
-        @stack.set_ch_inner(inner)
+        @stack.ch_inner(inner)
 
         ch, = TTTLS13::Ech.new_greased_ch(inner, TTTLS13::Ech.new_grease_ech)
         conn.send_record(
@@ -108,9 +110,9 @@ module EchSpec
         )
         key_schedule = TTTLS13::KeySchedule.new(
           psk: nil,
-          shared_secret: shared_secret,
+          shared_secret:,
           cipher_suite: sh.cipher_suite,
-          transcript: transcript
+          transcript:
         )
         hs_rcipher = TTTLS13::Endpoint.gen_cipher(
           sh.cipher_suite,
@@ -127,6 +129,8 @@ module EchSpec
 
         recv
       end
+      # rubocop: enable Metrics/AbcSize
+      # rubocop: enable Metrics/MethodLength
     end
   end
 end

@@ -12,8 +12,7 @@ module EchSpec
   end
 
   class Err
-    attr_reader :details
-    attr_reader :message_stack
+    attr_reader :details, :message_stack
 
     def initialize(details, message_stack)
       @details = details

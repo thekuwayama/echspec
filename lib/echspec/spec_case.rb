@@ -1,7 +1,6 @@
 module EchSpec
   class SpecCase
-    attr_reader :description
-    attr_reader :method
+    attr_reader :description, :method
 
     def initialize(description, method)
       @description = description

@@ -50,6 +50,7 @@ module EchSpec
         @stack.marshal
       end
 
+      # rubocop: disable Metrics/MethodLength
       def send_ch_ech_with_tls12(socket, hostname, ech_config)
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
@@ -72,7 +73,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
-        @stack.set_ch_inner(inner)
+        @stack.ch_inner(inner)
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
         ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
@@ -90,6 +91,7 @@ module EchSpec
 
         recv
       end
+      # rubocop: enable Metrics/MethodLength
     end
   end
 end
