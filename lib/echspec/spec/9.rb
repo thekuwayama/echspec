@@ -31,9 +31,9 @@ module EchSpec
                    end
 
           ech_configs = case result
-                        in Ok(ech_configs)
-                          ech_configs
-                        in Err(details)
+                        in Ok(obj)
+                          obj
+                        in Err
                           return result
                         end
 
@@ -59,7 +59,7 @@ module EchSpec
           end
           return Ok.new(ech_config) unless ech_config.nil?
 
-          Err.new('EchConfigs does NOT include HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.')
+          Err.new('EchConfigs does NOT include HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.', nil)
         end
 
         # @param hostname [String]
@@ -72,10 +72,10 @@ module EchSpec
               Resolv::DNS::Resource::IN::HTTPS
             )
           rescue Resolv::ResolvError => e
-            return Err.new(e.message)
+            return Err.new(e.message, nil)
           end
 
-          return Err.new('HTTPS resource record does NOT have ech SvcParams') \
+          return Err.new('HTTPS resource record does NOT have ech SvcParams', nil) \
             if rr.svc_params['ech'].nil?
 
           Ok.new(rr.svc_params['ech'].echconfiglist)
@@ -88,13 +88,13 @@ module EchSpec
           s = pem.gsub(/-----(BEGIN|END) ECH CONFIGS-----/, '')
                  .gsub("\n", '')
           b = Base64.decode64(s)
-          return Err.new('failed to parse ECHConfigs') \
+          return Err.new('failed to parse ECHConfigs', nil) \
             unless b.length == b.slice(0, 2).unpack1('n') + 2
 
           begin
             ech_configs = ECHConfig.decode_vectors(b.slice(2..))
           rescue ECHConfig::Error
-            return Err.new('failed to parse ECHConfigs')
+            return Err.new('failed to parse ECHConfigs', nil)
           end
 
           Ok.new(ech_configs)

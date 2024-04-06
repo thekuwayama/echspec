@@ -30,7 +30,7 @@ module EchSpec
       def print_err_details(err, idx, desc, verbose)
         puts "\t(#{idx + 1}) #{desc}"
         details =  "\t\t#{err.details}"
-        details += ", messge stack: #{err.message_stack}" if verbose
+        details += ", messge stack: #{err.message_stack}" if verbose && !err.message_stack.nil?
         puts details
       end
     end
