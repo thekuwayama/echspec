@@ -19,7 +19,7 @@ module EchSpec
         arr = []
         arr << "\"ClientHelloInner\":#{obj2json(@ch_inner)}" unless @ch_inner.nil?
         arr = @stack.reduce(arr) { |sum, msg| sum << "\"#{msg2name(msg)}\":#{obj2json(msg)}" }
-        "{#{arr.join(',')}}"
+        "{#{arr.reverse.join(',')}}"
       end
 
       # rubocop: disable Metrics/CyclomaticComplexity
