@@ -30,11 +30,20 @@ Usage: echspec [options] hostname
 ```
 
 ```sh-session
-$ bundle exec ruby exe/echspec -f fixtures/echconfigs.pem -p 4433 localhost
+$ bundle exec ruby exe/echspec crypto.cloudflare.com
 ```
 
 ```sh-session
-$ bundle exec ruby exe/echspec crypto.cloudflare.com
+$ bundle exec ruby exe/echspec -f fixtures/echconfigs.pem -p 4433 localhost
+	MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM. [9]
+	MUST abort with an "illegal_parameter" alert, if EncodedClientHelloInner is padded with non-zero values [5.1-9]
+	MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloInner [7-2.3.1]
+	MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloOuter [7-2.3.1]
+	MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below [7.1-10]
+	MUST include the "encrypted_client_hello" extension in its EncryptedExtensions with the "retry_configs" field set to one or more ECHConfig [7.1-13.2.1]
+	MUST abort with a "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension [7.1.1-2]
+	MUST abort with an "illegal_parameter" alert, if 2nd ClientHelloOuter "encrypted_client_hello" enc is empty [7.1.1-2]
+	MUST abort with a "decrypt_error" alert, if fails to decrypt 2nd ClientHelloOuter [7.1.1-5]
 ```
 
 ## License
