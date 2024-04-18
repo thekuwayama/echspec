@@ -53,7 +53,6 @@ PLATFORMS
   arm64-darwin-23
 
 DEPENDENCIES
-  openssl
   rake (= 13.2.1)
   rubocop (= 1.62.0)
   svcb_rr_patch

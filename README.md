@@ -7,12 +7,16 @@
 
 - https://datatracker.ietf.org/doc/draft-ietf-tls-esni/
 
-## Install
+## Initial Setup
 
 You can run it the following:
 
 ```sh-session
 $ gem install bundler
+
+$ git clone git@github.com:thekuwayama/echspec.git
+
+$ cd echspec
 
 $ bundle install
 ```
