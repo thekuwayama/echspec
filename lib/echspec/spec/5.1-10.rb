@@ -24,6 +24,10 @@ module EchSpec
             SpecCase.new(
               'MUST abort with an "illegal_parameter" alert, if any referenced extension is missing in ClientHelloOuter.',
               method(:validate_missing_extension_ch_outer)
+            ),
+            SpecCase.new(
+              'MUST abort with an "illegal_parameter" alert, if any extension is referenced in OuterExtensions more than once.',
+              method(:validate_duplicate_outer_extensions)
             )
           ]
         )
@@ -49,6 +53,26 @@ module EchSpec
         Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
       end
 
+      # @param hostname [String]
+      # @param port [Integer]
+      # @param ech_config [ECHConfig]
+      #
+      # @return [EchSpec::Ok | Err]
+      def self.validate_duplicate_outer_extensions(hostname, port, ech_config)
+        socket = TCPSocket.new(hostname, port)
+        spec = Spec5_1_10.new
+        recv = spec.send_duplicate_outer_extensions(socket, hostname, ech_config)
+        socket.close
+        return Err.new('did not send expected alert: illegal_parameter', spec.message_stack) \
+          unless Spec.expect_alert(recv, :illegal_parameter)
+
+        Ok.new(nil)
+      rescue Timeout::Error
+        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
+      rescue Errno::ECONNREFUSED
+        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
+      end
+
       def initialize
         @stack = Log::MessageStack.new
       end
@@ -59,6 +83,10 @@ module EchSpec
 
       def send_missing_extension_ch_outer(socket, hostname, ech_config)
         send_invalid_ech_outer_extensions(socket, hostname, ech_config, MissingReferencedExtensions)
+      end
+
+      def send_duplicate_outer_extensions(socket, hostname, ech_config)
+        send_invalid_ech_outer_extensions(socket, hostname, ech_config, DuplicateOuterExtensions)
       end
 
       def send_invalid_ech_outer_extensions(socket, hostname, ech_config, super_extensions)
@@ -104,16 +132,37 @@ module EchSpec
         def remove_and_replace!(_)
           outer_extensions = [TTTLS13::Message::ExtensionType::KEY_SHARE]
           tmp1 = filter { |k, _| !outer_extensions.include?(k) }
-          tmp2 = filter { |k, _| outer_extensions.include?(k) }
 
           clear
           replaced = TTTLS13::Message::Extensions.new
 
           tmp1.each_value { |v| self << v; replaced << v }
           # key_share is referenced, but it is missing in ClientHelloOuter.
-          replaced << TTTLS13::Message::Extension::ECHOuterExtensions.new(tmp2.keys) \
-            unless tmp2.keys.empty?
+          replaced << TTTLS13::Message::Extension::ECHOuterExtensions.new(
+            [TTTLS13::Message::ExtensionType::KEY_SHARE]
+          )
+          replaced
+        end
+      end
 
+      class DuplicateOuterExtensions < TTTLS13::Message::Extensions
+        # @param outer_extensions [Array of TTTLS13::Message::ExtensionType]
+        #
+        # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
+        def remove_and_replace!(_)
+          outer_extensions = [TTTLS13::Message::ExtensionType::KEY_SHARE]
+          tmp1 = filter { |k, _| !outer_extensions.include?(k) }
+          tmp2 = filter { |k, _| outer_extensions.include?(k) }
+
+          clear
+          replaced = TTTLS13::Message::Extensions.new
+
+          tmp1.each_value { |v| self << v; replaced << v }
+          tmp2.each_value { |v| self << v }
+          # key_share appears twice in OuterExtensions.
+          replaced << TTTLS13::Message::Extension::ECHOuterExtensions.new(
+            [TTTLS13::Message::ExtensionType::KEY_SHARE] * 2
+          )
           replaced
         end
       end
