@@ -32,6 +32,10 @@ module EchSpec
             SpecCase.new(
               'MUST abort with an "illegal_parameter" alert, if "encrypted_client_hello" is referenced in OuterExtensions.',
               method(:validate_referenced_encrypted_client_hello)
+            ),
+            SpecCase.new(
+              'MUST abort with an "illegal_parameter" alert, if the extensions in ClientHelloOuter corresponding to those in OuterExtensions do not occur in the same order.',
+              method(:validate_not_same_order_extensions)
             )
           ]
         )
@@ -62,6 +66,15 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def self.validate_referenced_encrypted_client_hello(hostname, port, ech_config)
         validate_invalid_ech_outer_extensions(hostname, port, ech_config, ReferencedEncryptedClientHello)
+      end
+
+      # @param hostname [String]
+      # @param port [Integer]
+      # @param ech_config [ECHConfig]
+      #
+      # @return [EchSpec::Ok | Err]
+      def self.validate_not_same_order_extensions(hostname, port, ech_config)
+        validate_invalid_ech_outer_extensions(hostname, port, ech_config, NotSameOrderExtensions)
       end
 
       def self.validate_invalid_ech_outer_extensions(hostname, port, ech_config, super_extensions)
@@ -124,7 +137,7 @@ module EchSpec
       end
 
       class MissingReferencedExtensions < TTTLS13::Message::Extensions
-        # @param outer_extensions [Array of TTTLS13::Message::ExtensionType]
+        # @param _ [Array of TTTLS13::Message::ExtensionType]
         #
         # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
         def remove_and_replace!(_)
@@ -144,7 +157,7 @@ module EchSpec
       end
 
       class DuplicatedOuterExtensions < TTTLS13::Message::Extensions
-        # @param outer_extensions [Array of TTTLS13::Message::ExtensionType]
+        # @param _ [Array of TTTLS13::Message::ExtensionType]
         #
         # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
         def remove_and_replace!(_)
@@ -166,7 +179,7 @@ module EchSpec
       end
 
       class ReferencedEncryptedClientHello < TTTLS13::Message::Extensions
-        # @param outer_extensions [Array of TTTLS13::Message::ExtensionType]
+        # @param _ [Array of TTTLS13::Message::ExtensionType]
         #
         # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
         def remove_and_replace!(_)
@@ -182,6 +195,31 @@ module EchSpec
           # encrypted_client_hello appears in OuterExtensions.
           replaced << TTTLS13::Message::Extension::ECHOuterExtensions.new(
             [TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
+          )
+          replaced
+        end
+      end
+
+      class NotSameOrderExtensions < TTTLS13::Message::Extensions
+        # @param _ [Array of TTTLS13::Message::ExtensionType]
+        #
+        # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
+        def remove_and_replace!(_)
+          outer_extensions = [
+            TTTLS13::Message::ExtensionType::KEY_SHARE,
+            TTTLS13::Message::ExtensionType::SUPPORTED_VERSIONS
+          ]
+          tmp1 = filter { |k, _| !outer_extensions.include?(k) }
+          tmp2 = filter { |k, _| outer_extensions.include?(k) }
+
+          clear
+          replaced = TTTLS13::Message::Extensions.new
+
+          tmp1.each_value { |v| self << v; replaced << v }
+          tmp2.each_value { |v| self << v }
+          # extensions in ClientHelloOuter and OuterExtensions are not in the same order.
+          replaced << TTTLS13::Message::Extension::ECHOuterExtensions.new(
+            tmp2.keys.reverse
           )
           replaced
         end
