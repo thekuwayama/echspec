@@ -39,18 +39,7 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_missing_extension_ch_outer(hostname, port, ech_config)
-        socket = TCPSocket.new(hostname, port)
-        spec = Spec5_1_10.new
-        recv = spec.send_missing_extension_ch_outer(socket, hostname, ech_config)
-        socket.close
-        return Err.new('did not send expected alert: illegal_parameter', spec.message_stack) \
-          unless Spec.expect_alert(recv, :illegal_parameter)
-
-        Ok.new(nil)
-      rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
-      rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
+        validate_invalid_ech_outer_extensions(hostname, port, ech_config, MissingReferencedExtensions)
       end
 
       # @param hostname [String]
@@ -59,9 +48,13 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_duplicate_outer_extensions(hostname, port, ech_config)
+        validate_invalid_ech_outer_extensions(hostname, port, ech_config, DuplicateOuterExtensions)
+      end
+
+      def self.validate_invalid_ech_outer_extensions(hostname, port, ech_config, super_extensions)
         socket = TCPSocket.new(hostname, port)
         spec = Spec5_1_10.new
-        recv = spec.send_duplicate_outer_extensions(socket, hostname, ech_config)
+        recv = spec.send_invalid_ech_outer_extensions(socket, hostname, ech_config, super_extensions)
         socket.close
         return Err.new('did not send expected alert: illegal_parameter', spec.message_stack) \
           unless Spec.expect_alert(recv, :illegal_parameter)
@@ -79,14 +72,6 @@ module EchSpec
 
       def message_stack
         @stack.marshal
-      end
-
-      def send_missing_extension_ch_outer(socket, hostname, ech_config)
-        send_invalid_ech_outer_extensions(socket, hostname, ech_config, MissingReferencedExtensions)
-      end
-
-      def send_duplicate_outer_extensions(socket, hostname, ech_config)
-        send_invalid_ech_outer_extensions(socket, hostname, ech_config, DuplicateOuterExtensions)
       end
 
       def send_invalid_ech_outer_extensions(socket, hostname, ech_config, super_extensions)
