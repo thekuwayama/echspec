@@ -34,6 +34,10 @@ You can run it the following:
 $ bundle exec ruby exe/echspec crypto.cloudflare.com
 	MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM. [9]
 	MUST abort with an "illegal_parameter" alert, if EncodedClientHelloInner is padded with non-zero values [5.1-9]
+	MUST abort with an "illegal_parameter" alert, if any referenced extension is missing in ClientHelloOuter. [5.1-10]
+	MUST abort with an "illegal_parameter" alert, if any extension is referenced in OuterExtensions more than once. [5.1-10]
+	MUST abort with an "illegal_parameter" alert, if "encrypted_client_hello" is referenced in OuterExtensions. [5.1-10]
+	MUST abort with an "illegal_parameter" alert, if the extensions in ClientHelloOuter corresponding to those in OuterExtensions do not occur in the same order. [5.1-10]
 	MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloInner [7-2.3.1]
 	MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloOuter [7-2.3.1]
 	MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below [7.1-10]
