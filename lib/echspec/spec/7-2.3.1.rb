@@ -150,12 +150,16 @@ module EchSpec
         # offer_ech
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
 
+        # for ech_outer_extensions
+        replaced = \
+          inner.extensions.remove_and_replace!([])
+
         # Encrypted ClientHello Configuration
         ech_state, enc = TTTLS13::Ech.encrypted_ech_config(
           ech_config,
           selector
         )
-        encoded = TTTLS13::Ech.encode_ch_inner(inner, ech_state.maximum_name_length)
+        encoded = TTTLS13::Ech.encode_ch_inner(inner, ech_state.maximum_name_length, replaced)
         overhead_len = TTTLS13::Ech.aead_id2overhead_len(
           ech_state.cipher_suite.aead_id.uint16
         )

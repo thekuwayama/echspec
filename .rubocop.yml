@@ -22,6 +22,9 @@ Naming/FileName:
 Naming/ClassAndModuleCamelCase:
   Enabled: false
 
+Semicolon:
+  AllowAsExpressionSeparator: true
+
 Style/Documentation:
   Enabled: false
 

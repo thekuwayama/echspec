@@ -85,7 +85,7 @@ module EchSpec
 
       def spec_groups
         # 5
-        groups = [Spec5_1_9]
+        groups = [Spec5_1_9, Spec5_1_10]
 
         # 7
         groups += [Spec7_2_3_1, Spec7_1_10, Spec7_1_13_2_1, Spec7_1_1_2, Spec7_1_1_5]
