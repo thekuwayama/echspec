@@ -58,10 +58,14 @@ module EchSpec
       end
 
       def send_missing_extension_ch_outer(socket, hostname, ech_config)
+        send_invalid_ech_outer_extensions(socket, hostname, ech_config, MissingReferencedExtensions)
+      end
+
+      def send_invalid_ech_outer_extensions(socket, hostname, ech_config, super_extensions)
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
         exs, = TLS13Client.gen_ch_extensions(hostname)
-        exs = MissingReferencedExtensions.new(exs.values)
+        exs = super_extensions.new(exs.values)
         inner = TTTLS13::Message::ClientHello.new(
           cipher_suites: TTTLS13::CipherSuites.new(
             [
