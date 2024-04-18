@@ -23,11 +23,15 @@ module EchSpec
           [
             SpecCase.new(
               'MUST abort with an "illegal_parameter" alert, if any referenced extension is missing in ClientHelloOuter.',
-              method(:validate_missing_extension_ch_outer)
+              method(:validate_missing_referenced_extensions)
             ),
             SpecCase.new(
               'MUST abort with an "illegal_parameter" alert, if any extension is referenced in OuterExtensions more than once.',
-              method(:validate_duplicate_outer_extensions)
+              method(:validate_duplicated_outer_extensions)
+            ),
+            SpecCase.new(
+              'MUST abort with an "illegal_parameter" alert, if "encrypted_client_hello" is referenced in OuterExtensions.',
+              method(:validate_referenced_encrypted_client_hello)
             )
           ]
         )
@@ -38,7 +42,7 @@ module EchSpec
       # @param ech_config [ECHConfig]
       #
       # @return [EchSpec::Ok | Err]
-      def self.validate_missing_extension_ch_outer(hostname, port, ech_config)
+      def self.validate_missing_referenced_extensions(hostname, port, ech_config)
         validate_invalid_ech_outer_extensions(hostname, port, ech_config, MissingReferencedExtensions)
       end
 
@@ -47,8 +51,17 @@ module EchSpec
       # @param ech_config [ECHConfig]
       #
       # @return [EchSpec::Ok | Err]
-      def self.validate_duplicate_outer_extensions(hostname, port, ech_config)
-        validate_invalid_ech_outer_extensions(hostname, port, ech_config, DuplicateOuterExtensions)
+      def self.validate_duplicated_outer_extensions(hostname, port, ech_config)
+        validate_invalid_ech_outer_extensions(hostname, port, ech_config, DuplicatedOuterExtensions)
+      end
+
+      # @param hostname [String]
+      # @param port [Integer]
+      # @param ech_config [ECHConfig]
+      #
+      # @return [EchSpec::Ok | Err]
+      def self.validate_referenced_encrypted_client_hello(hostname, port, ech_config)
+        validate_invalid_ech_outer_extensions(hostname, port, ech_config, ReferencedEncryptedClientHello)
       end
 
       def self.validate_invalid_ech_outer_extensions(hostname, port, ech_config, super_extensions)
@@ -130,7 +143,7 @@ module EchSpec
         end
       end
 
-      class DuplicateOuterExtensions < TTTLS13::Message::Extensions
+      class DuplicatedOuterExtensions < TTTLS13::Message::Extensions
         # @param outer_extensions [Array of TTTLS13::Message::ExtensionType]
         #
         # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
@@ -147,6 +160,28 @@ module EchSpec
           # key_share appears twice in OuterExtensions.
           replaced << TTTLS13::Message::Extension::ECHOuterExtensions.new(
             [TTTLS13::Message::ExtensionType::KEY_SHARE] * 2
+          )
+          replaced
+        end
+      end
+
+      class ReferencedEncryptedClientHello < TTTLS13::Message::Extensions
+        # @param outer_extensions [Array of TTTLS13::Message::ExtensionType]
+        #
+        # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
+        def remove_and_replace!(_)
+          outer_extensions = [TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
+          tmp1 = filter { |k, _| !outer_extensions.include?(k) }
+          tmp2 = filter { |k, _| outer_extensions.include?(k) }
+
+          clear
+          replaced = TTTLS13::Message::Extensions.new
+
+          tmp1.each_value { |v| self << v; replaced << v }
+          tmp2.each_value { |v| self << v }
+          # encrypted_client_hello appears in OuterExtensions.
+          replaced << TTTLS13::Message::Extension::ECHOuterExtensions.new(
+            [TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
           )
           replaced
         end
