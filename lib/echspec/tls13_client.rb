@@ -150,7 +150,7 @@ module EchSpec
         # receive HelloRetryRequest
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
         stack << recv
-        raise Error::BeforeTargetSituationError, 'not received HelloRetryRequest' \
+        raise Error::BeforeTargetSituationError, 'did not send expected handshake message: HelloRetryRequest' \
           unless recv.is_a?(TTTLS13::Message::ServerHello) && recv.hrr?
 
         [conn, ch, recv, ech_state]

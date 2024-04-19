@@ -17,9 +17,11 @@ module EchSpec
       def print_summarize(result, desc)
         case result
         in Ok
-          puts "\t#{desc.green}"
+          summary = "\u2714 #{desc}".green
+          puts "\t#{summary}"
         in Err
-          puts "\t#{desc.red}"
+          summary = "\u0078 #{desc}".red
+          puts "\t#{summary}"
         end
       end
 
@@ -28,10 +30,10 @@ module EchSpec
       # @param desc [String]
       # @param verbose [Boolean]
       def print_err_details(err, idx, desc, verbose)
-        puts "\t(#{idx + 1}) #{desc}"
-        details =  "\t\t#{err.details}"
-        details += ", messge stack: #{err.message_stack}" if verbose && !err.message_stack.nil?
-        puts details
+        puts "\t#{idx + 1}) #{desc}"
+        puts "\t\t#{err.details}"
+        puts "\t\tmessge stack: #{err.message_stack}" if verbose && !err.message_stack.nil?
+        puts
       end
     end
   end
@@ -42,6 +44,8 @@ Dir["#{File.dirname(__FILE__)}/spec/*.rb"].sort.each { |f| require f }
 module EchSpec
   module Spec
     class << self
+      using Refinements
+
       # @param fpath [String]
       # @param port [Integer]
       # @param hostname [String]
@@ -51,6 +55,7 @@ module EchSpec
       # rubocop: disable Metrics/CyclomaticComplexity
       def run(fpath, port, hostname, force_compliant, verbose)
         TTTLS13::Logging.logger.level = Logger::WARN
+        puts 'TLS Encrypted Client Hello Server'
         ech_config = try_get_ech_config(fpath, hostname, force_compliant)
 
         results = spec_groups.flat_map do |g|
@@ -63,10 +68,13 @@ module EchSpec
         results.each { |h| print_summarize(h[:result], h[:desc]) }
         return if results.all? { |h| h[:result].is_a? Ok }
 
+        puts
         puts 'Failures:'
-        results.filter { |h| h[:result].is_a? Err }
-               .each
-               .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc], verbose) }
+        puts
+        failures = results.filter { |h| h[:result].is_a? Err }
+        failures.each
+                .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc], verbose) }
+        puts "#{failures.length} failure".red
       end
       # rubocop: enable Metrics/AbcSize
       # rubocop: enable Metrics/CyclomaticComplexity
