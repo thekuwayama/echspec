@@ -13,11 +13,11 @@ module EchSpec
           '7-2.3.1',
           [
             SpecCase.new(
-              'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloInner',
+              'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloInner.',
               method(:validate_illegal_inner_ech_type)
             ),
             SpecCase.new(
-              'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloOuter',
+              'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloOuter.',
               method(:validate_illegal_outer_ech_type)
             )
           ]

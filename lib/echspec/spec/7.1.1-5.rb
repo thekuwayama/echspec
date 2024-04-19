@@ -16,7 +16,7 @@ module EchSpec
           '7.1.1-5',
           [
             SpecCase.new(
-              'MUST abort with a "decrypt_error" alert, if fails to decrypt 2nd ClientHelloOuter',
+              'MUST abort with a "decrypt_error" alert, if fails to decrypt 2nd ClientHelloOuter.',
               method(:validate_undecryptable_2nd_ch_outer)
             )
           ]

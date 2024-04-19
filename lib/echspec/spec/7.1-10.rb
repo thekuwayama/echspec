@@ -15,7 +15,7 @@ module EchSpec
           '7.1-10',
           [
             SpecCase.new(
-              'MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below',
+              'MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below.',
               method(:validate_ech_with_tls12)
             )
           ]

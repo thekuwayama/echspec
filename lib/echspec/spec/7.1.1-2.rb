@@ -17,11 +17,11 @@ module EchSpec
           '7.1.1-2',
           [
             SpecCase.new(
-              'MUST abort with a "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension',
+              'MUST abort with a "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension.',
               method(:validate_2nd_ch_missing_ech)
             ),
             SpecCase.new(
-              'MUST abort with an "illegal_parameter" alert, if 2nd ClientHelloOuter "encrypted_client_hello" enc is empty',
+              'MUST abort with an "illegal_parameter" alert, if 2nd ClientHelloOuter "encrypted_client_hello" enc is empty.',
               method(:validate_2nd_ch_unchanged_ech)
             )
           ]

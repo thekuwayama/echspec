@@ -15,7 +15,7 @@ module EchSpec
           '5.1-9',
           [
             SpecCase.new(
-              'MUST abort with an "illegal_parameter" alert, if EncodedClientHelloInner is padded with non-zero values',
+              'MUST abort with an "illegal_parameter" alert, if EncodedClientHelloInner is padded with non-zero values.',
               method(:validate_nonzero_padding_encoded_ch_inner)
             )
           ]

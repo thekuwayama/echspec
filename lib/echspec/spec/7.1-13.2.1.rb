@@ -19,7 +19,7 @@ module EchSpec
           '7.1-13.2.1',
           [
             SpecCase.new(
-              'MUST include the "encrypted_client_hello" extension in its EncryptedExtensions with the "retry_configs" field set to one or more ECHConfig',
+              'MUST include the "encrypted_client_hello" extension in its EncryptedExtensions with the "retry_configs" field set to one or more ECHConfig.',
               method(:validate_ee_retry_configs)
             )
           ]
