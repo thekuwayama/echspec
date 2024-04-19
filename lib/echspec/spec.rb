@@ -80,7 +80,7 @@ module EchSpec
       # rubocop: enable Metrics/CyclomaticComplexity
 
       def try_get_ech_config(fpath, hostname, force_compliant)
-        # 9
+        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
         case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
         in Ok(obj)
           result.tap { |r| print_summarize(r, Spec9.description) }
@@ -92,10 +92,10 @@ module EchSpec
       end
 
       def spec_groups
-        # 5
+        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-5
         groups = [Spec5_1_9, Spec5_1_10]
 
-        # 7
+        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7
         groups += [Spec7_2_3_1, Spec7_1_10, Spec7_1_13_2_1, Spec7_1_1_2, Spec7_1_1_5]
 
         groups.map(&:spec_group)
