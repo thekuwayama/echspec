@@ -9,22 +9,18 @@
 
 ## Initial Setup
 
-You can run it the following:
+You can install with:
 
 ```sh-session
-$ gem install bundler
+$ gem install specific_install
 
-$ git clone git@github.com:thekuwayama/echspec.git
-
-$ cd echspec
-
-$ bundle install
+$ gem specific_install git@github.com:thekuwayama/echspec.git
 ```
 
 ## Usage
 
 ```sh-session
-$ bundle exec ruby exe/echspec --help
+$ echspec --help
 Usage: echspec [options] hostname
     -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
     -p, --port VALUE                 server port number                (default 443)
@@ -35,7 +31,7 @@ Usage: echspec [options] hostname
 You can run it the following:
 
 ```sh-session
-$ bundle exec ruby exe/echspec crypto.cloudflare.com
+$ echspec crypto.cloudflare.com
 TLS Encrypted Client Hello Server
 	✔ MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM. [9]
 	✔ MUST abort with an "illegal_parameter" alert, if EncodedClientHelloInner is padded with non-zero values. [5.1-9]
@@ -55,7 +51,7 @@ TLS Encrypted Client Hello Server
 By default, `echspec` retrieves ECHConfigs via HTTPS records. By using the `-f, --file FILE` option, you can specify an ECHConfig pem file. If you need to test the server on localhost, you can run it the following:
 
 ```sh-session
-$ bundle exec ruby exe/echspec -f fixtures/echconfigs.pem -p 4433 localhost
+$ echspec -f fixtures/echconfigs.pem -p 4433 localhost
 ```
 
 By default, `echspec` uses the following HPKE cipher suite
@@ -70,7 +66,7 @@ By default, `echspec` uses the following HPKE cipher suite
 By using the `-n, --not-force-compliant-hpke`, you can not enforce the HPKE cipher suite.
 
 ```sh-session
-$ bundle exec ruby exe/echspec -f fixtures/echconfigs.pem -p 4433 -n localhost
+$ echspec -f fixtures/echconfigs.pem -p 4433 -n localhost
 ```
 
 ## License
