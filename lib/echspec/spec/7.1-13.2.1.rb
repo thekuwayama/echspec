@@ -121,9 +121,11 @@ module EchSpec
         )
         recv, = conn.recv_message(hs_rcipher)
         @stack << recv
+        if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
+          recv, = conn.recv_message(hs_rcipher)
+          @stack << recv
+        end
 
-        recv, = conn.recv_message(hs_rcipher) \
-          if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
         raise Error::BeforeTargetSituationError, 'not received EncryptedExtensions' \
           unless recv.is_a?(TTTLS13::Message::EncryptedExtensions)
 
