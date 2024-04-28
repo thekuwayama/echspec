@@ -57,14 +57,14 @@ module EchSpec
         case obj
         in OpenSSL::X509::Certificate
           obj.to_pem.gsub("\n", '\n')
-        in Numeric, TrueClass, FalseClass
+        in Numeric | TrueClass | FalseClass
           obj.pretty_print_inspect
-        in String if obj.empty?
+        in ''
           '""'
         in String
           "\"0x#{obj.unpack1('H*')}\""
         in NilClass
-          '""'
+          'null'
         in Array
           s = obj.map { |i| obj2json(i) }.join(',')
           "[#{s}]"
@@ -77,7 +77,7 @@ module EchSpec
             v = obj2json(obj.instance_variable_get(i))
             "\"#{k}\":#{v}"
           end
-          "{#{arr.join(',')}}"
+          arr.join(',')
         else
           "\"$#{obj.class.name}\""
         end
