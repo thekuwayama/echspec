@@ -32,6 +32,8 @@ module EchSpec
           'HelloRetryRequest'
         in TTTLS13::Message::ServerHello
           'ServerHello'
+        in TTTLS13::Message::ChangeCipherSpec
+          'ChangeCipherSpec'
         in TTTLS13::Message::EncryptedExtensions
           'EncryptedExtensions'
         in TTTLS13::Message::Certificate
