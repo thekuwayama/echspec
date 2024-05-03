@@ -21,11 +21,12 @@ $ gem specific_install git@github.com:thekuwayama/echspec.git
 
 ```sh-session
 $ echspec --help
-Usage: echspec [OPTIONS] <HOSTNAME> [SECTIONS]
+Usage: echspec [OPTIONS] <HOSTNAME>
     -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
     -p, --port VALUE                 server port number                (default 443)
     -n, --not-force-compliant-hpke   not force compliant ECHConfig HPKE cipher suite
     -v, --verbose                    verbose mode; prints message stack if raised an error
+    -s, --sections SECTIONS          sections to test, by the default, all sections to test
 ```
 
 You can run it the following:
@@ -72,7 +73,7 @@ $ echspec -f fixtures/echconfigs.pem -p 4433 -n localhost
 If you specify the SECTIONS, you can run only SECTIONS the following:
 
 ```sh-session
-$ echspec -f fixtures/echconfigs.pem -p 4433 -n localhost 7.1.1-2 7.1.1-5
+$ echspec -f fixtures/echconfigs.pem -p 4433 -n -s 7.1.1-2,7.1.1-5 localhost
 TLS Encrypted Client Hello Server
         ✔ MUST abort with a "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension. [7.1.1-2]
         ✔ MUST abort with an "illegal_parameter" alert, if 2nd ClientHelloOuter "encrypted_client_hello" enc is empty. [7.1.1-2]

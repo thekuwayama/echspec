@@ -44,7 +44,15 @@ module EchSpec
         verbose = true
       end
 
-      op.banner = 'Usage: echspec [OPTIONS] <HOSTNAME> [SECTIONS]'
+      op.on(
+        '-s',
+        '--sections SECTIONS',
+        'sections to test, by the default, all sections to test'
+      ) do |v|
+        sections = v.split(',')
+      end
+
+      op.banner = 'Usage: echspec [OPTIONS] <HOSTNAME>'
       begin
         args = op.parse(argv)
       rescue OptionParser::InvalidOption, OptionParser::MissingArgument => e
@@ -58,13 +66,12 @@ module EchSpec
         exit 1
       end
 
-      if args.empty?
+      if args.length != 1
         warn op
         warn '** `hostname` argument is not specified'
         exit 1
       end
       hostname = args[0]
-      sections = args[1..] if args.length > 1
 
       [fpath, port, force_compliant, verbose, hostname, sections]
     end
