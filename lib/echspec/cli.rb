@@ -74,7 +74,7 @@ module EchSpec
 
       if args.length != 1
         warn op
-        warn '** `hostname` argument is not specified'
+        warn '** <HOSTNAME> argument is not specified'
         exit 1
       end
       hostname = args[0]
