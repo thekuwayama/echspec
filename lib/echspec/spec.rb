@@ -97,8 +97,10 @@ module EchSpec
       def try_get_ech_config(fpath, hostname, force_compliant)
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
         case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
-        in Ok(obj)
+        in Ok(obj) if force_compliant
           result.tap { |r| print_summarize(r, Spec9.description) }
+          obj
+        in Ok(obj)
           obj
         in Err(details, _)
           puts "\t\t#{details}"
