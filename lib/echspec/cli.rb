@@ -9,6 +9,7 @@ module EchSpec
       port = 443
       force_compliant = true
       verbose = false
+      sections = nil
 
       op.on(
         '-f',
@@ -62,19 +63,19 @@ module EchSpec
         exit 1
       end
       hostname = args[0]
-      section = (args.size == 1 ? nil : args[1])
+      sections = args[1..] if args.length > 1
 
-      [fpath, port, force_compliant, verbose, hostname, section]
+      [fpath, port, force_compliant, verbose, hostname, sections]
     end
     # rubocop: enable Metrics/MethodLength
 
     def run
-      fpath, port, force_compliant, verbose, hostname, section = parse_options
+      fpath, port, force_compliant, verbose, hostname, sections = parse_options
 
-      if section.nil?
+      if sections.nil?
         Spec.run(fpath, port, hostname, force_compliant, verbose)
       else
-        Spec.run_only(fpath, port, hostname, section, verbose)
+        Spec.run_only(fpath, port, hostname, sections, verbose)
       end
     end
   end

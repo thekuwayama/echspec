@@ -64,14 +64,15 @@ module EchSpec
       # @param fpath [String]
       # @param port [Integer]
       # @param hostname [String]
-      # @param section [String]
+      # @param sections [Array of String]
       # @param verbose [Boolean]
-      def run_only(fpath, port, hostname, section, verbose)
+      def run_only(fpath, port, hostname, sections, verbose)
+        targets = spec_groups.filter { |g| sections.include?(g.section) }
+
         TTTLS13::Logging.logger.level = Logger::WARN
         puts 'TLS Encrypted Client Hello Server'
         ech_config = try_get_ech_config(fpath, hostname, false)
 
-        targets = spec_groups.filter { |g| g.section == section }
         do_run(port, hostname, ech_config, targets, verbose)
       end
 
