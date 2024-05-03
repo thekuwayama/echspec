@@ -134,6 +134,10 @@ module EchSpec
 
         groups.map(&:spec_group)
       end
+
+      def sections
+        (spec_groups + [Spec9]).map(&:section)
+      end
     end
   end
 end

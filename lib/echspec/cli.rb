@@ -66,6 +66,12 @@ module EchSpec
         exit 1
       end
 
+      unknowns = sections - Spec.sections
+      unless unknowns.empty?
+        warn "** #{unknowns} are unknown sections"
+        exit 1
+      end
+
       if args.length != 1
         warn op
         warn '** `hostname` argument is not specified'
