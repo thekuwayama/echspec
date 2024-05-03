@@ -53,13 +53,21 @@ module EchSpec
       # @param hostname [String]
       # @param force_compliant [Boolean]
       # @param verbose [Boolean]
-      # rubocop: disable Metrics/AbcSize
-      # rubocop: disable Metrics/CyclomaticComplexity
       def run(fpath, port, hostname, force_compliant, verbose)
         TTTLS13::Logging.logger.level = Logger::WARN
         puts 'TLS Encrypted Client Hello Server'
         ech_config = try_get_ech_config(fpath, hostname, force_compliant)
 
+        do_run(port, hostname, ech_config, verbose)
+      end
+
+      # @param port [Integer]
+      # @param hostname [String]
+      # @param ech_config [ECHConfig]
+      # @param verbose [Boolean]
+      # rubocop: disable Metrics/AbcSize
+      # rubocop: disable Metrics/CyclomaticComplexity
+      def do_run(port, hostname, ech_config, verbose)
         results = spec_groups.flat_map do |g|
           g.spec_cases.map do |sc|
             d = "#{sc.description} [#{g.section}]"
@@ -81,6 +89,11 @@ module EchSpec
       # rubocop: enable Metrics/AbcSize
       # rubocop: enable Metrics/CyclomaticComplexity
 
+      # @param fpath [String]
+      # @param hostname [String]
+      # @param force_compliant [Boolean]
+      #
+      # @return [ECHConfig]
       def try_get_ech_config(fpath, hostname, force_compliant)
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
         case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
