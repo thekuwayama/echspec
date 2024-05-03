@@ -77,7 +77,7 @@ module EchSpec
             v = obj2json(obj.instance_variable_get(i))
             "\"#{k}\":#{v}"
           end
-          arr.join(',')
+          "{#{arr.join(',')}}"
         else
           "\"$#{obj.class.name}\""
         end
