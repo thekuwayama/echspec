@@ -66,7 +66,7 @@ module EchSpec
         exit 1
       end
 
-      unknowns = sections - Spec.sections
+      unknowns = sections.nil? ? [] : sections - Spec.sections
       unless unknowns.empty?
         warn "** #{unknowns} are unknown sections"
         exit 1
