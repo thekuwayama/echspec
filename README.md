@@ -21,7 +21,7 @@ $ gem specific_install git@github.com:thekuwayama/echspec.git
 
 ```sh-session
 $ echspec --help
-Usage: echspec [options] hostname
+Usage: echspec [OPTIONS] <HOSTNAME> [SECTIONS]
     -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
     -p, --port VALUE                 server port number                (default 443)
     -n, --not-force-compliant-hpke   not force compliant ECHConfig HPKE cipher suite
@@ -67,6 +67,16 @@ By using the `-n, --not-force-compliant-hpke`, you can not enforce the HPKE ciph
 
 ```sh-session
 $ echspec -f fixtures/echconfigs.pem -p 4433 -n localhost
+```
+
+If you specify the SECTIONS, you can run only SECTIONS the following:
+
+```sh-session
+$ echspec -f fixtures/echconfigs.pem -p 4433 -n localhost 7.1.1-2 7.1.1-5
+TLS Encrypted Client Hello Server
+        ✔ MUST abort with a "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension. [7.1.1-2]
+        ✔ MUST abort with an "illegal_parameter" alert, if 2nd ClientHelloOuter "encrypted_client_hello" enc is empty. [7.1.1-2]
+        ✔ MUST abort with a "decrypt_error" alert, if fails to decrypt 2nd ClientHelloOuter. [7.1.1-5]
 ```
 
 ## License

@@ -43,7 +43,7 @@ module EchSpec
         verbose = true
       end
 
-      op.banner += ' hostname [section]'
+      op.banner = 'Usage: echspec [OPTIONS] <HOSTNAME> [SECTIONS]'
       begin
         args = op.parse(argv)
       rescue OptionParser::InvalidOption, OptionParser::MissingArgument => e
