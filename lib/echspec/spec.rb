@@ -68,10 +68,11 @@ module EchSpec
       # @param verbose [Boolean]
       def run_only(fpath, port, hostname, sections, verbose)
         targets = spec_groups.filter { |g| sections.include?(g.section) }
+        force_compliant = sections.include?(Spec9.section)
 
         TTTLS13::Logging.logger.level = Logger::WARN
         puts 'TLS Encrypted Client Hello Server'
-        ech_config = try_get_ech_config(fpath, hostname, false)
+        ech_config = try_get_ech_config(fpath, hostname, force_compliant)
 
         do_run(port, hostname, ech_config, targets, verbose)
       end
@@ -114,7 +115,7 @@ module EchSpec
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
         case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
         in Ok(obj) if force_compliant
-          result.tap { |r| print_summarize(r, Spec9.description) }
+          result.tap { |r| print_summarize(r, "#{Spec9.description} [#{Spec9.section}]") }
           obj
         in Ok(obj)
           obj

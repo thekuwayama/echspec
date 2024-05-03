@@ -13,10 +13,7 @@ module EchSpec
       @section = '9'
       @description = 'MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.'
       class << self
-        # @return [String]
-        def description
-          "#{@description} [#{@section}]"
-        end
+        attr_reader :description, :section
 
         # @param fpath [String]
         # @param hostname [String]
