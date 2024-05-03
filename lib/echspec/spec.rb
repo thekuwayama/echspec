@@ -58,17 +58,32 @@ module EchSpec
         puts 'TLS Encrypted Client Hello Server'
         ech_config = try_get_ech_config(fpath, hostname, force_compliant)
 
-        do_run(port, hostname, ech_config, verbose)
+        do_run(port, hostname, ech_config, spec_groups, verbose)
+      end
+
+      # @param fpath [String]
+      # @param port [Integer]
+      # @param hostname [String]
+      # @param section [String]
+      # @param verbose [Boolean]
+      def run_only(fpath, port, hostname, section, verbose)
+        TTTLS13::Logging.logger.level = Logger::WARN
+        puts 'TLS Encrypted Client Hello Server'
+        ech_config = try_get_ech_config(fpath, hostname, false)
+
+        targets = spec_groups.filter { |g| g.section == section }
+        do_run(port, hostname, ech_config, targets, verbose)
       end
 
       # @param port [Integer]
       # @param hostname [String]
       # @param ech_config [ECHConfig]
+      # @param targets [Array of EchSpec::SpecGroup]
       # @param verbose [Boolean]
       # rubocop: disable Metrics/AbcSize
       # rubocop: disable Metrics/CyclomaticComplexity
-      def do_run(port, hostname, ech_config, verbose)
-        results = spec_groups.flat_map do |g|
+      def do_run(port, hostname, ech_config, targets, verbose)
+        results = targets.flat_map do |g|
           g.spec_cases.map do |sc|
             d = "#{sc.description} [#{g.section}]"
             r = sc.method.call(hostname, port, ech_config)

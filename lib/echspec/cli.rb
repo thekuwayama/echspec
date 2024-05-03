@@ -42,7 +42,7 @@ module EchSpec
         verbose = true
       end
 
-      op.banner += ' hostname'
+      op.banner += ' hostname [section]'
       begin
         args = op.parse(argv)
       rescue OptionParser::InvalidOption, OptionParser::MissingArgument => e
@@ -56,19 +56,26 @@ module EchSpec
         exit 1
       end
 
-      if args.size != 1
+      if args.empty?
         warn op
         warn '** `hostname` argument is not specified'
         exit 1
       end
+      hostname = args[0]
+      section = (args.size == 1 ? nil : args[1])
 
-      [fpath, port, force_compliant, verbose, args[0]]
+      [fpath, port, force_compliant, verbose, hostname, section]
     end
     # rubocop: enable Metrics/MethodLength
 
     def run
-      fpath, port, force_compliant, verbose, hostname = parse_options
-      Spec.run(fpath, port, hostname, force_compliant, verbose)
+      fpath, port, force_compliant, verbose, hostname, section = parse_options
+
+      if section.nil?
+        Spec.run(fpath, port, hostname, force_compliant, verbose)
+      else
+        Spec.run_only(fpath, port, hostname, section, verbose)
+      end
     end
   end
 end
