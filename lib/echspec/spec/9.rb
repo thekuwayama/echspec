@@ -62,6 +62,7 @@ module EchSpec
         # @param hostname [String]
         #
         # @return [EchSpec::Ok<Array of ECHConfig> | Err]
+        # rubocop: disable Metrics/AbcSize
         def resolve_ech_configs(hostname)
           begin
             rr = Resolv::DNS.new.getresource(
@@ -72,11 +73,22 @@ module EchSpec
             return Err.new(e.message, nil)
           end
 
-          return Err.new('HTTPS resource record does NOT have ech SvcParams', nil) \
-            if rr.svc_params['ech'].nil?
+          if Gem::Version.create(RUBY_VERSION) >= Gem::Version.create(3.3)
+            ech = 5
+            return Err.new('HTTPS resource record does NOT have ech SvcParams', nil) if rr.params[ech].nil?
 
-          Ok.new(rr.svc_params['ech'].echconfiglist)
+            octet = rr.params[ech].value
+            Err.new('failed to parse ECHConfigs', nil) \
+              unless octet.length == octet.slice(0, 2).unpack1('n') + 2
+
+            Ok.new(ECHConfig.decode_vectors(octet.slice(2..)))
+          else
+            return Err.new('HTTPS resource record does NOT have ech SvcParams', nil) if rr.svc_params['ech'].nil?
+
+            Ok.new(rr.svc_params['ech'].echconfiglist)
+          end
         end
+        # rubocop: enable Metrics/AbcSize
 
         # @param pem [String]
         #
