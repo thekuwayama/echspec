@@ -1,4 +1,4 @@
-name: lint
+name: lint & test
 
 on:
   push:
@@ -26,5 +26,5 @@ jobs:
           gem install bundler
           bundle --version
           bundle install
-      - name: Run rubocop
-        run: bundle exec rake rubocop
+      - name: Run rubocop & rspec
+        run: bundle exec rake
