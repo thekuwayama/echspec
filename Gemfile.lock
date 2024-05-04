@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     echspec (0.0.0)
-      svcb_rr_patch
+      resolv (~> 0.4.0)
       tttls1.3 (~> 0.3.3)
 
 GEM
@@ -26,6 +26,7 @@ GEM
     rainbow (3.1.1)
     rake (13.2.1)
     regexp_parser (2.9.0)
+    resolv (0.4.0)
     rexml (3.2.6)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
@@ -55,8 +56,6 @@ GEM
       parser (>= 3.3.0.4)
     ruby-progressbar (1.13.0)
     sorbet-runtime (0.5.11305)
-    svcb_rr_patch (0.0.6)
-      ech_config
     tttls1.3 (0.3.3)
       ech_config (~> 0.0.3)
       hpke
@@ -71,9 +70,9 @@ DEPENDENCIES
   bundler
   echspec!
   rake (= 13.2.1)
+  resolv (~> 0.4.0)
   rspec
   rubocop (= 1.62.0)
-  svcb_rr_patch
   tttls1.3 (~> 0.3.3)
 
 BUNDLED WITH

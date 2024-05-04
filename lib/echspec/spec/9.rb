@@ -73,20 +73,14 @@ module EchSpec
             return Err.new(e.message, nil)
           end
 
-          if Gem::Version.create(RUBY_VERSION) >= Gem::Version.create(3.3)
-            ech = 5
-            return Err.new('HTTPS resource record does NOT have ech SvcParams', nil) if rr.params[ech].nil?
+          ech = 5
+          return Err.new('HTTPS resource record does NOT have ech SvcParams', nil) if rr.params[ech].nil?
 
-            octet = rr.params[ech].value
-            Err.new('failed to parse ECHConfigs', nil) \
-              unless octet.length == octet.slice(0, 2).unpack1('n') + 2
+          octet = rr.params[ech].value
+          Err.new('failed to parse ECHConfigs', nil) \
+            unless octet.length == octet.slice(0, 2).unpack1('n') + 2
 
-            Ok.new(ECHConfig.decode_vectors(octet.slice(2..)))
-          else
-            return Err.new('HTTPS resource record does NOT have ech SvcParams', nil) if rr.svc_params['ech'].nil?
-
-            Ok.new(rr.svc_params['ech'].echconfiglist)
-          end
+          Ok.new(ECHConfig.decode_vectors(octet.slice(2..)))
         end
         # rubocop: enable Metrics/AbcSize
 

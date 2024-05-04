@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'svcb_rr_patch'
+gem 'resolv', '~> 0.4.0'
 gem 'tttls1.3', '~> 0.3.3'
 
 group :development do

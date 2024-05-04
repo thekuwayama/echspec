@@ -1,7 +1,6 @@
 require 'base64'
 require 'optparse'
 require 'resolv'
-require 'svcb_rr_patch' if Gem::Version.create(RUBY_VERSION) < Gem::Version.create(3.3)
 require 'timeout'
 require 'tttls1.3'
 
