@@ -62,7 +62,6 @@ module EchSpec
         # @param hostname [String]
         #
         # @return [EchSpec::Ok<Array of ECHConfig> | Err]
-        # rubocop: disable Metrics/AbcSize
         def resolve_ech_configs(hostname)
           begin
             rr = Resolv::DNS.new.getresource(
@@ -82,7 +81,6 @@ module EchSpec
 
           Ok.new(ECHConfig.decode_vectors(octet.slice(2..)))
         end
-        # rubocop: enable Metrics/AbcSize
 
         # @param pem [String]
         #
