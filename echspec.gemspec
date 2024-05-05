@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.executables   = ['echspec']
 
   spec.add_development_dependency 'bundler'
+  spec.add_dependency             'base64'
   spec.add_dependency             'resolv', '~> 0.4.0'
   spec.add_dependency             'tttls1.3', '~> 0.3.3'
 end
