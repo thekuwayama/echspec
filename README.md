@@ -28,7 +28,7 @@ Usage: echspec [OPTIONS] <HOSTNAME>
     -p, --port VALUE                 server port number                (default 443)
     -n, --not-force-compliant-hpke   not force compliant ECHConfig HPKE cipher suite
     -v, --verbose                    verbose mode; prints message stack if raised an error
-    -s, --sections SECTIONS          sections to test, by the default, all sections to test
+    -s, --sections SECTIONS          sections to test; by the default, test all sections
 ```
 
 You can run it the following:

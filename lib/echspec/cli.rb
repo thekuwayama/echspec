@@ -47,7 +47,7 @@ module EchSpec
       op.on(
         '-s',
         '--sections SECTIONS',
-        'sections to test, by the default, all sections to test'
+        'sections to test; by the default, test all sections'
       ) do |v|
         sections = v.split(',')
       end
@@ -62,7 +62,7 @@ module EchSpec
       end
 
       if !fpath.nil? && !File.exist?(fpath)
-        warn '** FILE is not found'
+        warn '** <FILE> is not found'
         exit 1
       end
 
