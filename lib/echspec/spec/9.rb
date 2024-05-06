@@ -72,6 +72,7 @@ module EchSpec
             return Err.new(e.message, nil)
           end
 
+          # https://datatracker.ietf.org/doc/html/draft-ietf-tls-svcb-ech-01#section-6
           ech = 5
           return Err.new('HTTPS resource record does NOT have ech SvcParams', nil) if rr.params[ech].nil?
 
