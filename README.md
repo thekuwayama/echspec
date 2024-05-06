@@ -1,9 +1,11 @@
 # echspec
 
 [![Actions Status](https://github.com/thekuwayama/echspec/actions/workflows/ci.yml/badge.svg)](https://github.com/thekuwayama/echspec/actions/workflows/ci.yml)
-[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/thekuwayama/echspec/main/LICENSE.txt)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
 
 `echspec` is a conformance testing tool for ECH implementation.
+
+![echspec demo](docs/echspec-demo.png)
 
 - https://datatracker.ietf.org/doc/draft-ietf-tls-esni/
 
