@@ -1,6 +1,6 @@
 module EchSpec
   module Spec
-    class Spec7_1_13_2_1
+    class Spec7_1_14_2_1
       # Otherwise, if all candidate ECHConfig values fail to decrypt the
       # extension, the client-facing server MUST ignore the extension and
       # proceed with the connection using ClientHelloOuter, with the
@@ -9,14 +9,16 @@ module EchSpec
       # * If the server is configured with any ECHConfigs, it MUST include
       #   the "encrypted_client_hello" extension in its EncryptedExtensions
       #   with the "retry_configs" field set to one or more ECHConfig
-      #   structures with up-to-date keys.
+      #   structures with up-to-date keys. Servers MAY supply multiple
+      #   ECHConfig values of different versions. This allows a server to
+      #   support multiple versions at once.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7.1-13.2.1
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-7.1-14.2.1
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group
         SpecGroup.new(
-          '7.1-13.2.1',
+          '7.1-14.2.1',
           [
             SpecCase.new(
               'MUST include the "encrypted_client_hello" extension in its EncryptedExtensions with the "retry_configs" field set to one or more ECHConfig.',
@@ -33,7 +35,7 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def self.validate_ee_retry_configs(hostname, port, _)
         socket = TCPSocket.new(hostname, port)
-        spec = Spec7_1_13_2_1.new
+        spec = Spec7_1_14_2_1.new
         recv = spec.send_ch_with_greased_ech(socket, hostname)
         socket.close
         ex = recv.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]

@@ -7,7 +7,7 @@ module EchSpec
       # zero, the server MUST abort the connection with an
       # "illegal_parameter" alert.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-5.1-9
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-5.1-9
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group
