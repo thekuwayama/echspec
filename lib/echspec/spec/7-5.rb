@@ -1,16 +1,15 @@
 module EchSpec
   module Spec
-    class Spec7_2_3_1
-      # * Otherwise, if ECHClientHello.type is not a valid
-      #   ECHClientHelloType, then the server MUST abort with an
-      #   "illegal_parameter" alert.
+    class Spec7_5
+      # If ECHClientHello.type is not a valid ECHClientHelloType, then the
+      # server MUST abort with an "illegal_parameter" alert.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-7-2.3.1
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-7-5
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group
         SpecGroup.new(
-          '7-2.3.1',
+          '7-5',
           [
             SpecCase.new(
               'MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloInner.',
@@ -60,7 +59,7 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def self.do_validate_illegal_ech_type(hostname, port, ech_config, method)
         socket = TCPSocket.new(hostname, port)
-        spec = Spec7_2_3_1.new
+        spec = Spec7_5.new
         recv = spec.send(method, socket, hostname, ech_config)
         socket.close
         if Spec.expect_alert(recv, :illegal_parameter)

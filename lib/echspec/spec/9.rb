@@ -9,7 +9,7 @@ module EchSpec
       # * KDF: HKDF-SHA256 (see Section 7.2 of [HPKE])
       # * AEAD: AES-128-GCM (see Section 7.3 of [HPKE])
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-17#section-9
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-9
       @section = '9'
       @description = 'MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.'
       class << self
