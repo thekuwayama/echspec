@@ -82,8 +82,6 @@ module EchSpec
       # @param ech_config [ECHConfig]
       # @param targets [Array of EchSpec::SpecGroup]
       # @param verbose [Boolean]
-      # rubocop: disable Metrics/AbcSize
-      # rubocop: disable Metrics/CyclomaticComplexity
       def do_run(port, hostname, ech_config, targets, verbose)
         results = targets.flat_map do |g|
           g.spec_cases.map do |sc|
@@ -93,18 +91,16 @@ module EchSpec
           end
         end
         results.each { |h| print_summarize(h[:result], h[:desc]) }
-        return if results.all? { |h| h[:result].is_a? Ok }
+        failures = results.filter { |h| h[:result].is_a? Err }
+        return if failures.empty?
 
         puts
         puts 'Failures:'
         puts
-        failures = results.filter { |h| h[:result].is_a? Err }
         failures.each
                 .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc], verbose) }
         puts "#{failures.length} failure".red
       end
-      # rubocop: enable Metrics/AbcSize
-      # rubocop: enable Metrics/CyclomaticComplexity
 
       # @param fpath [String]
       # @param hostname [String]
