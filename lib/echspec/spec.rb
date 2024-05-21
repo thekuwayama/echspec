@@ -17,14 +17,13 @@ module EchSpec
       def print_summarize(result, desc)
         check = "\u2714"
         cross = "\u0078"
-        case result
-        in Ok
-          summary = "#{check} #{desc}".green
-          puts "\t#{summary}"
-        in Err
-          summary = "#{cross} #{desc}".red
-          puts "\t#{summary}"
-        end
+        summary = case result
+                  in Ok
+                    "\t#{check} #{desc}".green
+                  in Err
+                    "\t#{cross} #{desc}".red
+                  end
+        puts summary
       end
 
       # @param result [EchSpec::Err]
