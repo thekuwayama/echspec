@@ -47,7 +47,7 @@ module EchSpec
     class << self
       using Refinements
 
-      # @param fpath [String]
+      # @param fpath [String | NilClass]
       # @param port [Integer]
       # @param hostname [String]
       # @param force_compliant [Boolean]
@@ -60,7 +60,7 @@ module EchSpec
         do_run(port, hostname, ech_config, spec_groups, verbose)
       end
 
-      # @param fpath [String]
+      # @param fpath [String | NilClass]
       # @param port [Integer]
       # @param hostname [String]
       # @param sections [Array of String]
@@ -101,7 +101,7 @@ module EchSpec
         puts "#{failures.length} failure".red
       end
 
-      # @param fpath [String]
+      # @param fpath [String | NilClass]
       # @param hostname [String]
       # @param force_compliant [Boolean]
       #

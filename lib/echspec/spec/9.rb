@@ -15,7 +15,7 @@ module EchSpec
       class << self
         attr_reader :description, :section
 
-        # @param fpath [String]
+        # @param fpath [String | NilClass]
         # @param hostname [String]
         # @param force_compliant [Boolean]
         #
