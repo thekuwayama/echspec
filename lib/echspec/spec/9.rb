@@ -87,7 +87,9 @@ module EchSpec
         #
         # @return [EchSpec::Ok<Array of ECHConfig> | Err]
         def parse_pem(pem)
-          s = pem.gsub(/-----(BEGIN|END) ECH CONFIGS-----/, '')
+          s = pem.scan(/-----BEGIN ECHCONFIG-----(.*)-----END ECHCONFIG-----/m)
+                 .first
+                 .first
                  .gsub("\n", '')
           b = Base64.decode64(s)
           return Err.new('failed to parse ECHConfigs', nil) \
@@ -96,7 +98,7 @@ module EchSpec
           begin
             ech_configs = ECHConfig.decode_vectors(b.slice(2..))
           rescue ECHConfig::Error
-            return Err.new('failed to parse ECHConfigs', nil)
+            return Err.new('failed to parse ECHConfig file', nil)
           end
 
           Ok.new(ech_configs)
