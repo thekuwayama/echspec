@@ -82,6 +82,12 @@ TLS Encrypted Client Hello Server
         ✔ MUST abort with a "decrypt_error" alert, if fails to decrypt 2nd ClientHelloOuter. [7.1.1-5]
 ```
 
+## Note
+
+`echspec` is inspired by:
+
+- https://github.com/summerwind/h2spec
+
 ## License
 
 `echspec` is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).

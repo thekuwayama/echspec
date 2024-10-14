@@ -1,0 +1,545 @@
+$ bundle exec ruby exe/echspec crypto.cloudflare.com -v 2>&1 > /dev/null |  jq .
+{
+  "Alert": {
+    "level": "0x02",
+    "description": "0x32"
+  },
+  "ClientHello": {
+    "msg_type": "0x01",
+    "legacy_version": "0x0303",
+    "random": "0x677e86decc6a24b3996f8f35ed65c077d08c904f9e00f5c2bbe20ab5be6afa6d",
+    "legacy_session_id": "0xac28711fcdd25c631484cd0d49227d2c6ab3394732991f615e9c7f43c3a5f54d",
+    "cipher_suites": [
+      "0x1302",
+      "0x1303",
+      "0x1301"
+    ],
+    "legacy_compression_methods": [
+      "0x00"
+    ],
+    "extensions": {
+      "0x0000": {
+        "extension_type": "0x0000",
+        "server_name": "0x636c6f7564666c6172652d6563682e636f6d"
+      },
+      "0x002b": {
+        "extension_type": "0x002b",
+        "msg_type": "0x01",
+        "versions": [
+          "0x0304"
+        ]
+      },
+      "0x000d": {
+        "extension_type": "0x000d",
+        "supported_signature_algorithms": [
+          "0x0403",
+          "0x0503",
+          "0x0603",
+          "0x0804",
+          "0x0805",
+          "0x0806",
+          "0x0401",
+          "0x0501",
+          "0x0601"
+        ]
+      },
+      "0x000a": {
+        "extension_type": "0x000a",
+        "named_group_list": [
+          "0x0017",
+          "0x0018",
+          "0x0019"
+        ]
+      },
+      "0x0033": {
+        "extension_type": "0x0033",
+        "msg_type": "0x01",
+        "key_share_entry": [
+          {
+            "group": "0x0017",
+            "key_exchange": "0x04b978f6ddfad0d9f22f4b20a8771b3b0d574f27c6fd0b45177d78078c8872369f3cec97b318c2f5565d7cf0ad586479460c53cacb23c537798899c179b337e103"
+          },
+          {
+            "group": "0x0018",
+            "key_exchange": "0x04b99d54d9ed8603dd98384aed4d4814ddda4c0e54ee61876f4951218d84d3d1d980bc72ec322a6c8f926f59dc85ea16f52f6474f5c363223c3f6b268b695b5cc87bc459aaba97fcac4172867a63054f4a2aa972bd2a7bb322d58de682c8441f29"
+          },
+          {
+            "group": "0x0019",
+            "key_exchange": "0x040054f85abde0b2f5d1631172c60684e3c3c8c882ab6c4ef2acfc06dd6ced25e73ce473205da0da2501d7772d96e2415a22b7ca10610c0d8a165b805a5b3930a023aa00ff763b305c41a91c7bb931ee206c6b29f12950c7010a367a184264a19e663ceeae76a2e1be3602b4d976174fccb63269a564a68ee23fdd98e78019e3d89eb0452c"
+          }
+        ]
+      },
+      "0xfe0d": {
+        "extension_type": "0xfe0d",
+        "type": "0x02",
+        "cipher_suite": {
+          "kdf_id": {
+            "uint16": 1
+          },
+          "aead_id": {
+            "uint16": 1
+          }
+        },
+        "config_id": 96,
+        "enc": "0xf020d9a24f73d47bffff369ca9a525a6dff8a10ae7dafcf6b44c7f5e690a870c",
+        "payload": "0x1d7dc35d6304e9a2918a77a71b4ab880d5fabcb53643b84ab9ec45e8494558877bf2c4e4e2f44f4d0b2b70a0c510d53e3263d522b88424f899557c1ed32d700e80619c8cdf4fdc16a9fa0655bd5200201b4ab5471157c69206801087c61ad86d7210a360b865d69f4abb677e6c90359220b8bf0cd595c773132647bb4353c256708bd4ebe0cd5792491be135ace9286d3e3f572c05c455190024a3b8b89ffc279d0792e5cf7b707cb766ebbbc90794b6f7bf9969a71e3d1618742ba277349a8dfb63ddf365846a4097c6d92b455cd82709d1a467e973e9b2cf909f12a23494bf82a3248cac90eab2a2c579a1603390cd60817efc49e6e56c09d04e47525dcef6f3157b6fbab72118b2e7f8df9198e19c750c5330226b66717a3ac226102177818b5182e5f61c6d3baf1a62758e1e2562864e3ef07a3d691f0e8b55d3d0a3843920db620f469a3a3415a33e41df473249eb789a4a82e518ba9edf80ed83999340e2fdbb88bef4bc90c4e3e56e0869ddc746b8f277bfd7eda9462759ac0b1b0e7d75b54f16cd4b48334530f3f91d0c1fb6f95ed85c3898015607d4e8d87ecabb2590524924510387896c3f7c7f215ed74cee7fbc51c8eb2af408cd54e9704ccdd667d01b941b9113c9d2e6d11b6b794689"
+      }
+    }
+  },
+  "ClientHelloInner": {
+    "msg_type": "0x01",
+    "legacy_version": "0x0303",
+    "random": "0x95895b2902590a4f03c1ee3f57757472b69c9e4596a37ff322981f53badd769d",
+    "legacy_session_id": "0xac28711fcdd25c631484cd0d49227d2c6ab3394732991f615e9c7f43c3a5f54d",
+    "cipher_suites": [
+      "0x1302",
+      "0x1303",
+      "0x1301"
+    ],
+    "legacy_compression_methods": [
+      "0x00"
+    ],
+    "extensions": {
+      "0x0000": {
+        "extension_type": "0x0000",
+        "server_name": "0x63727970746f2e636c6f7564666c6172652e636f6d"
+      },
+      "0x002b": {
+        "extension_type": "0x002b",
+        "msg_type": "0x01",
+        "versions": [
+          "0x0304"
+        ]
+      },
+      "0x000d": {
+        "extension_type": "0x000d",
+        "supported_signature_algorithms": [
+          "0x0403",
+          "0x0503",
+          "0x0603",
+          "0x0804",
+          "0x0805",
+          "0x0806",
+          "0x0401",
+          "0x0501",
+          "0x0601"
+        ]
+      },
+      "0x000a": {
+        "extension_type": "0x000a",
+        "named_group_list": [
+          "0x0017",
+          "0x0018",
+          "0x0019"
+        ]
+      },
+      "0x0033": {
+        "extension_type": "0x0033",
+        "msg_type": "0x01",
+        "key_share_entry": [
+          {
+            "group": "0x0017",
+            "key_exchange": "0x04b978f6ddfad0d9f22f4b20a8771b3b0d574f27c6fd0b45177d78078c8872369f3cec97b318c2f5565d7cf0ad586479460c53cacb23c537798899c179b337e103"
+          },
+          {
+            "group": "0x0018",
+            "key_exchange": "0x04b99d54d9ed8603dd98384aed4d4814ddda4c0e54ee61876f4951218d84d3d1d980bc72ec322a6c8f926f59dc85ea16f52f6474f5c363223c3f6b268b695b5cc87bc459aaba97fcac4172867a63054f4a2aa972bd2a7bb322d58de682c8441f29"
+          },
+          {
+            "group": "0x0019",
+            "key_exchange": "0x040054f85abde0b2f5d1631172c60684e3c3c8c882ab6c4ef2acfc06dd6ced25e73ce473205da0da2501d7772d96e2415a22b7ca10610c0d8a165b805a5b3930a023aa00ff763b305c41a91c7bb931ee206c6b29f12950c7010a367a184264a19e663ceeae76a2e1be3602b4d976174fccb63269a564a68ee23fdd98e78019e3d89eb0452c"
+          }
+        ]
+      },
+      "0xfe0d": {
+        "extension_type": "0xfe0d",
+        "type": "0x01",
+        "cipher_suite": null,
+        "config_id": null,
+        "enc": null,
+        "payload": null
+      }
+    }
+  }
+}
+{
+  "Alert": {
+    "level": "0x02",
+    "description": "0x6d"
+  },
+  "ClientHello": {
+    "msg_type": "0x01",
+    "legacy_version": "0x0303",
+    "random": "0xf323fc7a0297cacd974f501c9c4636c317926d1f92efc19983d8c481e218accc",
+    "legacy_session_id": "0x3b01b941fe76e5b48fc513d48f0e1136fcf65407463f0f53ede4ef6231736b0c",
+    "cipher_suites": [
+      "0x1302",
+      "0x1303",
+      "0x1301"
+    ],
+    "legacy_compression_methods": [
+      "0x00"
+    ],
+    "extensions": {
+      "0x0000": {
+        "extension_type": "0x0000",
+        "server_name": "0x636c6f7564666c6172652d6563682e636f6d"
+      },
+      "0x002b": {
+        "extension_type": "0x002b",
+        "msg_type": "0x01",
+        "versions": [
+          "0x0304"
+        ]
+      },
+      "0x000d": {
+        "extension_type": "0x000d",
+        "supported_signature_algorithms": [
+          "0x0403",
+          "0x0503",
+          "0x0603",
+          "0x0804",
+          "0x0805",
+          "0x0806",
+          "0x0401",
+          "0x0501",
+          "0x0601"
+        ]
+      },
+      "0x000a": {
+        "extension_type": "0x000a",
+        "named_group_list": [
+          "0x0017",
+          "0x0018",
+          "0x0019"
+        ]
+      },
+      "0xfe0d": {
+        "extension_type": "0xfe0d",
+        "type": "0x00",
+        "cipher_suite": {
+          "kdf_id": {
+            "uint16": 1
+          },
+          "aead_id": {
+            "uint16": 1
+          }
+        },
+        "config_id": 96,
+        "enc": "0xea3863d26093912fff284492810e0d01f83ec58914b38c0d75e1fcb06d7bcb25",
+        "payload": "0x065ee74c84148b19c22b8ee9ce35878d6ba0afcdf416523a9b9a0e5a7b5a0b64ceeeb4ea985e2a67b820ee7eb20031943ddad5cab4b5e4b84c3af9e3705ab5d4ec4dfcdf885a33b8d2ccbf05ade09641aee6d39dd0baa650f0abdf01017ddd4d937017fff8b9881b89938f23b65b50e4d66eb760938373855f93b199c676af93ac127c755be21638d8eb948e2afbf4e0"
+      }
+    }
+  },
+  "ClientHelloInner": {
+    "msg_type": "0x01",
+    "legacy_version": "0x0303",
+    "random": "0xc64a5f49e4662816aab80a6c82e51c4a6ce66d8fd8dcb2bde197b3f34a2f5281",
+    "legacy_session_id": "0x3b01b941fe76e5b48fc513d48f0e1136fcf65407463f0f53ede4ef6231736b0c",
+    "cipher_suites": [
+      "0x1302",
+      "0x1303",
+      "0x1301"
+    ],
+    "legacy_compression_methods": [
+      "0x00"
+    ],
+    "extensions": {
+      "0x0000": {
+        "extension_type": "0x0000",
+        "server_name": "0x63727970746f2e636c6f7564666c6172652e636f6d"
+      },
+      "0x002b": {
+        "extension_type": "0x002b",
+        "msg_type": "0x01",
+        "versions": [
+          "0x0304"
+        ]
+      },
+      "0x000d": {
+        "extension_type": "0x000d",
+        "supported_signature_algorithms": [
+          "0x0403",
+          "0x0503",
+          "0x0603",
+          "0x0804",
+          "0x0805",
+          "0x0806",
+          "0x0401",
+          "0x0501",
+          "0x0601"
+        ]
+      },
+      "0x000a": {
+        "extension_type": "0x000a",
+        "named_group_list": [
+          "0x0017",
+          "0x0018",
+          "0x0019"
+        ]
+      },
+      "0xfe0d": {
+        "extension_type": "0xfe0d",
+        "type": "0x01",
+        "cipher_suite": null,
+        "config_id": null,
+        "enc": null,
+        "payload": null
+      }
+    }
+  }
+}
+{
+  "Alert": {
+    "level": "0x02",
+    "description": "0x6d"
+  },
+  "ClientHello": {
+    "msg_type": "0x01",
+    "legacy_version": "0x0303",
+    "random": "0x9ce18f3bb3e1ff7507746d52ee1177cb0912fabcf6758e0a7e6cb3dc71f95a58",
+    "legacy_session_id": "0x192f28f3c6e1d5321197e84a1e19dc420567ec806ac1e5b634f60ce1041e876e",
+    "cipher_suites": [
+      "0x1302",
+      "0x1303",
+      "0x1301"
+    ],
+    "legacy_compression_methods": [
+      "0x00"
+    ],
+    "extensions": {
+      "0x0000": {
+        "extension_type": "0x0000",
+        "server_name": "0x636c6f7564666c6172652d6563682e636f6d"
+      },
+      "0x002b": {
+        "extension_type": "0x002b",
+        "msg_type": "0x01",
+        "versions": [
+          "0x0304"
+        ]
+      },
+      "0x000d": {
+        "extension_type": "0x000d",
+        "supported_signature_algorithms": [
+          "0x0403",
+          "0x0503",
+          "0x0603",
+          "0x0804",
+          "0x0805",
+          "0x0806",
+          "0x0401",
+          "0x0501",
+          "0x0601"
+        ]
+      },
+      "0x000a": {
+        "extension_type": "0x000a",
+        "named_group_list": [
+          "0x0017",
+          "0x0018",
+          "0x0019"
+        ]
+      },
+      "0xfe0d": {
+        "extension_type": "0xfe0d",
+        "type": "0x00",
+        "cipher_suite": {
+          "kdf_id": {
+            "uint16": 1
+          },
+          "aead_id": {
+            "uint16": 1
+          }
+        },
+        "config_id": 96,
+        "enc": "0x0449f11b120048c0e027cd0c8a9d09ec7f043089ceb2a968947f7a8634aa0067",
+        "payload": "0x0abcef90f666af35a07cf54ea2d4e2f907f0b36185736b74ec6ad9412b2a8cd1e89dcc7a006f0882d1a5155eda65491f8173d52dc71db9c96210a29cc678c4065f1e4b1a57051a027153bc06e0ba2d708289db052ed5cd6c2304994c06b466bdb4e78e0e6a2cb59f8d86f6ef6757252e6ae2b8fdad63ed2fc22f67dedd5f42c6e742dbbcc2d0e7b7bfe8bbd818797c4f"
+      }
+    }
+  },
+  "ClientHelloInner": {
+    "msg_type": "0x01",
+    "legacy_version": "0x0303",
+    "random": "0x126c02406359958b2561226fc633ccf7f48d55c9d1897bf45eeabfdbe75611fb",
+    "legacy_session_id": "0x192f28f3c6e1d5321197e84a1e19dc420567ec806ac1e5b634f60ce1041e876e",
+    "cipher_suites": [
+      "0x1302",
+      "0x1303",
+      "0x1301"
+    ],
+    "legacy_compression_methods": [
+      "0x00"
+    ],
+    "extensions": {
+      "0x0000": {
+        "extension_type": "0x0000",
+        "server_name": "0x63727970746f2e636c6f7564666c6172652e636f6d"
+      },
+      "0x002b": {
+        "extension_type": "0x002b",
+        "msg_type": "0x01",
+        "versions": [
+          "0x0304"
+        ]
+      },
+      "0x000d": {
+        "extension_type": "0x000d",
+        "supported_signature_algorithms": [
+          "0x0403",
+          "0x0503",
+          "0x0603",
+          "0x0804",
+          "0x0805",
+          "0x0806",
+          "0x0401",
+          "0x0501",
+          "0x0601"
+        ]
+      },
+      "0x000a": {
+        "extension_type": "0x000a",
+        "named_group_list": [
+          "0x0017",
+          "0x0018",
+          "0x0019"
+        ]
+      },
+      "0xfe0d": {
+        "extension_type": "0xfe0d",
+        "type": "0x01",
+        "cipher_suite": null,
+        "config_id": null,
+        "enc": null,
+        "payload": null
+      }
+    }
+  }
+}
+{
+  "Alert": {
+    "level": "0x02",
+    "description": "0x6d"
+  },
+  "ClientHello": {
+    "msg_type": "0x01",
+    "legacy_version": "0x0303",
+    "random": "0xdd4dcb4160888436a711679f174b9513ee0043aa890bcd0cf4f5db265386ab54",
+    "legacy_session_id": "0x1bb329195498331301954236776a5429cf6aa73b65299be3dd9d16895802e325",
+    "cipher_suites": [
+      "0x1302",
+      "0x1303",
+      "0x1301"
+    ],
+    "legacy_compression_methods": [
+      "0x00"
+    ],
+    "extensions": {
+      "0x0000": {
+        "extension_type": "0x0000",
+        "server_name": "0x636c6f7564666c6172652d6563682e636f6d"
+      },
+      "0x002b": {
+        "extension_type": "0x002b",
+        "msg_type": "0x01",
+        "versions": [
+          "0x0304"
+        ]
+      },
+      "0x000d": {
+        "extension_type": "0x000d",
+        "supported_signature_algorithms": [
+          "0x0403",
+          "0x0503",
+          "0x0603",
+          "0x0804",
+          "0x0805",
+          "0x0806",
+          "0x0401",
+          "0x0501",
+          "0x0601"
+        ]
+      },
+      "0x000a": {
+        "extension_type": "0x000a",
+        "named_group_list": [
+          "0x0017",
+          "0x0018",
+          "0x0019"
+        ]
+      },
+      "0xfe0d": {
+        "extension_type": "0xfe0d",
+        "type": "0x00",
+        "cipher_suite": {
+          "kdf_id": {
+            "uint16": 1
+          },
+          "aead_id": {
+            "uint16": 1
+          }
+        },
+        "config_id": 96,
+        "enc": "0x87c2285453c9791333058f5868f9302566fdc94e1d1ae96e552258ea345e7839",
+        "payload": "0xf6af3c49be4643cd4dd7c9a6a57e5392c6b673561a7d5e394d1737d956d51cacee4f95e7538f4c5c2f6b51bc85a886a512a2d1986a8f893fbaef6f2ab57f3758a6815d593511174beb5daf4a7b0679d6cb524ba29241f2ffc9b44b3ccd6004748a247ae27a0906006f950ea05e3c6dc525a2a5059e72d767ad778ac299831788c5a7c7e6aac1b61f6799e638bac85f5d"
+      }
+    }
+  },
+  "ClientHelloInner": {
+    "msg_type": "0x01",
+    "legacy_version": "0x0303",
+    "random": "0xf7530d96b81ae302ffe5fcca80f56867569489b745f8af66f846f7726c88940e",
+    "legacy_session_id": "0x1bb329195498331301954236776a5429cf6aa73b65299be3dd9d16895802e325",
+    "cipher_suites": [
+      "0x1302",
+      "0x1303",
+      "0x1301"
+    ],
+    "legacy_compression_methods": [
+      "0x00"
+    ],
+    "extensions": {
+      "0x0000": {
+        "extension_type": "0x0000",
+        "server_name": "0x63727970746f2e636c6f7564666c6172652e636f6d"
+      },
+      "0x002b": {
+        "extension_type": "0x002b",
+        "msg_type": "0x01",
+        "versions": [
+          "0x0304"
+        ]
+      },
+      "0x000d": {
+        "extension_type": "0x000d",
+        "supported_signature_algorithms": [
+          "0x0403",
+          "0x0503",
+          "0x0603",
+          "0x0804",
+          "0x0805",
+          "0x0806",
+          "0x0401",
+          "0x0501",
+          "0x0601"
+        ]
+      },
+      "0x000a": {
+        "extension_type": "0x000a",
+        "named_group_list": [
+          "0x0017",
+          "0x0018",
+          "0x0019"
+        ]
+      },
+      "0xfe0d": {
+        "extension_type": "0xfe0d",
+        "type": "0x01",
+        "cipher_suite": null,
+        "config_id": null,
+        "enc": null,
+        "payload": null
+      }
+    }
+  }
+}
