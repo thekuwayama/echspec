@@ -34,7 +34,7 @@ Usage: echspec [OPTIONS] <HOSTNAME>
 You can run it the following:
 
 ```sh-session
-$ echspec crypto.cloudflare.com
+$ echspec research.cloudflare.com
 TLS Encrypted Client Hello Server
         ✔ MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM. [9]
         ✔ MUST abort with an "illegal_parameter" alert, if EncodedClientHelloInner is padded with non-zero values. [5.1-9]
