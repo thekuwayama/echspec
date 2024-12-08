@@ -107,7 +107,7 @@ module EchSpec
       #
       # @return [ECHConfig]
       def try_get_ech_config(fpath, hostname, force_compliant)
-        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-9
+        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-9
         case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
         in Ok(obj) if force_compliant
           result.tap { |r| print_summarize(r, "#{Spec9.description} [#{Spec9.section}]") }
@@ -121,10 +121,10 @@ module EchSpec
       end
 
       def spec_groups
-        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-5
+        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-5
         groups = [Spec5_1_9, Spec5_1_10]
 
-        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-7
+        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-7
         groups += [Spec7_5, Spec7_1_11, Spec7_1_14_2_1, Spec7_1_1_2, Spec7_1_1_5]
 
         groups.map(&:spec_group)

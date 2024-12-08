@@ -4,7 +4,7 @@ module EchSpec
       # If ECHClientHello.type is not a valid ECHClientHelloType, then the
       # server MUST abort with an "illegal_parameter" alert.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-7-5
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-7-5
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group

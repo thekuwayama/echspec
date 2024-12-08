@@ -7,7 +7,7 @@
 
 ![echspec demo](docs/echspec-demo.png)
 
-- https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18
+- https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22
 
 ## Initial Setup
 

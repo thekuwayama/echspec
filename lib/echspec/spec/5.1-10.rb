@@ -14,7 +14,7 @@ module EchSpec
       # * The extensions in ClientHelloOuter corresponding to those in
       #   OuterExtensions do not occur in the same order.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-5.1-10
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-5.1-10
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group

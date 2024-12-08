@@ -9,7 +9,7 @@ module EchSpec
       # unchanged, and that ECHClientHello.enc is empty. If not, it MUST
       # abort the handshake with an "illegal_parameter" alert.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-7.1.1-2
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-7.1.1-2
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group

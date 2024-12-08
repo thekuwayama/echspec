@@ -13,7 +13,7 @@ module EchSpec
       #   ECHConfig values of different versions. This allows a server to
       #   support multiple versions at once.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-7.1-14.2.1
+      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-7.1-14.2.1
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group
