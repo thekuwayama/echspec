@@ -56,7 +56,7 @@ module EchSpec
           end
           return Ok.new(ech_config) unless ech_config.nil?
 
-          Err.new('EchConfigs does NOT include HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.', nil)
+          Err.new('ECHConfigs does NOT include HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.', nil)
         end
 
         # @param hostname [String]
@@ -74,10 +74,10 @@ module EchSpec
 
           # https://datatracker.ietf.org/doc/html/draft-ietf-tls-svcb-ech-01#section-6
           ech = 5
-          return Err.new('HTTPS resource record does NOT have ech SvcParams', nil) if rr.params[ech].nil?
+          return Err.new("HTTPS resource record for #{hostname} does NOT have ech SvcParams.", nil) if rr.params[ech].nil?
 
           octet = rr.params[ech].value
-          Err.new('failed to parse ECHConfigs', nil) \
+          Err.new('Failed to parse ECHConfig on HTTPS resource record.', nil) \
             unless octet.length == octet.slice(0, 2).unpack1('n') + 2
 
           Ok.new(ECHConfig.decode_vectors(octet.slice(2..)))
@@ -92,16 +92,20 @@ module EchSpec
                  .first
                  .gsub("\n", '')
           b = Base64.decode64(s)
-          return Err.new('failed to parse ECHConfigs', nil) \
-            unless b.length == b.slice(0, 2).unpack1('n') + 2
-
-          begin
-            ech_configs = ECHConfig.decode_vectors(b.slice(2..))
-          rescue ECHConfig::Error
-            return Err.new('failed to parse ECHConfig file', nil)
-          end
-
+          ech_configs = ECHConfig.decode_vectors(b.slice(2..))
           Ok.new(ech_configs)
+        rescue StandardError
+          # https://datatracker.ietf.org/doc/html/draft-farrell-tls-pemesni-08#section-3
+          example = <<~PEM
+            -----BEGIN PRIVATE KEY-----
+            MC4CAQAwBQYDK2VuBCIEICjd4yGRdsoP9gU7YT7My8DHx1Tjme8GYDXrOMCi8v1V
+            -----END PRIVATE KEY-----
+            -----BEGIN ECHCONFIG-----
+            AD7+DQA65wAgACA8wVN2BtscOl3vQheUzHeIkVmKIiydUhDCliA4iyQRCwAEAAEA
+            AQALZXhhbXBsZS5jb20AAA==
+            -----END ECHCONFIG-----
+          PEM
+          Err.new("Failed to parse ECHConfig PEM file, expected ECHConfig PEM like following: \n\n#{example}", nil)
         end
       end
     end

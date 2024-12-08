@@ -115,7 +115,7 @@ module EchSpec
         in Ok(obj)
           obj
         in Err(details, _)
-          puts "\t\t#{details}"
+          puts "\t#{details}".red
           exit 1
         end
       end
