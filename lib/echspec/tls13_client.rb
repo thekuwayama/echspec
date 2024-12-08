@@ -121,7 +121,12 @@ module EchSpec
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
         exs, = TLS13Client.gen_ch_extensions(hostname)
-        exs.delete(TTTLS13::Message::ExtensionType::KEY_SHARE) # for HRR
+        # for HRR
+        key_share = TTTLS13::Message::Extension::KeyShare.new(
+          msg_type: TTTLS13::Message::HandshakeType::CLIENT_HELLO,
+          key_share_entry: [] # empty client_shares vector
+        )
+        exs[TTTLS13::Message::ExtensionType::KEY_SHARE] = key_share
         inner = TTTLS13::Message::ClientHello.new(
           cipher_suites: TTTLS13::CipherSuites.new(
             [
