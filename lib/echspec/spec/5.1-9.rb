@@ -1,6 +1,6 @@
 module EchSpec
   module Spec
-    class Spec5_1_9
+    class Spec5_1_9 < WithSocket
       # The client-facing server computes ClientHelloInner by reversing this
       # process. First it parses EncodedClientHelloInner, interpreting all
       # bytes after client_hello as padding. If any padding byte is non-
@@ -28,26 +28,20 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_nonzero_padding_encoded_ch_inner(hostname, port, ech_config)
-        socket = TCPSocket.new(hostname, port)
-        spec = Spec5_1_9.new
-        recv = spec.send_nonzero_padding_encoded_ch_inner(socket, hostname, ech_config)
-        socket.close
-        return Err.new('did not send expected alert: illegal_parameter', spec.message_stack) \
-          unless Spec.expect_alert(recv, :illegal_parameter)
-
-        Ok.new(nil)
-      rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
-      rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
+        Spec5_1_9.new.do_validate_nonzero_padding_encoded_ch_inner(hostname, port, ech_config)
       end
 
-      def initialize
-        @stack = Log::MessageStack.new
-      end
-
-      def message_stack
-        @stack.marshal
+      # @param hostname [String]
+      # @param port [Integer]
+      # @param ech_config [ECHConfig]
+      #
+      # @return [EchSpec::Ok | Err]
+      def do_validate_nonzero_padding_encoded_ch_inner(hostname, port, ech_config)
+        with_socket(hostname, port) do |socket|
+          recv = send_nonzero_padding_encoded_ch_inner(socket, hostname, ech_config)
+          return Err.new('did not send expected alert: illegal_parameter', message_stack) \
+            unless Spec.expect_alert(recv, :illegal_parameter)
+        end
       end
 
       def send_nonzero_padding_encoded_ch_inner(socket, hostname, ech_config)

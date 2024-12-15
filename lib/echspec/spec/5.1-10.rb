@@ -1,6 +1,6 @@
 module EchSpec
   module Spec
-    class Spec5_1_10
+    class Spec5_1_10 < WithSocket
       # Next it makes a copy of the client_hello field and copies the
       # legacy_session_id field from ClientHelloOuter. It then looks for an
       # "ech_outer_extensions" extension. If found, it replaces the extension
@@ -47,7 +47,7 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_missing_referenced_extensions(hostname, port, ech_config)
-        validate_invalid_ech_outer_extensions(hostname, port, ech_config, MissingReferencedExtensions)
+        Spec5_1_10.new.validate_invalid_ech_outer_extensions(hostname, port, ech_config, MissingReferencedExtensions)
       end
 
       # @param hostname [String]
@@ -56,7 +56,7 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_duplicated_outer_extensions(hostname, port, ech_config)
-        validate_invalid_ech_outer_extensions(hostname, port, ech_config, DuplicatedOuterExtensions)
+        Spec5_1_10.new.validate_invalid_ech_outer_extensions(hostname, port, ech_config, DuplicatedOuterExtensions)
       end
 
       # @param hostname [String]
@@ -65,7 +65,7 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_referenced_encrypted_client_hello(hostname, port, ech_config)
-        validate_invalid_ech_outer_extensions(hostname, port, ech_config, ReferencedEncryptedClientHello)
+        Spec5_1_10.new.validate_invalid_ech_outer_extensions(hostname, port, ech_config, ReferencedEncryptedClientHello)
       end
 
       # @param hostname [String]
@@ -74,30 +74,15 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_not_same_order_extensions(hostname, port, ech_config)
-        validate_invalid_ech_outer_extensions(hostname, port, ech_config, NotSameOrderExtensions)
+        Spec5_1_10.new.validate_invalid_ech_outer_extensions(hostname, port, ech_config, NotSameOrderExtensions)
       end
 
-      def self.validate_invalid_ech_outer_extensions(hostname, port, ech_config, super_extensions)
-        socket = TCPSocket.new(hostname, port)
-        spec = Spec5_1_10.new
-        recv = spec.send_invalid_ech_outer_extensions(socket, hostname, ech_config, super_extensions)
-        socket.close
-        return Err.new('did not send expected alert: illegal_parameter', spec.message_stack) \
-          unless Spec.expect_alert(recv, :illegal_parameter)
-
-        Ok.new(nil)
-      rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
-      rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
-      end
-
-      def initialize
-        @stack = Log::MessageStack.new
-      end
-
-      def message_stack
-        @stack.marshal
+      def validate_invalid_ech_outer_extensions(hostname, port, ech_config, super_extensions)
+        with_socket(hostname, port) do |socket|
+          recv = send_invalid_ech_outer_extensions(socket, hostname, ech_config, super_extensions)
+          return Err.new('did not send expected alert: illegal_parameter', message_stack) \
+            unless Spec.expect_alert(recv, :illegal_parameter)
+        end
       end
 
       def send_invalid_ech_outer_extensions(socket, hostname, ech_config, super_extensions)

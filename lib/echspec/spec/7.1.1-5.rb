@@ -1,6 +1,6 @@
 module EchSpec
   module Spec
-    class Spec7_1_1_5
+    class Spec7_1_1_5 < WithSocket
       # ClientHelloOuterAAD is computed as described in Section 5.2, but
       # using the second ClientHelloOuter. If decryption fails, the client-
       # facing server MUST abort the handshake with a "decrypt_error" alert.
@@ -29,28 +29,20 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_undecryptable_2nd_ch_outer(hostname, port, ech_config)
-        socket = TCPSocket.new(hostname, port)
-        spec = Spec7_1_1_5.new
-        recv = spec.send_2nd_ch_with_undecryptable_ech(socket, hostname, ech_config)
-        socket.close
-        return Err.new('did not send expected alert: decrypt_error', spec.message_stack) \
-          unless Spec.expect_alert(recv, :decrypt_error)
-
-        Ok.new(nil)
-      rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
-      rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
-      rescue Error::BeforeTargetSituationError => e
-        Err.new(e.message, spec.message_stack)
+        Spec7_1_1_5.new.do_validate_undecryptable_2nd_ch_outer(hostname, port, ech_config)
       end
 
-      def initialize
-        @stack = Log::MessageStack.new
-      end
-
-      def message_stack
-        @stack.marshal
+      # @param hostname [String]
+      # @param port [Integer]
+      # @param ech_config [ECHConfig]
+      #
+      # @return [EchSpec::Ok | Err]
+      def do_validate_undecryptable_2nd_ch_outer(hostname, port, ech_config)
+        with_socket(hostname, port) do |socket|
+          recv = send_2nd_ch_with_undecryptable_ech(socket, hostname, ech_config)
+          return Err.new('did not send expected alert: decrypt_error', message_stack) \
+            unless Spec.expect_alert(recv, :decrypt_error)
+        end
       end
 
       def send_2nd_ch_with_undecryptable_ech(socket, hostname, ech_config)

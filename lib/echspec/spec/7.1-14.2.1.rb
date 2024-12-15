@@ -1,6 +1,6 @@
 module EchSpec
   module Spec
-    class Spec7_1_14_2_1
+    class Spec7_1_14_2_1 < WithSocket
       # Otherwise, if all candidate ECHConfig values fail to decrypt the
       # extension, the client-facing server MUST ignore the extension and
       # proceed with the connection using ClientHelloOuter, with the
@@ -34,31 +34,22 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_ee_retry_configs(hostname, port, _)
-        socket = TCPSocket.new(hostname, port)
-        spec = Spec7_1_14_2_1.new
-        recv = spec.send_ch_with_greased_ech(socket, hostname)
-        socket.close
-        ex = recv.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
-        return Err.new('did not send expected alert: encrypted_client_hello', spec.message_stack) \
-          unless ex.is_a?(TTTLS13::Message::Extension::ECHEncryptedExtensions)
-        return Err.new('ECHConfigs did not have "retry_configs"', spec.message_stack) \
-          if ex.retry_configs.nil? || ex.retry_configs.empty?
-
-        Ok.new(nil)
-      rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
-      rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
-      rescue Error::BeforeTargetSituationError => e
-        Err.new(e.message, spec.message_stack)
+        Spec7_1_14_2_1.new.do_validate_ee_retry_configs(hostname, port)
       end
 
-      def initialize
-        @stack = Log::MessageStack.new
-      end
-
-      def message_stack
-        @stack.marshal
+      # @param hostname [String]
+      # @param port [Integer]
+      #
+      # @return [EchSpec::Ok | Err]
+      def do_validate_ee_retry_configs(hostname, port)
+        with_socket(hostname, port) do |socket|
+          recv = send_ch_with_greased_ech(socket, hostname)
+          ex = recv.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
+          return Err.new('did not send expected alert: encrypted_client_hello', message_stack) \
+            unless ex.is_a?(TTTLS13::Message::Extension::ECHEncryptedExtensions)
+          return Err.new('ECHConfigs did not have "retry_configs"', message_stack) \
+            if ex.retry_configs.nil? || ex.retry_configs.empty?
+        end
       end
 
       # rubocop: disable Metrics/AbcSize
