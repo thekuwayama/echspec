@@ -77,6 +77,12 @@ module EchSpec
         Spec5_1_10.new.validate_invalid_ech_outer_extensions(hostname, port, ech_config, NotSameOrderExtensions)
       end
 
+      # @param hostname [String]
+      # @param port [Integer]
+      # @param ech_config [ECHConfig]
+      # @param super_extensions [TTTLS13::Message::Extension::$Object]
+      #
+      # @return [EchSpec::Ok | Err]
       def validate_invalid_ech_outer_extensions(hostname, port, ech_config, super_extensions)
         with_socket(hostname, port) do |socket|
           recv = send_invalid_ech_outer_extensions(socket, hostname, ech_config, super_extensions)
