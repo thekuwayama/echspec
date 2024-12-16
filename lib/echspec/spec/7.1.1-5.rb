@@ -42,6 +42,8 @@ module EchSpec
           recv = send_2nd_ch_with_undecryptable_ech(socket, hostname, ech_config)
           return Err.new('did not send expected alert: decrypt_error', message_stack) \
             unless Spec.expect_alert(recv, :decrypt_error)
+
+          Ok.new(nil)
         end
       end
 

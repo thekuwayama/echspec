@@ -42,8 +42,6 @@ module EchSpec
       def with_socket(hostname, port)
         socket = TCPSocket.new(hostname, port)
         yield(socket)
-
-        Ok.new(nil)
       rescue Timeout::Error
         Err.new("#{hostname}:#{port} connection timeout", message_stack)
       rescue Errno::ECONNREFUSED

@@ -47,6 +47,8 @@ module EchSpec
           recv = send_2nd_ch_missing_ech(socket, hostname, ech_config)
           return Err.new('did not send expected alert: missing_extension', message_stack) \
             unless Spec.expect_alert(recv, :missing_extension)
+
+          Ok.new(nil)
         end
       end
 
@@ -69,6 +71,8 @@ module EchSpec
           recv = send_2nd_ch_unchanged_ech(socket, hostname, ech_config)
           return Err.new('did not send expected alert: illegal_parameter', message_stack) \
             unless Spec.expect_alert(recv, :illegal_parameter)
+
+          Ok.new(nil)
         end
       end
 

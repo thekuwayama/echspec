@@ -49,6 +49,8 @@ module EchSpec
             unless ex.is_a?(TTTLS13::Message::Extension::ECHEncryptedExtensions)
           return Err.new('ECHConfigs did not have "retry_configs"', message_stack) \
             if ex.retry_configs.nil? || ex.retry_configs.empty?
+
+          Ok.new(nil)
         end
       end
 

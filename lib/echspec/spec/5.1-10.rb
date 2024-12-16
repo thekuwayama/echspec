@@ -88,6 +88,8 @@ module EchSpec
           recv = send_invalid_ech_outer_extensions(socket, hostname, ech_config, super_extensions)
           return Err.new('did not send expected alert: illegal_parameter', message_stack) \
             unless Spec.expect_alert(recv, :illegal_parameter)
+
+          Ok.new(nil)
         end
       end
 

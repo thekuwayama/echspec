@@ -62,6 +62,8 @@ module EchSpec
           recv = send(method, socket, hostname, ech_config)
           return Err.new('did not send expected alert: illegal_parameter', message_stack) \
             unless Spec.expect_alert(recv, :illegal_parameter)
+
+          Ok.new(nil)
         end
       end
 

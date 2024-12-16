@@ -47,10 +47,9 @@ RSpec.describe EchSpec::Spec::WithSocket do
       allow(TCPSocket).to receive(:new).and_return(socket)
     end
 
-    it 'should return Ok(nil)' do
+    it 'should return nil' do
       result = EchSpec::Spec::SpecX.new.validate('localhost', 4433)
-      expect(result).to be_a EchSpec::Ok
-      expect(result.obj).to eq nil
+      expect(result).to eq nil
     end
 
     it 'should return Ok(1)' do
