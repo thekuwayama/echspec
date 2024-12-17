@@ -37,6 +37,29 @@ module EchSpec
         puts
       end
     end
+
+    class WithSocket
+      def with_socket(hostname, port)
+        socket = TCPSocket.new(hostname, port)
+        yield(socket)
+      rescue Timeout::Error
+        Err.new("#{hostname}:#{port} connection timeout", message_stack)
+      rescue Errno::ECONNREFUSED
+        Err.new("#{hostname}:#{port} connection refused", message_stack)
+      rescue Error::BeforeTargetSituationError => e
+        Err.new(e.message, message_stack)
+      ensure
+        socket&.close
+      end
+
+      def initialize
+        @stack = Log::MessageStack.new
+      end
+
+      def message_stack
+        @stack.marshal
+      end
+    end
   end
 end
 

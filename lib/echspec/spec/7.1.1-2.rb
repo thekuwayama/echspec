@@ -1,6 +1,6 @@
 module EchSpec
   module Spec
-    class Spec7_1_1_2
+    class Spec7_1_1_2 < WithSocket
       # If the client-facing server accepted ECH, it checks the second
       # ClientHelloOuter also contains the "encrypted_client_hello"
       # extension. If not, it MUST abort the handshake with a
@@ -34,20 +34,22 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_2nd_ch_missing_ech(hostname, port, ech_config)
-        socket = TCPSocket.new(hostname, port)
-        spec = Spec7_1_1_2.new
-        recv = spec.send_2nd_ch_missing_ech(socket, hostname, ech_config)
-        socket.close
-        return Err.new('did not send expected alert: missing_extension', spec.message_stack) \
-          unless Spec.expect_alert(recv, :missing_extension)
+        Spec7_1_1_2.new.do_validate_2nd_ch_missing_ech(hostname, port, ech_config)
+      end
 
-        Ok.new(nil)
-      rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
-      rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
-      rescue Error::BeforeTargetSituationError => e
-        Err.new(e.message, spec.message_stack)
+      # @param hostname [String]
+      # @param port [Integer]
+      # @param ech_config [ECHConfig]
+      #
+      # @return [EchSpec::Ok | Err]
+      def do_validate_2nd_ch_missing_ech(hostname, port, ech_config)
+        with_socket(hostname, port) do |socket|
+          recv = send_2nd_ch_missing_ech(socket, hostname, ech_config)
+          return Err.new('did not send expected alert: missing_extension', message_stack) \
+            unless Spec.expect_alert(recv, :missing_extension)
+
+          Ok.new(nil)
+        end
       end
 
       # @param hostname [String]
@@ -56,28 +58,22 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_2nd_ch_unchanged_ech(hostname, port, ech_config)
-        socket = TCPSocket.new(hostname, port)
-        spec = Spec7_1_1_2.new
-        recv = spec.send_2nd_ch_unchanged_ech(socket, hostname, ech_config)
-        socket.close
-        return Err.new('did not send expected alert: illegal_parameter', spec.message_stack) \
-          unless Spec.expect_alert(recv, :illegal_parameter)
-
-        Ok.new(nil)
-      rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
-      rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
-      rescue Error::BeforeTargetSituationError => e
-        Err.new(e.message, spec.message_stack)
+        Spec7_1_1_2.new.do_validate_2nd_ch_unchanged_ech(hostname, port, ech_config)
       end
 
-      def initialize
-        @stack = Log::MessageStack.new
-      end
+      # @param hostname [String]
+      # @param port [Integer]
+      # @param ech_config [ECHConfig]
+      #
+      # @return [EchSpec::Ok | Err]
+      def do_validate_2nd_ch_unchanged_ech(hostname, port, ech_config)
+        with_socket(hostname, port) do |socket|
+          recv = send_2nd_ch_unchanged_ech(socket, hostname, ech_config)
+          return Err.new('did not send expected alert: illegal_parameter', message_stack) \
+            unless Spec.expect_alert(recv, :illegal_parameter)
 
-      def message_stack
-        @stack.marshal
+          Ok.new(nil)
+        end
       end
 
       def send_2nd_ch_missing_ech(socket, hostname, ech_config)
