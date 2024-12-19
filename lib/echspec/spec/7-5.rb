@@ -1,6 +1,6 @@
 module EchSpec
   module Spec
-    class Spec7_5
+    class Spec7_5 < WithSocket
       # If ECHClientHello.type is not a valid ECHClientHelloType, then the
       # server MUST abort with an "illegal_parameter" alert.
       #
@@ -29,7 +29,7 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_illegal_inner_ech_type(hostname, port, ech_config)
-        do_validate_illegal_ech_type(
+        Spec7_5.new.do_validate_illegal_ech_type(
           hostname,
           port,
           ech_config,
@@ -43,7 +43,7 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def self.validate_illegal_outer_ech_type(hostname, port, ech_config)
-        do_validate_illegal_ech_type(
+        Spec7_5.new.do_validate_illegal_ech_type(
           hostname,
           port,
           ech_config,
@@ -57,28 +57,14 @@ module EchSpec
       # @param method [Method]
       #
       # @return [EchSpec::Ok | Err]
-      def self.do_validate_illegal_ech_type(hostname, port, ech_config, method)
-        socket = TCPSocket.new(hostname, port)
-        spec = Spec7_5.new
-        recv = spec.send(method, socket, hostname, ech_config)
-        socket.close
-        if Spec.expect_alert(recv, :illegal_parameter)
+      def do_validate_illegal_ech_type(hostname, port, ech_config, method)
+        with_socket(hostname, port) do |socket|
+          recv = send(method, socket, hostname, ech_config)
+          return Err.new('did not send expected alert: illegal_parameter', message_stack) \
+            unless Spec.expect_alert(recv, :illegal_parameter)
+
           Ok.new(nil)
-        else
-          Err.new('did not send expected alert: illegal_parameter', spec.message_stack)
         end
-      rescue Timeout::Error
-        Err.new("#{hostname}:#{port} connection timeout", spec.message_stack)
-      rescue Errno::ECONNREFUSED
-        Err.new("#{hostname}:#{port} connection refused", spec.message_stack)
-      end
-
-      def initialize
-        @stack = Log::MessageStack.new
-      end
-
-      def message_stack
-        @stack.marshal
       end
 
       # @param socket [TCPSocket]
