@@ -5,7 +5,7 @@ module EchSpec
         @stack = []
       end
 
-      # @param inner [TTTLS13::Message::ClientHello]
+      # @param ch_inner [TTTLS13::Message::ClientHello]
       def ch_inner(ch_inner)
         @ch_inner = ch_inner
       end

@@ -41,7 +41,7 @@ module EchSpec
           end
         end
 
-        # @param [Array of ECHConfig]
+        # @param ech_configs [Array of ECHConfig]
         #
         # @return [EchSpec::Ok<ECHConfig> | Err]
         def validate_compliant_ech_configs(ech_configs)

@@ -3,7 +3,7 @@ module EchSpec
     class << self
       using Refinements
 
-      # @param record [TTTLS13::Message::Record]
+      # @param msg [TTTLS13::Message::Record]
       # @param desc [Symbol]
       #
       # @return [Boolean]
@@ -26,7 +26,7 @@ module EchSpec
         puts summary
       end
 
-      # @param result [EchSpec::Err]
+      # @param err [EchSpec::Err]
       # @param idx [Integer]
       # @param desc [String]
       # @param verbose [Boolean]
