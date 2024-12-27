@@ -17,14 +17,14 @@ module EchSpec
 
       def marshal
         arr = []
-        arr << "\"ClientHelloInner\":#{obj2json(@ch_inner)}" unless @ch_inner.nil?
-        arr = @stack.reduce(arr) { |sum, msg| sum << "\"#{msg2name(msg)}\":#{obj2json(msg)}" }
+        arr << "\"ClientHelloInner\":#{MessageStack.obj2json(@ch_inner)}" unless @ch_inner.nil?
+        arr = @stack.reduce(arr) { |sum, msg| sum << "\"#{MessageStack.msg2name(msg)}\":#{MessageStack.obj2json(msg)}" }
         "{#{arr.reverse.join(',')}}"
       end
 
       # rubocop: disable Metrics/CyclomaticComplexity
       # rubocop: disable Metrics/PerceivedComplexity
-      def msg2name(msg)
+      def self.msg2name(msg)
         case msg
         in TTTLS13::Message::ClientHello
           'ClientHello'
@@ -53,7 +53,7 @@ module EchSpec
 
       # rubocop: disable Metrics/CyclomaticComplexity
       # rubocop: disable Metrics/PerceivedComplexity
-      def obj2json(obj)
+      def self.obj2json(obj)
         case obj
         in OpenSSL::X509::Certificate
           obj.to_pem.gsub("\n", '\n')
