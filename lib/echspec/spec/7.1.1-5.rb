@@ -48,10 +48,10 @@ module EchSpec
       end
 
       def send_2nd_ch_with_undecryptable_ech(socket, hostname, ech_config)
-        conn, ch1, hrr, ech_state = TLS13Client.recv_hrr(socket, hostname, ech_config, @stack)
+        conn, _inner1, ch1, hrr, ech_state = TLS13Client.recv_hrr(socket, hostname, ech_config, @stack)
         # send 2nd ClientHello with undecryptable ech
         new_exs = TLS13Client.gen_newch_extensions(ch1, hrr)
-        ch = TTTLS13::Message::ClientHello.new(
+        inner = TTTLS13::Message::ClientHello.new(
           legacy_version: ch1.legacy_version,
           random: ch1.random,
           legacy_session_id: ch1.legacy_session_id,
@@ -60,7 +60,7 @@ module EchSpec
           extensions: new_exs
         )
         ech_state.ctx.increment_seq # invalidly increment of the sequence number
-        ch, = TTTLS13::Ech.offer_new_ech(ch, ech_state)
+        ch, inner = TTTLS13::Ech.offer_new_ech(inner, ech_state)
         conn.send_record(
           TTTLS13::Message::Record.new(
             type: TTTLS13::Message::ContentType::HANDSHAKE,
@@ -68,6 +68,7 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        @stack << inner
         @stack << ch
 
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)

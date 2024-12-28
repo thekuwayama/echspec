@@ -112,6 +112,7 @@ module EchSpec
       # @raise [EchSpec::Error::BeforeTargetSituationError]
       #
       # @return [EchSpec::TLS13Client::Connection]
+      # @return [TTTLS13::Message::ClientHello] ClientHelloInner
       # @return [TTTLS13::Message::ClientHello]
       # @return [TTTLS13::Message::ServerHello] HelloRetryRequest
       # @return [TTTLS13::EchState]
@@ -139,7 +140,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
-        stack.ch_inner(inner)
+        stack << inner
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
         ch, _inner, ech_state = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
@@ -158,7 +159,7 @@ module EchSpec
         raise Error::BeforeTargetSituationError, 'did not send expected handshake message: HelloRetryRequest' \
           unless recv.is_a?(TTTLS13::Message::ServerHello) && recv.hrr?
 
-        [conn, ch, recv, ech_state]
+        [conn, inner, ch, recv, ech_state]
       end
       # rubocop: enable Metrics/MethodLength
     end

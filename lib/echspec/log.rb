@@ -5,11 +5,6 @@ module EchSpec
         @stack = []
       end
 
-      # @param ch_inner [TTTLS13::Message::ClientHello]
-      def ch_inner(ch_inner)
-        @ch_inner = ch_inner
-      end
-
       # @param msg [TTTLS13::Message::$Object]
       def <<(msg)
         @stack << msg
@@ -17,7 +12,6 @@ module EchSpec
 
       def marshal
         arr = []
-        arr << "\"ClientHelloInner\":#{MessageStack.obj2json(@ch_inner)}" unless @ch_inner.nil?
         arr = @stack.reduce(arr) { |sum, msg| sum << "\"#{MessageStack.msg2name(msg)}\":#{MessageStack.obj2json(msg)}" }
         "{#{arr.reverse.join(',')}}"
       end
@@ -26,6 +20,8 @@ module EchSpec
       # rubocop: disable Metrics/PerceivedComplexity
       def self.msg2name(msg)
         case msg
+        in TTTLS13::Message::ClientHello if msg.ch_inner?
+          'ClientHelloInner'
         in TTTLS13::Message::ClientHello
           'ClientHello'
         in TTTLS13::Message::ServerHello if msg.hrr?

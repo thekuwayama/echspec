@@ -110,10 +110,9 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
-        @stack.ch_inner(inner)
 
         selector = proc { |x| TLS13Client.select_ech_hpke_cipher_suite(x) }
-        ch, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
+        ch, inner, = TTTLS13::Ech.offer_ech(inner, ech_config, selector)
         conn.send_record(
           TTTLS13::Message::Record.new(
             type: TTTLS13::Message::ContentType::HANDSHAKE,
@@ -121,6 +120,7 @@ module EchSpec
             cipher: TTTLS13::Cryptograph::Passer.new
           )
         )
+        @stack << inner
         @stack << ch
 
         recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
