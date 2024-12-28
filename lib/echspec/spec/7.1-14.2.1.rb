@@ -73,7 +73,7 @@ module EchSpec
             TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
           )
         )
-        @stack.ch_inner(inner)
+        @stack << inner
 
         ch, = TTTLS13::Ech.new_greased_ch(inner, TTTLS13::Ech.new_grease_ech)
         conn.send_record(
