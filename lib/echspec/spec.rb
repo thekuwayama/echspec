@@ -12,6 +12,21 @@ module EchSpec
           msg.description == TTTLS13::Message::ALERT_DESCRIPTION[desc]
       end
 
+      # @param results [Array of Hash] result: EchSpec::Ok | Err, desc: String
+      # @param verbose [Boolean]
+      def print_results(results, verbose)
+        results.each { |h| print_summarize(h[:result], h[:desc]) }
+        failures = results.filter { |h| h[:result].is_a? Err }
+        return if failures.empty?
+
+        puts
+        puts 'Failures:'
+        puts
+        failures.each
+                .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc], verbose) }
+        puts "#{failures.length} failure".red
+      end
+
       # @param result [EchSpec::Ok | Err]
       # @param desc [String]
       def print_summarize(result, desc)
@@ -112,16 +127,8 @@ module EchSpec
             { result: r, desc: d }
           end
         end
-        results.each { |h| print_summarize(h[:result], h[:desc]) }
-        failures = results.filter { |h| h[:result].is_a? Err }
-        return if failures.empty?
 
-        puts
-        puts 'Failures:'
-        puts
-        failures.each
-                .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc], verbose) }
-        puts "#{failures.length} failure".red
+        print_results(results, verbose)
       end
 
       # @param fpath [String | NilClass]
