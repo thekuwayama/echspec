@@ -75,7 +75,7 @@ module EchSpec
         )
         @stack << inner
 
-        ch, = TTTLS13::Ech.new_greased_ch(inner, TTTLS13::Ech.new_grease_ech)
+        ch = TTTLS13::Ech.new_greased_ch(inner, TTTLS13::Ech.new_grease_ech)
         conn.send_record(
           TTTLS13::Message::Record.new(
             type: TTTLS13::Message::ContentType::HANDSHAKE,
