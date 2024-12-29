@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/thekuwayama/tttls1.3.git
-  revision: e3d60cc7f5687d191c7672d8ebdd708b48b8d205
+  revision: 333dc85668bf88755564dab4174bf930d071e10f
   specs:
-    tttls1.3 (0.3.3)
+    tttls1.3 (0.3.4)
       ech_config (~> 0.0.3)
       hpke
       logger
@@ -14,7 +14,7 @@ PATH
     echspec (0.0.0)
       base64
       resolv (~> 0.4.0)
-      tttls1.3 (~> 0.3.3)
+      tttls1.3 (~> 0.3.4)
 
 GEM
   remote: https://rubygems.org/
