@@ -12,7 +12,9 @@ module EchSpec
           msg.description == TTTLS13::Message::ALERT_DESCRIPTION[desc]
       end
 
-      # @param results [Array of Struct] result: EchSpec::Ok | Err, desc: String
+      Result = Struct.new(:result, :desc)
+
+      # @param results [Array of Result] result: EchSpec::Ok | Err, desc: String
       # @param verbose [Boolean]
       def print_results(results, verbose)
         results.each { |h| print_summary(h.result, h.desc) }
@@ -124,7 +126,7 @@ module EchSpec
           g.spec_cases.map do |sc|
             r = sc.method.call(hostname, port, ech_config)
             d = "#{sc.description} [#{g.section}]"
-            Struct.new(:result, :desc).new(result: r, desc: d)
+            Result.new(result: r, desc: d)
           end
         end
 
