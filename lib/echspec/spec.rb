@@ -12,11 +12,11 @@ module EchSpec
           msg.description == TTTLS13::Message::ALERT_DESCRIPTION[desc]
       end
 
-      # @param results [Array of Hash] result: EchSpec::Ok | Err, desc: String
+      # @param results [Array of Struct] result: EchSpec::Ok | Err, desc: String
       # @param verbose [Boolean]
       def print_results(results, verbose)
-        results.each { |h| print_summarize(h[:result], h[:desc]) }
-        failures = results.filter { |h| h[:result].is_a? Err }
+        results.each { |h| print_summary(h.result, h.desc) }
+        failures = results.filter { |h| h.result.is_a? Err }
         return if failures.empty?
 
         puts
@@ -29,7 +29,7 @@ module EchSpec
 
       # @param result [EchSpec::Ok | Err]
       # @param desc [String]
-      def print_summarize(result, desc)
+      def print_summary(result, desc)
         check = "\u2714"
         cross = "\u0078"
         summary = case result
@@ -122,9 +122,9 @@ module EchSpec
       def do_run(port, hostname, ech_config, targets, verbose)
         results = targets.flat_map do |g|
           g.spec_cases.map do |sc|
-            d = "#{sc.description} [#{g.section}]"
             r = sc.method.call(hostname, port, ech_config)
-            { result: r, desc: d }
+            d = "#{sc.description} [#{g.section}]"
+            Struct.new(:result, :desc).new(result: r, desc: d)
           end
         end
 
@@ -140,7 +140,7 @@ module EchSpec
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-9
         case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
         in Ok(obj) if force_compliant
-          result.tap { |r| print_summarize(r, "#{Spec9.description} [#{Spec9.section}]") }
+          result.tap { |r| print_summary(r, "#{Spec9.description} [#{Spec9.section}]") }
           obj
         in Ok(obj)
           obj
