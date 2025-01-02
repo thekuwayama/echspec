@@ -12,20 +12,20 @@ module EchSpec
           msg.description == TTTLS13::Message::ALERT_DESCRIPTION[desc]
       end
 
-      Result = Struct.new(:result, :desc)
+      ResultDesc = Struct.new(:result, :desc)
 
-      # @param results [Array of Result] result: EchSpec::Ok | Err, desc: String
+      # @param rds [Array of ResultDesc] result: EchSpec::Ok | Err, desc: String
       # @param verbose [Boolean]
-      def print_results(results, verbose)
-        results.each { |h| print_summary(h.result, h.desc) }
-        failures = results.filter { |h| h.result.is_a? Err }
+      def print_results(rds, verbose)
+        rds.each { |rd| print_summary(rd.result, rd.desc) }
+        failures = rds.filter { |rd| rd.result.is_a? Err }
         return if failures.empty?
 
         puts
         puts 'Failures:'
         puts
         failures.each
-                .with_index { |h, idx| print_err_details(h[:result], idx, h[:desc], verbose) }
+                .with_index { |rd, idx| print_err_details(rd.result, idx, rd.desc, verbose) }
         puts "#{failures.length} failure".red
       end
 
@@ -122,15 +122,15 @@ module EchSpec
       # @param targets [Array of EchSpec::SpecGroup]
       # @param verbose [Boolean]
       def do_run(port, hostname, ech_config, targets, verbose)
-        results = targets.flat_map do |g|
+        rds = targets.flat_map do |g|
           g.spec_cases.map do |sc|
             r = sc.method.call(hostname, port, ech_config)
             d = "#{sc.description} [#{g.section}]"
-            Result.new(result: r, desc: d)
+            ResultDesc.new(result: r, desc: d)
           end
         end
 
-        print_results(results, verbose)
+        print_results(rds, verbose)
       end
 
       # @param fpath [String | NilClass]
