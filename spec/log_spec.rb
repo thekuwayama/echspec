@@ -2,9 +2,13 @@ require_relative 'spec_helper'
 
 RSpec.describe EchSpec::Log::MessageStack do
   context 'obj2json' do
+    let(:crt) do
+      File.open("#{__dir__}/../fixtures/server.crt").read
+    end
+
     it 'should convert' do
-      expect(EchSpec::Log::MessageStack.obj2json(OpenSSL::X509::Certificate.new(TEST_CERTIFICATE_PEM)))
-        .to eq "#{TEST_CERTIFICATE_PEM.split("\n").join('\n')}\\n"
+      expect(EchSpec::Log::MessageStack.obj2json(OpenSSL::X509::Certificate.new(crt)))
+        .to eq "#{crt.split("\n").join('\n')}\\n"
     end
 
     it 'should convert' do
