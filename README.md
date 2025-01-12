@@ -11,7 +11,7 @@
 - https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22
 
 
-## Initial Setup
+## Installation
 
 The gem is available at [rubygems.org](https://rubygems.org/gems/echspec). You can install it the following:
 
