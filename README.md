@@ -1,5 +1,6 @@
 # echspec
 
+[![Gem Version](https://badge.fury.io/rb/echspec.svg)](https://badge.fury.io/rb/echspec)
 [![Actions Status](https://github.com/thekuwayama/echspec/actions/workflows/ci.yml/badge.svg)](https://github.com/thekuwayama/echspec/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.txt)
 
@@ -9,15 +10,15 @@
 
 - https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22
 
+
 ## Initial Setup
 
-You can install with:
+The gem is available at [rubygems.org](https://rubygems.org/gems/echspec). You can install it the following:
 
 ```sh-session
-$ gem install specific_install
-
-$ gem specific_install git@github.com:thekuwayama/echspec.git
+$ gem install echspec
 ```
+
 
 ## Usage
 
@@ -264,6 +265,7 @@ $ echspec -s 7-5 -v research.cloudflare.com 2>&1 > /dev/null | jq .
 `echspec` is inspired by:
 
 - https://github.com/summerwind/h2spec
+
 
 ## License
 
