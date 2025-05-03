@@ -34,12 +34,16 @@ module EchSpec
           'EncryptedExtensions'
         in TTTLS13::Message::Certificate
           'Certificate'
+        in TTTLS13::Message::CompressedCertificate
+          'CompressedCertificate'
         in TTTLS13::Message::CertificateVerify
           'CertificateVerify'
         in TTTLS13::Message::Finished
           'Finished'
         in TTTLS13::Message::EndOfEarlyData
           'EndOfEarlyData'
+        in TTTLS13::Message::NewSessionTicket
+          'NewSessionTicket'
         in TTTLS13::Message::Alert
           'Alert'
         end
