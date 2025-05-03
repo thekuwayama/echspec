@@ -60,7 +60,7 @@ module EchSpec
         # send ClientHello
         conn = TLS13Client::Connection.new(socket, :client)
         inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
-        exs, priv_keys = TLS13Client.gen_ch_extensions(hostname)
+        exs, shared_secret = TLS13Client.gen_ch_extensions(hostname)
         inner = TTTLS13::Message::ClientHello.new(
           cipher_suites: TTTLS13::CipherSuites.new(
             [
@@ -98,14 +98,9 @@ module EchSpec
         transcript[TTTLS13::SH] = [sh, sh.serialize]
         kse = sh.extensions[TTTLS13::Message::ExtensionType::KEY_SHARE]
                 .key_share_entry.first
-        shared_secret = TTTLS13::Endpoint.gen_shared_secret(
-          kse.key_exchange,
-          priv_keys[kse.group],
-          kse.group
-        )
         key_schedule = TTTLS13::KeySchedule.new(
           psk: nil,
-          shared_secret:,
+          shared_secret: shared_secret.build(kse.group, kse.key_exchange),
           cipher_suite: sh.cipher_suite,
           transcript:
         )

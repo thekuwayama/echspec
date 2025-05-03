@@ -66,12 +66,12 @@ module EchSpec
         exs << TTTLS13::Message::Extension::SupportedGroups.new(groups)
 
         # key_share
-        key_share, priv_keys = TTTLS13::Message::Extension::KeyShare.gen_ch_key_share(
+        key_share, shared_secret = TTTLS13::Message::Extension::KeyShare.gen_ch_key_share(
           groups
         )
         exs << key_share
 
-        [exs, priv_keys]
+        [exs, shared_secret]
       end
 
       # @param ch1 [TTTLS13::Message::ClientHello]
