@@ -12,20 +12,20 @@ module EchSpec
           msg.description == TTTLS13::Message::ALERT_DESCRIPTION[desc]
       end
 
-      ResultDesc = Struct.new(:result, :desc)
+      ResultDescURL = Struct.new(:result, :desc, :url)
 
-      # @param rds [Array<ResultDesc>] result: EchSpec::Ok | Err, desc: String
+      # @param rds [Array<ResultDescURL>] result: EchSpec::Ok | Err, desc: String
       # @param verbose [Boolean]
-      def print_results(rds, verbose)
-        rds.each { |rd| print_summary(rd.result, rd.desc) }
-        failures = rds.filter { |rd| rd.result.is_a? Err }
+      def print_results(rdus, verbose)
+        rdus.each { |rdu| print_summary(rdu.result, rdu.desc) }
+        failures = rdus.filter { |rdu| rdu.result.is_a? Err }
         return if failures.empty?
 
         puts
         puts 'Failures:'
         puts
         failures.each
-                .with_index { |rd, idx| print_err_details(rd.result, idx, rd.desc, verbose) }
+                .with_index { |rdu, idx| print_err_details(rdu.result, rdu.url, idx, rdu.desc, verbose) }
         puts "#{failures.length} failure".red
       end
 
@@ -44,11 +44,13 @@ module EchSpec
       end
 
       # @param err [EchSpec::Err]
+      # @param url [String]
       # @param idx [Integer]
       # @param desc [String]
       # @param verbose [Boolean]
-      def print_err_details(err, idx, desc, verbose)
+      def print_err_details(err, url, idx, desc, verbose)
         puts "#{idx + 1}) #{desc}".indent
+        puts url.indent.indent
         puts err.details.indent.indent
         warn err.message_stack if verbose && !err.message_stack.nil?
         puts
@@ -122,15 +124,31 @@ module EchSpec
       # @param targets [Array<EchSpec::SpecGroup>]
       # @param verbose [Boolean]
       def do_run(port, hostname, ech_config, targets, verbose)
-        rds = targets.flat_map do |g|
+        rdus = targets.flat_map do |g|
           g.spec_cases.map do |sc|
             r = sc.method.call(hostname, port, ech_config)
-            d = "#{sc.description} [#{g.section}]"
-            ResultDesc.new(result: r, desc: d)
+            d = desc(sc.description, g.section)
+            u = url(g.section)
+            ResultDescURL.new(result: r, desc: d, url: u)
           end
         end
 
-        print_results(rds, verbose)
+        print_results(rdus, verbose)
+      end
+
+      # @param description [String]
+      # @param section [String]
+      #
+      # @return [String]
+      def desc(description, section)
+        "#{description} [#{section}]"
+      end
+
+      # @param section [String]
+      #
+      # @return [String]
+      def url(section)
+        "https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-#{section}"
       end
 
       # @param fpath [String | NilClass]
@@ -142,11 +160,12 @@ module EchSpec
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-9
         case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
         in Ok(obj) if force_compliant
-          result.tap { |r| print_summary(r, "#{Spec9.description} [#{Spec9.section}]") }
+          result.tap { |r| print_summary(r, desc(Spec9.description, Spec9.section)) }
           obj
         in Ok(obj)
           obj
         in Err(details, _)
+          puts url(Spec9.section).indent
           puts details.red.indent
           exit 1
         end
