@@ -41,9 +41,9 @@ module EchSpec
           end
         end
 
-        # @param ech_configs [Array of ECHConfig]
+        # @param ech_configs [Array<ECHConfig>]
         #
-        # @return [EchSpec::Ok<ECHConfig> | Err]
+        # @return [EchSpec::Ok | Err]
         def validate_compliant_ech_configs(ech_configs)
           ech_config = ech_configs.find do |c|
             kconfig = c.echconfig_contents.key_config
@@ -61,7 +61,7 @@ module EchSpec
 
         # @param hostname [String]
         #
-        # @return [EchSpec::Ok<Array of ECHConfig> | Err]
+        # @return [EchSpec::Ok<Array<ECHConfig>> | Err]
         def resolve_ech_configs(hostname)
           begin
             rr = Resolv::DNS.new.getresource(
@@ -85,7 +85,7 @@ module EchSpec
 
         # @param pem [String]
         #
-        # @return [EchSpec::Ok<Array of ECHConfig> | Err]
+        # @return [EchSpec::Ok<Array<ECHConfig>> | Err]
         def parse_pem(pem)
           s = pem.scan(/-----BEGIN ECHCONFIG-----(.*)-----END ECHCONFIG-----/m)
                  .first
