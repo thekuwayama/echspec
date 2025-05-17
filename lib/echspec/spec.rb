@@ -126,10 +126,10 @@ module EchSpec
       def do_run(port, hostname, ech_config, targets, verbose)
         rdus = targets.flat_map do |g|
           g.spec_cases.map do |sc|
-            r = sc.method.call(hostname, port, ech_config)
-            d = desc(sc.description, g.section)
-            u = url(g.section)
-            ResultDescURL.new(result: r, desc: d, url: u)
+            result = sc.method.call(hostname, port, ech_config)
+            desc = desc(sc.description, g.section)
+            url = url(g.section)
+            ResultDescURL.new(result:, desc:, url:)
           end
         end
 
@@ -158,15 +158,18 @@ module EchSpec
       # @return [ECHConfig]
       def try_get_ech_config(fpath, hostname, force_compliant)
         # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-9
-        case result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
-        in Ok(obj) if force_compliant
-          result.tap { |r| print_summary(r, desc(Spec9.description, Spec9.section)) }
-          obj
-        in Ok(obj)
-          obj
+        result = Spec9.try_get_ech_config(fpath, hostname, force_compliant)
+        desc = desc(Spec9.description, Spec9.section)
+        url = url(Spec9.section)
+
+        case result
+        in Ok(ech_config) if force_compliant
+          print_summary(result, desc)
+          ech_config
+        in Ok(ech_config)
+          ech_config
         in Err(details, _)
-          puts url(Spec9.section).indent
-          puts details.red.indent
+          print_results([ResultDescURL.new(result:, desc:, url:)], true)
           exit 1
         end
       end
