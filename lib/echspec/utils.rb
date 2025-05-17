@@ -1,6 +1,10 @@
 module EchSpec
   module Refinements
     refine String do
+      def indent
+        "\t#{self}"
+      end
+
       def colorize(code)
         "\e[#{code}m#{self}\e[0m"
       end

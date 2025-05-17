@@ -36,9 +36,9 @@ module EchSpec
         cross = "\u0078"
         summary = case result
                   in Ok
-                    "\t#{check} #{desc}".green
+                    "#{check} #{desc}".green.indent
                   in Err
-                    "\t#{cross} #{desc}".red
+                    "#{cross} #{desc}".red.indent
                   end
         puts summary
       end
@@ -48,8 +48,8 @@ module EchSpec
       # @param desc [String]
       # @param verbose [Boolean]
       def print_err_details(err, idx, desc, verbose)
-        puts "\t#{idx + 1}) #{desc}"
-        puts "\t\t#{err.details}"
+        puts "#{idx + 1}) #{desc}".indent
+        puts err.details.indent.indent
         warn err.message_stack if verbose && !err.message_stack.nil?
         puts
       end
@@ -147,7 +147,7 @@ module EchSpec
         in Ok(obj)
           obj
         in Err(details, _)
-          puts "\t#{details}".red
+          puts details.red.indent
           exit 1
         end
       end
