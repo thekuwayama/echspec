@@ -14,7 +14,7 @@ module EchSpec
 
       ResultDesc = Struct.new(:result, :desc)
 
-      # @param rds [Array of ResultDesc] result: EchSpec::Ok | Err, desc: String
+      # @param rds [Array<ResultDesc>] result: EchSpec::Ok | Err, desc: String
       # @param verbose [Boolean]
       def print_results(rds, verbose)
         rds.each { |rd| print_summary(rd.result, rd.desc) }
@@ -103,7 +103,7 @@ module EchSpec
       # @param fpath [String | NilClass]
       # @param port [Integer]
       # @param hostname [String]
-      # @param sections [Array of String]
+      # @param sections [Array<String>]
       # @param verbose [Boolean]
       def run_only(fpath, port, hostname, sections, verbose)
         targets = spec_groups.filter { |g| sections.include?(g.section) }
@@ -119,7 +119,7 @@ module EchSpec
       # @param port [Integer]
       # @param hostname [String]
       # @param ech_config [ECHConfig]
-      # @param targets [Array of EchSpec::SpecGroup]
+      # @param targets [Array<EchSpec::SpecGroup>]
       # @param verbose [Boolean]
       def do_run(port, hostname, ech_config, targets, verbose)
         rds = targets.flat_map do |g|

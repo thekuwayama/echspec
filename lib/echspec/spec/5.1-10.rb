@@ -130,7 +130,7 @@ module EchSpec
       end
 
       class MissingReferencedExtensions < TTTLS13::Message::Extensions
-        # @param _ [Array of TTTLS13::Message::ExtensionType]
+        # @param _ [Array<TTTLS13::Message::ExtensionType>]
         #
         # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
         def remove_and_replace!(_)
@@ -150,7 +150,7 @@ module EchSpec
       end
 
       class DuplicatedOuterExtensions < TTTLS13::Message::Extensions
-        # @param _ [Array of TTTLS13::Message::ExtensionType]
+        # @param _ [Array<TTTLS13::Message::ExtensionType>]
         #
         # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
         def remove_and_replace!(_)
@@ -172,7 +172,7 @@ module EchSpec
       end
 
       class ReferencedEncryptedClientHello < TTTLS13::Message::Extensions
-        # @param _ [Array of TTTLS13::Message::ExtensionType]
+        # @param _ [Array<TTTLS13::Message::ExtensionType>]
         #
         # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
         def remove_and_replace!(_)
@@ -194,7 +194,7 @@ module EchSpec
       end
 
       class NotSameOrderExtensions < TTTLS13::Message::Extensions
-        # @param _ [Array of TTTLS13::Message::ExtensionType]
+        # @param _ [Array<TTTLS13::Message::ExtensionType>]
         #
         # @return [TTTLS13::Message::Extensions] for EncodedClientHelloInner
         def remove_and_replace!(_)
