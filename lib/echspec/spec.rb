@@ -14,7 +14,7 @@ module EchSpec
 
       ResultDescURL = Struct.new(:result, :desc, :url)
 
-      # @param rds [Array<ResultDescURL>] result: EchSpec::Ok | Err, desc: String
+      # @param rdus [Array<ResultDescURL>] result: EchSpec::Ok | Err, desc: String, url: URI
       # @param verbose [Boolean]
       def print_results(rdus, verbose)
         rdus.each { |rdu| print_summary(rdu.result, rdu.desc) }
