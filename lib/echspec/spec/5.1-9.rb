@@ -2,12 +2,12 @@ module EchSpec
   module Spec
     class Spec5_1_9 < WithSocket
       # The client-facing server computes ClientHelloInner by reversing this
-      # process. First it parses EncodedClientHelloInner, interpreting all
-      # bytes after client_hello as padding. If any padding byte is non-
-      # zero, the server MUST abort the connection with an
-      # "illegal_parameter" alert.
+      # process. First, it parses EncodedClientHelloInner, interpreting all
+      # bytes after client_hello as padding. If any padding byte is non-zero,
+      # the server MUST abort the connection with an "illegal_parameter"
+      # alert.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-5.1-9
+      # https://datatracker.ietf.org/doc/html/rfc9849#section-5.1-9
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group

@@ -5,10 +5,10 @@ module EchSpec
       # using the second ClientHelloOuter. If decryption fails, the client-
       # facing server MUST abort the handshake with a "decrypt_error" alert.
       # Otherwise, it reconstructs the second ClientHelloInner from the new
-      # EncodedClientHelloInner as described in Section 5.1, using the
-      # second ClientHelloOuter for any referenced extensions.
+      # EncodedClientHelloInner as described in Section 5.1, using the second
+      # ClientHelloOuter for any referenced extensions.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-7.1.1-5
+      # https://datatracker.ietf.org/doc/html/rfc9849#section-7.1.1-5
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group

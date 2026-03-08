@@ -1,7 +1,7 @@
 module EchSpec
   module Spec
     class Spec5_1_10 < WithSocket
-      # Next it makes a copy of the client_hello field and copies the
+      # Next, it makes a copy of the client_hello field and copies the
       # legacy_session_id field from ClientHelloOuter. It then looks for an
       # "ech_outer_extensions" extension. If found, it replaces the extension
       # with the corresponding sequence of extensions in the
@@ -14,7 +14,7 @@ module EchSpec
       # * The extensions in ClientHelloOuter corresponding to those in
       #   OuterExtensions do not occur in the same order.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-5.1-10
+      # https://datatracker.ietf.org/doc/html/rfc9849#section-5.1-10
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group

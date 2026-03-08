@@ -8,7 +8,7 @@
 
 ![echspec demo](docs/echspec-demo.png)
 
-- https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22
+- https://datatracker.ietf.org/doc/html/rfc9849
 
 
 ## Installation
@@ -54,7 +54,7 @@ TLS Encrypted Client Hello Server
 Failures:
 
         1) MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloOuter. [7-5]
-                https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-7-5
+                https://datatracker.ietf.org/doc/html/rfc9849#section-7-5
                 did not send expected alert: illegal_parameter
 
 1 failure
