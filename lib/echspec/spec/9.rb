@@ -47,9 +47,9 @@ module EchSpec
         def validate_compliant_ech_configs(ech_configs)
           ech_config = ech_configs.find do |c|
             kconfig = c.echconfig_contents.key_config
-            valid_kem_id = kconfig.kem_id.uint16 == 0x0020
+            valid_kem_id = kconfig.kem_id.uint16 == HPKE::DHKEM_X25519_HKDF_SHA256
             valid_cipher_suite = kconfig.cipher_suites.any? do |cs|
-              cs.kdf_id.uint16 == 0x0001 && cs.aead_id.uint16 == 0x0001
+              cs.kdf_id.uint16 == HPKE::HKDF_SHA256 && cs.aead_id.uint16 == HPKE::AES_128_GCM
             end
 
             valid_kem_id && valid_cipher_suite
