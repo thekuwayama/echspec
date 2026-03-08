@@ -14,10 +14,9 @@ ECHCONFIGS = "#{TMP_DIR}/echconfigs.pem".freeze
 directory TMP_DIR
 
 file ECHCONFIGS => TMP_DIR do
-  key = OpenSSL::PKey.generate_key('X25519')
-
   puts "generate #{ECHCONFIGS}..."
 
+  key = OpenSSL::PKey.generate_key('X25519')
   echconfigs = ECHConfigList.new(
     [
       ECHConfig.new(
@@ -45,6 +44,6 @@ file ECHCONFIGS => TMP_DIR do
 end
 
 desc 'generate echconfigs file'
-task gen_echconfig: ECHCONFIGS
+task gen_echconfigs: ECHCONFIGS
 
 task default: %i[rubocop spec]
