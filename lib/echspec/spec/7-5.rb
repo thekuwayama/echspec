@@ -1,10 +1,14 @@
 module EchSpec
   module Spec
     class Spec7_5 < WithSocket
-      # If ECHClientHello.type is not a valid ECHClientHelloType, then the
-      # server MUST abort with an "illegal_parameter" alert.
+      # In shared mode, a server plays both roles, first decrypting the
+      # ClientHelloOuter and then using the contents of the ClientHelloInner.
+      # A shared mode server which receives a ClientHello with
+      # ECHClientHello.type of inner MUST abort with an "illegal_parameter"
+      # alert, because such a ClientHello should never be received directly
+      # from the network.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-7-5
+      # https://datatracker.ietf.org/doc/html/rfc9849#section-7-5
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group

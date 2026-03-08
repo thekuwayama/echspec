@@ -3,8 +3,8 @@ module EchSpec
     class Spec7_1_14_2_1 < WithSocket
       # Otherwise, if all candidate ECHConfig values fail to decrypt the
       # extension, the client-facing server MUST ignore the extension and
-      # proceed with the connection using ClientHelloOuter, with the
-      # following modifications:
+      # proceed with the connection using ClientHelloOuter with the following
+      # modifications:
       #
       # * If the server is configured with any ECHConfigs, it MUST include
       #   the "encrypted_client_hello" extension in its EncryptedExtensions
@@ -13,7 +13,7 @@ module EchSpec
       #   ECHConfig values of different versions. This allows a server to
       #   support multiple versions at once.
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-7.1-14.2.1
+      # https://datatracker.ietf.org/doc/html/rfc9849#section-7.1-14.2.1
 
       # @return [EchSpec::SpecGroup]
       def self.spec_group

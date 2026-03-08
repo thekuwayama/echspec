@@ -9,7 +9,7 @@ module EchSpec
       # * KDF: HKDF-SHA256 (see Section 7.2 of [HPKE])
       # * AEAD: AES-128-GCM (see Section 7.3 of [HPKE])
       #
-      # https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-22#section-9
+      # https://datatracker.ietf.org/doc/html/rfc9849#section-9
       @section = '9'
       @description = 'MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.'
       class << self
@@ -72,7 +72,7 @@ module EchSpec
             return Err.new(e.message, nil)
           end
 
-          # https://datatracker.ietf.org/doc/html/draft-ietf-tls-svcb-ech-01#section-6
+          # https://datatracker.ietf.org/doc/html/rfc9934#section-3
           ech = 5
           return Err.new("HTTPS resource record for #{hostname} does NOT have ech SvcParams.", nil) if rr.params[ech].nil?
 
@@ -95,7 +95,7 @@ module EchSpec
           ech_configs = ECHConfig.decode_vectors(b.slice(2..))
           Ok.new(ech_configs)
         rescue StandardError
-          # https://datatracker.ietf.org/doc/html/draft-farrell-tls-pemesni-08#section-3
+          # https://datatracker.ietf.org/doc/html/rfc9934#section-3
           example = <<~PEM
             -----BEGIN PRIVATE KEY-----
             MC4CAQAwBQYDK2VuBCIEICjd4yGRdsoP9gU7YT7My8DHx1Tjme8GYDXrOMCi8v1V
