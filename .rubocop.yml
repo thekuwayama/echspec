@@ -9,6 +9,7 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Exclude:
+    - 'Rakefile'
     - 'spec/*.rb'
 
 Metrics/ClassLength:
