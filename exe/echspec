@@ -4,4 +4,4 @@ $LOAD_PATH << "#{__dir__}/../lib"
 
 require 'echspec'
 
-EchSpec::CLI.new.run
+EchSpec::CLI.new.execute
