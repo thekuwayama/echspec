@@ -24,7 +24,13 @@ $ gem install echspec
 
 ```sh-session
 $ echspec --help
-Usage: echspec [OPTIONS] <HOSTNAME>
+Usage: echspec {SUBCOMMAND}
+
+Available subcommands: run, gen_configs, version, help.
+```
+```sh-session
+$ echspec run --help
+Usage: echspec run [OPTIONS...] {HOSTNAME}
     -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
     -p, --port VALUE                 server port number                (default 443)
     -n, --not-force-compliant-hpke   not force compliant ECHConfig HPKE cipher suite
@@ -35,7 +41,7 @@ Usage: echspec [OPTIONS] <HOSTNAME>
 You can run it the following:
 
 ```sh-session
-$ echspec research.cloudflare.com
+$ echspec run research.cloudflare.com
 TLS Encrypted Client Hello Server
         ✔ MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM. [9]
         ✔ MUST abort with an "illegal_parameter" alert, if EncodedClientHelloInner is padded with non-zero values. [5.1-9]
@@ -63,7 +69,7 @@ Failures:
 By default, `echspec` retrieves ECHConfigs via HTTPS records. By using the `-f, --file FILE` option, you can specify an ECHConfig pem file. If you need to test the server on localhost, you can run it the following:
 
 ```sh-session
-$ echspec -f fixtures/echconfigs.pem -p 4433 localhost
+$ echspec run -f fixtures/echconfigs.pem -p 4433 localhost
 ```
 
 By default, `echspec` uses the following HPKE cipher suite
@@ -78,13 +84,13 @@ By default, `echspec` uses the following HPKE cipher suite
 Using the `-n` or `--not-force-compliant-hpke`, you can not enforce the HPKE cipher suite.
 
 ```sh-session
-$ echspec -f fixtures/echconfigs.pem -p 4433 -n localhost
+$ echspec run -f fixtures/echconfigs.pem -p 4433 -n localhost
 ```
 
 If you specify the SECTIONS, you can run only SECTIONS the following:
 
 ```sh-session
-$ echspec -f fixtures/echconfigs.pem -p 4433 -n -s 7.1.1-2,7.1.1-5 localhost
+$ echspec run -f fixtures/echconfigs.pem -p 4433 -n -s 7.1.1-2,7.1.1-5 localhost
 TLS Encrypted Client Hello Server
         ✔ MUST abort with a "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension. [7.1.1-2]
         ✔ MUST abort with an "illegal_parameter" alert, if 2nd ClientHelloOuter "encrypted_client_hello" enc is empty. [7.1.1-2]
@@ -94,7 +100,7 @@ TLS Encrypted Client Hello Server
 Using the `-v` or `--verbose` option provides a message stack if an error occurs. The message stack is formatted as JSON.
 
 ```sh-session
-$ echspec -s 7-5 -v research.cloudflare.com 2>&1 > /dev/null | jq .
+$ echspec run -s 7-5 -v research.cloudflare.com 2>&1 > /dev/null | jq .
 ````
 
 <details>

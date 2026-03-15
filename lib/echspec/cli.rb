@@ -27,7 +27,7 @@ module EchSpec
         klass = self.class.const_get(subcommand.to_camel)
         klass.new.__send__(:execute, argv)
       else
-        puts op.help
+        puts op
       end
     end
   end

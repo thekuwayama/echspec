@@ -3,13 +3,13 @@ module EchSpec
     class GenConfigs
       def execute(argv)
         fpath = parse_options(argv)
-        gen(fpath)
+        write(fpath)
       end
 
       def parse_options(argv)
         op = OptionParser.new
 
-        op.banner = 'Usage: echspec gen_configs {FILE_PATH}'
+        op.banner = 'Usage: echspec gen_configs {FILE}'
 
         begin
           args = op.parse(argv)
@@ -21,13 +21,13 @@ module EchSpec
 
         if args.length != 1
           warn op
-          warn '** {FILE_PATH} argument is not specified'
+          warn '** {FILE} argument is not specified'
           exit 1
         end
         args[0]
       end
 
-      def gen(fpath)
+      def write(fpath)
         hostname = 'localhost'
 
         key = OpenSSL::PKey.generate_key('X25519')
