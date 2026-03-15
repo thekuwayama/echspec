@@ -1,96 +1,33 @@
+require_relative 'cli/gen_configs'
+require_relative 'cli/run'
+
 module EchSpec
   class CLI
-    # rubocop: disable Metrics/AbcSize
-    # rubocop: disable Metrics/MethodLength
-    def parse_options(argv = ARGV)
+    using Refinements
+
+    def execute(argv = ARGV)
+      subcommands = %i[run gen_configs]
+
       op = OptionParser.new
 
-      # default value
-      fpath = nil
-      port = 443
-      force_compliant = true
-      verbose = false
-      sections = nil
+      op.banner = <<~USAGE
+        Usage: echspec {SUBCOMMAND}
 
-      op.on(
-        '-f',
-        '--file FILE',
-        'path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)'
-      ) do |v|
-        fpath = v
-      end
+        Available subcommands: #{subcommands.join(', ')}, version, help.
+      USAGE
 
-      op.on(
-        '-p',
-        '--port VALUE',
-        "server port number                (default #{port})"
-      ) do |v|
-        port = v
-      end
+      op.version = EchSpec::VERSION
+      op.order!(argv)
 
-      op.on(
-        '-n',
-        '--not-force-compliant-hpke',
-        'not force compliant ECHConfig HPKE cipher suite'
-      ) do
-        force_compliant = false
-      end
-
-      op.on(
-        '-v',
-        '--verbose',
-        'verbose mode; prints message stack if raised an error'
-      ) do
-        verbose = true
-      end
-
-      op.on(
-        '-s',
-        '--sections SECTIONS',
-        'sections to test; by the default, test all sections'
-      ) do |v|
-        sections = v.split(',')
-      end
-
-      op.banner = 'Usage: echspec [OPTIONS] <HOSTNAME>'
-      begin
-        args = op.parse(argv)
-      rescue OptionParser::InvalidOption, OptionParser::MissingArgument => e
-        warn op
-        warn "** #{e.message}"
-        exit 1
-      end
-
-      if !fpath.nil? && !File.exist?(fpath)
-        warn '** <FILE> is not found'
-        exit 1
-      end
-
-      unknowns = sections.nil? ? [] : sections - Spec.sections
-      unless unknowns.empty?
-        warn "** #{unknowns} are unknown sections"
-        exit 1
-      end
-
-      if args.length != 1
-        warn op
-        warn '** <HOSTNAME> argument is not specified'
-        exit 1
-      end
-      hostname = args[0]
-
-      [fpath, port, force_compliant, verbose, hostname, sections]
-    end
-    # rubocop: enable Metrics/AbcSize
-    # rubocop: enable Metrics/MethodLength
-
-    def run
-      fpath, port, force_compliant, verbose, hostname, sections = parse_options
-
-      if sections.nil?
-        Spec.run(fpath, port, hostname, force_compliant, verbose)
+      subcommand = argv.shift
+      case subcommand&.to_sym
+      when :version
+        puts EchSpec::VERSION
+      when *subcommands
+        klass = self.class.const_get(subcommand.to_camel)
+        klass.new.__send__(:execute, argv)
       else
-        Spec.run_only(fpath, port, hostname, sections, verbose)
+        puts op.help
       end
     end
   end

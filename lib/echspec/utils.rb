@@ -20,6 +20,10 @@ module EchSpec
       def yellow
         colorize(33)
       end
+
+      def to_camel
+        gsub(/(?:^|_)(.)/) { Regexp.last_match(1).upcase }
+      end
     end
   end
 end
