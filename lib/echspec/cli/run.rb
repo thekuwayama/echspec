@@ -63,7 +63,18 @@ module EchSpec
           sections = v.split(',')
         end
 
-        op.banner = 'Usage: echspec run [OPTIONS...] {HOSTNAME}'
+        op.banner = <<~USAGE
+          Usage: echspec run [OPTIONS...] {HOSTNAME}
+
+          Run HTTP/2 server conformance tests.
+
+          Examples:
+
+            $ echspec run localhost
+            $ echspec run -f echconfigs.pem -p 4433 localhost
+
+          Options:
+        USAGE
 
         begin
           args = op.parse(argv)

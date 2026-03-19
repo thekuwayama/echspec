@@ -31,6 +31,15 @@ Available subcommands: run, gen_configs, version, help.
 ```sh-session
 $ echspec run --help
 Usage: echspec run [OPTIONS...] {HOSTNAME}
+
+Run HTTP/2 server conformance tests.
+
+Examples:
+
+  $ echspec run localhost
+  $ echspec run -f echconfigs.pem -p 4433 localhost
+
+Options:
     -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
     -p, --port VALUE                 server port number                (default 443)
     -n, --not-force-compliant-hpke   not force compliant ECHConfig HPKE cipher suite

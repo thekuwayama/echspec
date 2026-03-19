@@ -9,7 +9,15 @@ module EchSpec
       def parse_options(argv)
         op = OptionParser.new
 
-        op.banner = 'Usage: echspec gen_configs {FILE}'
+        op.banner = <<~USAGE
+          Usage: echspec gen_configs {FILE}
+
+          Generate an ECHConfig PEM file.
+
+          Examples:
+
+            $ echspec gen_configs echconfigs.pem
+        USAGE
 
         begin
           args = op.parse(argv)
