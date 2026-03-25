@@ -66,7 +66,7 @@ module EchSpec
         op.banner = <<~USAGE
           Usage: echspec run [OPTIONS...] {HOSTNAME}
 
-          Run HTTP/2 server conformance tests.
+          Run ECH conformance tests for a server.
 
           Examples:
 

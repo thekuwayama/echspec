@@ -13,7 +13,7 @@
 
 ## Installation
 
-The gem is available at [rubygems.org](https://rubygems.org/gems/echspec). You can install it the following:
+The gem is available at [rubygems.org](https://rubygems.org/gems/echspec). You can install it with the following:
 
 ```sh-session
 $ gem install echspec
@@ -32,7 +32,7 @@ Available subcommands: run, gen_configs, version, help.
 $ echspec run --help
 Usage: echspec run [OPTIONS...] {HOSTNAME}
 
-Run HTTP/2 server conformance tests.
+Run ECH conformance tests for a server.
 
 Examples:
 
@@ -47,7 +47,7 @@ Options:
     -s, --sections SECTIONS          sections to test; by the default, test all sections
 ```
 
-You can run it the following:
+Example output:
 
 ```sh-session
 $ echspec run research.cloudflare.com
@@ -75,13 +75,13 @@ Failures:
 1 failure
 ```
 
-By default, `echspec` retrieves ECHConfigs via HTTPS records. By using the `-f, --file FILE` option, you can specify an ECHConfig pem file. If you need to test the server on localhost, you can run it the following:
+By default, `echspec` retrieves ECHConfigs via DNS HTTPS records. You can specify a local PEM file using the `-f, --file FILE` option. To test a server on localhost:
 
 ```sh-session
 $ echspec run -f fixtures/echconfigs.pem -p 4433 localhost
 ```
 
-By default, `echspec` uses the following HPKE cipher suite
+By default, `echspec` enforces the following mandatory HPKE cipher suite:
 
 - KEM
   - DHKEM(X25519, HKDF-SHA256)
@@ -90,13 +90,13 @@ By default, `echspec` uses the following HPKE cipher suite
 - AEAD
   - AES-128-GCM
 
-Using the `-n` or `--not-force-compliant-hpke`, you can not enforce the HPKE cipher suite.
+Use the `-n` or `--not-force-compliant-hpke` option to disable this enforcement and use the cipher suite provided in the ECHConfig.
 
 ```sh-session
 $ echspec run -f fixtures/echconfigs.pem -p 4433 -n localhost
 ```
 
-If you specify the SECTIONS, you can run only SECTIONS the following:
+To run only specific test SECTIONS, use the `-s` option:
 
 ```sh-session
 $ echspec run -f fixtures/echconfigs.pem -p 4433 -n -s 7.1.1-2,7.1.1-5 localhost
@@ -281,6 +281,21 @@ $ echspec run -s 7-5 -v research.cloudflare.com 2>&1 > /dev/null | jq .
 ```
 
 </details>
+
+You can generate an ECHConfig PEM file the following:
+
+```sh-session
+$ echspec gen_configs echconfigs.pem
+```
+```
+-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VuBCIEICjd4yGRdsoP9gU7YT7My8DHx1Tjme8GYDXrOMCi8v1V
+-----END PRIVATE KEY-----
+-----BEGIN ECHCONFIG-----
+AD7+DQA65wAgACA8wVN2BtscOl3vQheUzHeIkVmKIiydUhDCliA4iyQRCwAEAAEA
+AQALZXhhbXBsZS5jb20AAA==
+-----END ECHCONFIG-----
+```
 
 
 ## Note
