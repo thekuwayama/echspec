@@ -23,7 +23,7 @@ jobs:
         with:
           ruby-version: '4.0'
       - name: Publish to RubyGems
-        uses: rubygems/release-gem@6317d8d1f7e28c24d28f6eff169ea854948bd9f7 # v1.2.0
+        uses: thekuwayama/release-gem@1a84d77ab20b64ae00f9f056f9646cf0b93b1c52 # fix__bundler_setup
       - name: Create GitHub release
         run: |
           tag_name="$(git describe --tags --abbrev=0)"
