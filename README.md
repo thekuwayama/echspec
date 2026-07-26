@@ -26,8 +26,11 @@ $ gem install echspec
 $ echspec --help
 Usage: echspec {SUBCOMMAND}
 
-Available subcommands: run, gen_configs, resolve, version, help.
+Available subcommands: run, gen_configs, resolve, grease, version, help.
 ```
+
+### run
+
 ```sh-session
 $ echspec run --help
 Usage: echspec run [OPTIONS...] {HOSTNAME}
@@ -282,6 +285,25 @@ $ echspec run -s 7-5 -v research.cloudflare.com 2>&1 > /dev/null | jq .
 
 </details>
 
+### gen_configs
+
+You can generate an ECHConfig PEM file the following:
+
+```sh-session
+$ echspec gen_configs echconfigs.pem
+```
+```
+-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VuBCIEICjd4yGRdsoP9gU7YT7My8DHx1Tjme8GYDXrOMCi8v1V
+-----END PRIVATE KEY-----
+-----BEGIN ECHCONFIG-----
+AD7+DQA65wAgACA8wVN2BtscOl3vQheUzHeIkVmKIiydUhDCliA4iyQRCwAEAAEA
+AQALZXhhbXBsZS5jb20AAA==
+-----END ECHCONFIG-----
+```
+
+### resolve
+
 You can resolve ECHConfigs for a hostname and print fields using the `resolve` subcommand:
 
 ```sh-session
@@ -317,20 +339,40 @@ ECHConfig:                                     │
     extensions(opaque):                        │ 
 ```
 
+### grease
 
-You can generate an ECHConfig PEM file the following:
+You can send a GREASE ECH to a server to trigger `retry_configs` and print the retry ECHConfigs fields using the `grease` subcommand:
 
 ```sh-session
-$ echspec gen_configs echconfigs.pem
+$ echspec grease --help
+Usage: echspec grease [OPTIONS...] {HOSTNAME}
+
+Send GREASE ECH to a server and display retry_configs.
+
+Examples:
+
+  $ echspec grease localhost
+  $ echspec grease -p 4433 localhost
+
+Options:
+    -p, --port VALUE                 server port number                (default 443)
 ```
-```
------BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VuBCIEICjd4yGRdsoP9gU7YT7My8DHx1Tjme8GYDXrOMCi8v1V
------END PRIVATE KEY-----
------BEGIN ECHCONFIG-----
-AD7+DQA65wAgACA8wVN2BtscOl3vQheUzHeIkVmKIiydUhDCliA4iyQRCwAEAAEA
-AQALZXhhbXBsZS5jb20AAA==
------END ECHCONFIG-----
+```sh-session
+$ echspec grease research.cloudflare.com
+ECHConfig:                                     │ 
+  version(uint16):                             │ fe 0d
+  length(uint16):                              │ 65
+  contents(ECHConfigContents):                 │ 
+    key_config(HpkeKeyConfig):                 │ 
+      config_id(uint8):                        │ 72
+      kem_id(uint16):                          │ 00 20
+      public_key(opaque):                      │ 0a 89 2a 9f 05 0a d5 21 da cc 42 65 df cf 70 38 22 7e 85 44 93 1b 68 fa a2 b5 37 ad d8 2c 89 39
+      cipher_suites(HpkeSymmetricCipherSuite): │ 
+        kdf_id(uint16):                        │ 00 01
+        aead_id(uint16):                       │ 00 01
+    maximum_name_length(uint8):                │ 0
+    public_name(opaque):                       │ cloudflare-ech.com
+    extensions(opaque):                        │ 
 ```
 
 
