@@ -19,6 +19,7 @@ module EchSpec
         end
       end
 
+      # rubocop: disable Metrics/MethodLength
       def parse_options(argv)
         op = OptionParser.new
         fpath = nil
@@ -65,10 +66,11 @@ module EchSpec
 
         [fpath, args[0]]
       end
+      # rubocop: enable Metrics/MethodLength
 
       def print_ech_configs(ech_configs)
         ech_configs.each_with_index do |c, i|
-          puts "#{'─' * 48}┼#{'─' * 48}" if i > 0
+          puts "#{'─' * 48}┼#{'─' * 48}" if i.positive?
           print_ech_config(c)
         end
       end
@@ -77,27 +79,29 @@ module EchSpec
         puts "#{label.ljust(48)}│ #{value}"
       end
 
+      # rubocop: disable Metrics/AbcSize
       def print_ech_config(c)
-        print_field("ECHConfig:", '')
-        print_field("  version(uint16):", c.version.unpack1('H4').scan(/.{2}/).join(' '))
+        print_field('ECHConfig:', '')
+        print_field('  version(uint16):', c.version.unpack1('H4').scan(/.{2}/).join(' '))
         ec = c.echconfig_contents
-        print_field("  length(uint16):", ec.encode.length)
-        print_field("  contents(ECHConfigContents):", '')
-        print_field("    key_config(HpkeKeyConfig):", '')
+        print_field('  length(uint16):', ec.encode.length)
+        print_field('  contents(ECHConfigContents):', '')
+        print_field('    key_config(HpkeKeyConfig):', '')
         kc = ec.key_config
-        print_field("      config_id(uint8):", kc.config_id)
-        print_field("      kem_id(uint16):", kc.kem_id.encode.unpack1('H4').scan(/.{2}/).join(' '))
-        print_field("      public_key(opaque):", kc.public_key.opaque.unpack1('H*').scan(/.{2}/).join(' '))
-        print_field("      cipher_suites(HpkeSymmetricCipherSuite):", '')
+        print_field('      config_id(uint8):', kc.config_id)
+        print_field('      kem_id(uint16):', kc.kem_id.encode.unpack1('H4').scan(/.{2}/).join(' '))
+        print_field('      public_key(opaque):', kc.public_key.opaque.unpack1('H*').scan(/.{2}/).join(' '))
+        print_field('      cipher_suites(HpkeSymmetricCipherSuite):', '')
         kc.cipher_suites.each do |cs|
-          print_field("        kdf_id(uint16):", cs.kdf_id.encode.unpack1('H4').scan(/.{2}/).join(' '))
-          print_field("        aead_id(uint16):", cs.aead_id.encode.unpack1('H4').scan(/.{2}/).join(' '))
+          print_field('        kdf_id(uint16):', cs.kdf_id.encode.unpack1('H4').scan(/.{2}/).join(' '))
+          print_field('        aead_id(uint16):', cs.aead_id.encode.unpack1('H4').scan(/.{2}/).join(' '))
         end
-        print_field("    maximum_name_length(uint8):", ec.maximum_name_length)
-        print_field("    public_name(opaque):", ec.public_name)
+        print_field('    maximum_name_length(uint8):', ec.maximum_name_length)
+        print_field('    public_name(opaque):', ec.public_name)
         ext = ec.extensions.octet.unpack1('H*').scan(/.{2}/).join(' ')
-        print_field("    extensions(opaque):", ext)
+        print_field('    extensions(opaque):', ext)
       end
+      # rubocop: enable Metrics/AbcSize
     end
   end
 end
