@@ -1,4 +1,6 @@
+require_relative 'cli/ech_config_printer'
 require_relative 'cli/gen_configs'
+require_relative 'cli/grease'
 require_relative 'cli/resolve'
 require_relative 'cli/run'
 
@@ -7,7 +9,7 @@ module EchSpec
     using Refinements
 
     def execute(argv = ARGV)
-      subcommands = %i[run gen_configs resolve]
+      subcommands = %i[run gen_configs resolve grease]
 
       op = OptionParser.new
 

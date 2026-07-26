@@ -1,4 +1,5 @@
 module EchSpec
+  # rubocop: disable Metrics/ModuleLength
   module TLS13Client
     class Connection < TTTLS13::Connection
       # @param socket [Socket]
@@ -95,6 +96,84 @@ module EchSpec
         ch1.extensions.merge(exs)
       end
 
+      # @param socket [TCPSocket]
+      # @param hostname [String]
+      # @param stack [EchSpec::Log::MessageStack | nil]
+      #
+      # @raise [EchSpec::Error::BeforeTargetSituationError]
+      #
+      # @return [TTTLS13::Message::EncryptedExtensions]
+      # rubocop: disable Metrics/AbcSize
+      # rubocop: disable Metrics/CyclomaticComplexity
+      # rubocop: disable Metrics/MethodLength
+      # rubocop: disable Metrics/PerceivedComplexity
+      def send_ch_with_greased_ech(socket, hostname, stack = nil)
+        conn = TLS13Client::Connection.new(socket, :client)
+        inner_ech = TTTLS13::Message::Extension::ECHClientHello.new_inner
+        exs, shared_secret = TLS13Client.gen_ch_extensions(hostname)
+        inner = TTTLS13::Message::ClientHello.new(
+          cipher_suites: TTTLS13::CipherSuites.new(
+            [
+              TTTLS13::CipherSuite::TLS_AES_256_GCM_SHA384,
+              TTTLS13::CipherSuite::TLS_CHACHA20_POLY1305_SHA256,
+              TTTLS13::CipherSuite::TLS_AES_128_GCM_SHA256
+            ]
+          ),
+          extensions: exs.merge(
+            TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO => inner_ech
+          )
+        )
+        stack << inner if stack
+
+        ch = TTTLS13::Ech.new_greased_ch(inner, TTTLS13::Ech.new_grease_ech)
+        conn.send_record(
+          TTTLS13::Message::Record.new(
+            type: TTTLS13::Message::ContentType::HANDSHAKE,
+            messages: [ch],
+            cipher: TTTLS13::Cryptograph::Passer.new
+          )
+        )
+        stack << ch if stack
+
+        recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        stack << recv if stack
+        raise Error::BeforeTargetSituationError, 'not received ServerHello' \
+          unless recv.is_a?(TTTLS13::Message::ServerHello) && !recv.hrr?
+
+        transcript = TTTLS13::Transcript.new
+        transcript[TTTLS13::CH] = [ch, ch.serialize]
+        sh = recv
+        transcript[TTTLS13::SH] = [sh, sh.serialize]
+        kse = sh.extensions[TTTLS13::Message::ExtensionType::KEY_SHARE]
+                .key_share_entry.first
+        key_schedule = TTTLS13::KeySchedule.new(
+          psk: nil,
+          shared_secret: shared_secret.build(kse.group, kse.key_exchange),
+          cipher_suite: sh.cipher_suite,
+          transcript:
+        )
+        hs_rcipher = TTTLS13::Endpoint.gen_cipher(
+          sh.cipher_suite,
+          key_schedule.server_handshake_write_key,
+          key_schedule.server_handshake_write_iv
+        )
+        recv, = conn.recv_message(hs_rcipher)
+        stack << recv if stack
+        if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
+          recv, = conn.recv_message(hs_rcipher)
+          stack << recv if stack
+        end
+
+        raise Error::BeforeTargetSituationError, 'not received EncryptedExtensions' \
+          unless recv.is_a?(TTTLS13::Message::EncryptedExtensions)
+
+        recv
+      end
+      # rubocop: enable Metrics/AbcSize
+      # rubocop: enable Metrics/CyclomaticComplexity
+      # rubocop: enable Metrics/MethodLength
+      # rubocop: enable Metrics/PerceivedComplexity
+
       # @param conf [ECHConfig::ECHConfigContents::HpkeKeyConfig]
       #
       # @return [Boolean]
@@ -164,4 +243,5 @@ module EchSpec
       # rubocop: enable Metrics/MethodLength
     end
   end
+  # rubocop: enable Metrics/ModuleLength
 end
