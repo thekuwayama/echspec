@@ -7,7 +7,7 @@ module EchSpec
         result = if fpath.nil?
                    Spec::Spec9.resolve_ech_configs(hostname)
                  else
-                   Spec::Spec9.parse_pem(File.open(fpath).read)
+                   Spec::Spec9.parse_pem(File.read(fpath))
                  end
 
         case result
