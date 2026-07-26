@@ -33,14 +33,15 @@ module EchSpec
         end
 
         op.banner = <<~USAGE
-          Usage: echspec resolve [OPTIONS...] {HOSTNAME}
+          Usage: echspec resolve [OPTIONS...] [{HOSTNAME}]
 
           Resolve ECHConfigs for a hostname and print fields.
+          {HOSTNAME} is required unless -f is specified.
 
           Examples:
 
-            $ echspec resolve example.com
-            $ echspec resolve -f echconfigs.pem example.com
+            $ echspec resolve localhost
+            $ echspec resolve -f echconfigs.pem
 
           Options:
         USAGE
@@ -58,7 +59,7 @@ module EchSpec
           exit 1
         end
 
-        if args.length != 1
+        if fpath.nil? && args.length != 1
           warn op
           warn '** {HOSTNAME} argument is not specified'
           exit 1

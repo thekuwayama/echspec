@@ -286,14 +286,15 @@ You can resolve ECHConfigs for a hostname and print fields using the `resolve` s
 
 ```sh-session
 $ echspec resolve --help
-Usage: echspec resolve [OPTIONS...] {HOSTNAME}
+Usage: echspec resolve [OPTIONS...] [{HOSTNAME}]
 
 Resolve ECHConfigs for a hostname and print fields.
+{HOSTNAME} is required unless -f is specified.
 
 Examples:
 
-  $ echspec resolve example.com
-  $ echspec resolve -f echconfigs.pem example.com
+  $ echspec resolve localhost
+  $ echspec resolve -f echconfigs.pem
 
 Options:
     -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
