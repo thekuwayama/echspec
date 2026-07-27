@@ -1,4 +1,5 @@
 require_relative 'cli/gen_configs'
+require_relative 'cli/resolve'
 require_relative 'cli/run'
 
 module EchSpec
@@ -6,7 +7,7 @@ module EchSpec
     using Refinements
 
     def execute(argv = ARGV)
-      subcommands = %i[run gen_configs]
+      subcommands = %i[run gen_configs resolve]
 
       op = OptionParser.new
 

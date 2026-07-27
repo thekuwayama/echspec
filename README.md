@@ -26,7 +26,7 @@ $ gem install echspec
 $ echspec --help
 Usage: echspec {SUBCOMMAND}
 
-Available subcommands: run, gen_configs, version, help.
+Available subcommands: run, gen_configs, resolve, version, help.
 ```
 ```sh-session
 $ echspec run --help
@@ -281,6 +281,42 @@ $ echspec run -s 7-5 -v research.cloudflare.com 2>&1 > /dev/null | jq .
 ```
 
 </details>
+
+You can resolve ECHConfigs for a hostname and print fields using the `resolve` subcommand:
+
+```sh-session
+$ echspec resolve --help
+Usage: echspec resolve [OPTIONS...] [{HOSTNAME}]
+
+Resolve ECHConfigs for a hostname and print fields.
+{HOSTNAME} is required unless -f is specified.
+
+Examples:
+
+  $ echspec resolve localhost
+  $ echspec resolve -f echconfigs.pem
+
+Options:
+    -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
+```
+```sh-session
+$ echspec resolve research.cloudflare.com
+ECHConfig:                                     │ 
+  version(uint16):                             │ fe 0d
+  length(uint16):                              │ 65
+  contents(ECHConfigContents):                 │ 
+    key_config(HpkeKeyConfig):                 │ 
+      config_id(uint8):                        │ 104
+      kem_id(uint16):                          │ 00 20
+      public_key(opaque):                      │ e8 49 25 b3 6c e3 fb 9c 72 c7 71 e2 7a b2 8c 65 84 ba c2 2a 90 c2 cb 59 23 b2 27 d8 c1 85 84 17
+      cipher_suites(HpkeSymmetricCipherSuite): │ 
+        kdf_id(uint16):                        │ 00 01
+        aead_id(uint16):                       │ 00 01
+    maximum_name_length(uint8):                │ 0
+    public_name(opaque):                       │ cloudflare-ech.com
+    extensions(opaque):                        │ 
+```
+
 
 You can generate an ECHConfig PEM file the following:
 
