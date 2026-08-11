@@ -3,12 +3,14 @@ module EchSpec
     class Resolve
       include EchConfigPrinter
       def execute(argv)
-        fpath, hostname = parse_options(argv)
+        fpath, well_known, hostname = parse_options(argv)
 
-        result = if fpath.nil?
-                   Spec::Spec9.resolve_ech_configs(hostname)
-                 else
+        result = if !fpath.nil?
                    Spec::Spec9.parse_pem(File.read(fpath))
+                 elsif well_known
+                   Spec::Spec9.well_known_origin_svcb(hostname)
+                 else
+                   Spec::Spec9.resolve_ech_configs(hostname)
                  end
 
         case result
@@ -24,6 +26,7 @@ module EchSpec
       def parse_options(argv)
         op = OptionParser.new
         fpath = nil
+        well_known = false
 
         op.on(
           '-f',
@@ -31,6 +34,14 @@ module EchSpec
           'path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)'
         ) do |v|
           fpath = v
+        end
+
+        op.on(
+          '-w',
+          '--well-known',
+          'resolve ECHConfigs via well-known URI, instead of DNS'
+        ) do
+          well_known = true
         end
 
         op.banner = <<~USAGE
@@ -42,6 +53,7 @@ module EchSpec
           Examples:
 
             $ echspec resolve localhost
+            $ echspec resolve -w localhost
             $ echspec resolve -f echconfigs.pem
 
           Options:
@@ -66,7 +78,7 @@ module EchSpec
           exit 1
         end
 
-        [fpath, args[0]]
+        [fpath, well_known, args[0]]
       end
       # rubocop: enable Metrics/MethodLength
     end

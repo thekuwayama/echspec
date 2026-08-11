@@ -83,6 +83,74 @@ module EchSpec
           Ok.new(ECHConfig.decode_vectors(octet.slice(2..)))
         end
 
+        # @param hostname [String]
+        #
+        # @return [EchSpec::Ok<Array<ECHConfig>> | Err]
+        def well_known_origin_svcb(hostname)
+          res = fetch_well_known(hostname)
+          body = case res
+                 in Ok(obj)
+                   obj
+                 in Err
+                   return res
+                 end
+
+          parse_origin_svcb(body)
+        end
+
+        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-wkech-12
+        WK_ECH_PATH = '/.well-known/origin-svcb'.freeze
+        private_constant :WK_ECH_PATH
+
+        # @param hostname [String]
+        #
+        # @return [EchSpec::Ok | Err]
+        def fetch_well_known(hostname)
+          uri = URI("https://#{hostname}#{WK_ECH_PATH}")
+          res = Net::HTTP.get_response(uri)
+          return Err.new("GET #{uri} returned #{res.code}.", nil) unless res.is_a?(Net::HTTPSuccess)
+
+          Ok.new(res.body)
+        rescue StandardError => e
+          Err.new(e.message, nil)
+        end
+
+        # {
+        #   "regeninterval": 3600,
+        #   "endpoints": [
+        #     {
+        #       "priority": 1,
+        #       "params": {
+        #         "ipv4hint": [ "192.0.2.1", "192.0.2.254" ],
+        #         "ech": "AD7+DQA6NAAgACCn3zNTeX/WOD...AAA==",
+        #         "ipv6hint": [ "2001:DB::ec4" ],
+        #         "alpn": [ "h2", "http/1.1" ]
+        #       }
+        #     }
+        #   ]
+        # }
+        #
+        # https://datatracker.ietf.org/doc/html/draft-ietf-tls-wkech-12#section-5
+        #
+        # @param body [String]
+        #
+        # @return [EchSpec::Ok | Err]
+        def parse_origin_svcb(body)
+          h = JSON.parse(body)
+          echs = h['endpoints']&.filter_map { |e| e.dig('params', 'ech') }
+          return Err.new('The origin-svcb well-known resource does NOT have ech SvcParams.', nil) if echs.nil? || echs.empty?
+
+          # if parsing any one of the ech values fails, return Err
+          ech_configs = echs.flat_map do |ech|
+            octet = Base64.decode64(ech)
+            ECHConfig.decode_vectors(octet.slice(2..))
+          end
+
+          Ok.new(ech_configs)
+        rescue StandardError => e
+          Err.new(e.message, nil)
+        end
+
         # @param pem [String]
         #
         # @return [EchSpec::Ok<Array<ECHConfig>> | Err]
