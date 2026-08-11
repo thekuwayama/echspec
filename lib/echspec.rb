@@ -1,4 +1,6 @@
 require 'base64'
+require 'json'
+require 'net/http'
 require 'optparse'
 require 'pp'
 require 'resolv'

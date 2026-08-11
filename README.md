@@ -78,7 +78,7 @@ Failures:
 1 failure
 ```
 
-By default, `echspec` retrieves ECHConfigs via DNS HTTPS records. You can specify a local PEM file using the `-f, --file FILE` option. To test a server on localhost:
+By default, `echspec` retrieves ECHConfigs via DNS HTTPS resource records. You can specify a local PEM file using the `-f, --file FILE` option. To test a server on localhost:
 
 ```sh-session
 $ echspec run -f fixtures/echconfigs.pem -p 4433 localhost
@@ -304,7 +304,8 @@ AQALZXhhbXBsZS5jb20AAA==
 
 ### resolve
 
-You can resolve ECHConfigs for a hostname and print fields using the `resolve` subcommand:
+You can resolve ECHConfigs for a hostname and print fields using the `resolve` subcommand.
+With `-w`, ECHConfigs are resolved from the well-known URI (`https://{HOSTNAME}/.well-known/origin-svcb`) defined in [draft-ietf-tls-wkech](https://datatracker.ietf.org/doc/html/draft-ietf-tls-wkech-12), instead of DNS HTTPS resource records:
 
 ```sh-session
 $ echspec resolve --help
@@ -316,10 +317,12 @@ Resolve ECHConfigs for a hostname and print fields.
 Examples:
 
   $ echspec resolve localhost
+  $ echspec resolve -w localhost
   $ echspec resolve -f echconfigs.pem
 
 Options:
     -f, --file FILE                  path to ECHConfigs PEM file       (default resolve ECHConfigs via DNS)
+    -w, --well-known                 resolve ECHConfigs via well-known URI, instead of DNS
 ```
 ```sh-session
 $ echspec resolve research.cloudflare.com
