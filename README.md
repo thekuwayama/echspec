@@ -326,20 +326,20 @@ Options:
 ```
 ```sh-session
 $ echspec resolve research.cloudflare.com
-ECHConfig:                                     │ 
-  version(uint16):                             │ fe 0d
-  length(uint16):                              │ 65
-  contents(ECHConfigContents):                 │ 
-    key_config(HpkeKeyConfig):                 │ 
-      config_id(uint8):                        │ 104
-      kem_id(uint16):                          │ 00 20
-      public_key(opaque):                      │ e8 49 25 b3 6c e3 fb 9c 72 c7 71 e2 7a b2 8c 65 84 ba c2 2a 90 c2 cb 59 23 b2 27 d8 c1 85 84 17
-      cipher_suites(HpkeSymmetricCipherSuite): │ 
-        kdf_id(uint16):                        │ 00 01
-        aead_id(uint16):                       │ 00 01
-    maximum_name_length(uint8):                │ 0
-    public_name(opaque):                       │ cloudflare-ech.com
-    extensions(opaque):                        │ 
+ECHConfig:                        │ 
+  version(hex):                   │ fe 0d
+  length(integer):                │ 65
+  contents:                       │ 
+    key_config:                   │ 
+      config_id(integer):         │ 104
+      kem_id(hex):                │ 00 20
+      public_key(hex):            │ e8 49 25 b3 6c e3 fb 9c 72 c7 71 e2 7a b2 8c 65 84 ba c2 2a 90 c2 cb 59 23 b2 27 d8 c1 85 84 17
+      cipher_suites:              │ 
+        kdf_id(hex):              │ 00 01
+        aead_id(hex):             │ 00 01
+    maximum_name_length(integer): │ 0
+    public_name(string):          │ cloudflare-ech.com
+    extensions(hex):              │ 
 ```
 
 ### grease
@@ -362,20 +362,20 @@ Options:
 ```
 ```sh-session
 $ echspec grease research.cloudflare.com
-ECHConfig:                                     │ 
-  version(uint16):                             │ fe 0d
-  length(uint16):                              │ 65
-  contents(ECHConfigContents):                 │ 
-    key_config(HpkeKeyConfig):                 │ 
-      config_id(uint8):                        │ 72
-      kem_id(uint16):                          │ 00 20
-      public_key(opaque):                      │ 0a 89 2a 9f 05 0a d5 21 da cc 42 65 df cf 70 38 22 7e 85 44 93 1b 68 fa a2 b5 37 ad d8 2c 89 39
-      cipher_suites(HpkeSymmetricCipherSuite): │ 
-        kdf_id(uint16):                        │ 00 01
-        aead_id(uint16):                       │ 00 01
-    maximum_name_length(uint8):                │ 0
-    public_name(opaque):                       │ cloudflare-ech.com
-    extensions(opaque):                        │ 
+ECHConfig:                        │ 
+  version(hex):                   │ fe 0d
+  length(integer):                │ 65
+  contents:                       │ 
+    key_config:                   │ 
+      config_id(integer):         │ 72
+      kem_id(hex):                │ 00 20
+      public_key(hex):            │ 0a 89 2a 9f 05 0a d5 21 da cc 42 65 df cf 70 38 22 7e 85 44 93 1b 68 fa a2 b5 37 ad d8 2c 89 39
+      cipher_suites:              │ 
+        kdf_id(hex):              │ 00 01
+        aead_id(hex):             │ 00 01
+    maximum_name_length(integer): │ 0
+    public_name(string):          │ cloudflare-ech.com
+    extensions(hex):              │ 
 ```
 
 
