@@ -304,6 +304,28 @@ AQALZXhhbXBsZS5jb20AAA==
 -----END ECHCONFIG-----
 ```
 
+The generated file contains the following two PEM blocks:
+
+- `PRIVATE KEY`
+  - X25519
+- `ECHCONFIG`
+  - version
+    - 0xfe0d
+  - config_id
+    - 123
+  - KEM
+    - DHKEM(X25519, HKDF-SHA256)
+  - KDF
+    - HKDF-SHA256
+  - AEAD
+    - AES-128-GCM
+  - maximum\_name\_length
+    - 32
+  - public_name
+    - "localhost"
+  - extensions
+    - []
+
 ### resolve
 
 You can resolve ECHConfigs for a hostname and print fields using the `resolve` subcommand.
