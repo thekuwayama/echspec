@@ -53,8 +53,7 @@ module EchSpec
       #
       # @return [EchSpec::Ok | Err]
       def validate_hrr_ech(hrr)
-        # Extensions#[] returns nil for UnknownExtension, so use super_fetch to
-        # distinguish the extension whose length is not 8 from the missing one.
+        # Extensions#[] returns nil for UnknownExtension, so use super_fetch.
         ex = hrr.extensions.super_fetch(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO, nil)
         case ex
         in TTTLS13::Message::Extension::ECHHelloRetryRequest
