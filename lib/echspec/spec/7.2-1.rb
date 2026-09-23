@@ -61,7 +61,7 @@ module EchSpec
       def validate_sh_confirmation(expected, sh)
         return Ok.new(nil) if sh.random[-8..] == expected
 
-        Err.new('ServerHello.random did not include accept_confirmation, although HelloRetryRequest confirmed ECH acceptance', message_stack)
+        Err.new('the last 8 bytes of ServerHello.random did not match accept_confirmation, although HelloRetryRequest confirmed ECH acceptance', message_stack)
       end
 
       private

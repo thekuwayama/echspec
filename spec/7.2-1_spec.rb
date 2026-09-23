@@ -61,7 +61,7 @@ RSpec.describe EchSpec::Spec::Spec7_2_1 do
       )
       result = EchSpec::Spec::Spec7_2_1.new.validate_sh_confirmation(expected, sh_without_confirmation)
       expect(result).to be_a EchSpec::Err
-      expect(result.details).to eq 'ServerHello.random did not include accept_confirmation, although HelloRetryRequest confirmed ECH acceptance'
+      expect(result.details).to eq 'the last 8 bytes of ServerHello.random did not match accept_confirmation, although HelloRetryRequest confirmed ECH acceptance'
     end
   end
 end
