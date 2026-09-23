@@ -61,6 +61,8 @@ TLS Encrypted Client Hello Server
         ✔ MUST abort with an "illegal_parameter" alert, if any extension is referenced in OuterExtensions more than once. [5.1-10]
         ✔ MUST abort with an "illegal_parameter" alert, if "encrypted_client_hello" is referenced in OuterExtensions. [5.1-10]
         ✔ MUST abort with an "illegal_parameter" alert, if the extensions in ClientHelloOuter corresponding to those in OuterExtensions do not occur in the same order. [5.1-10]
+        ✔ ECHConfig.contents.public_name MUST be a valid host name in preferred name syntax. [6.1.7-5]
+        ✔ ECHConfig.contents.public_name MUST NOT be interpreted as IPv4 literals. [6.1.7-5]
         ✔ MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloInner. [7-5]
         x MUST abort with an "illegal_parameter" alert, if ECHClientHello.type is not a valid ECHClientHelloType in ClientHelloOuter. [7-5]
         ✔ MUST abort with an "illegal_parameter" alert, if ClientHelloInner offers TLS 1.2 or below. [7.1-11]
