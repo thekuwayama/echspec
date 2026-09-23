@@ -64,8 +64,6 @@ module EchSpec
         Err.new('the last 8 bytes of ServerHello.random did not match accept_confirmation, although HelloRetryRequest confirmed ECH acceptance', message_stack)
       end
 
-      private
-
       # @param socket [TCPSocket]
       # @param hostname [String]
       # @param ech_config [ECHConfig]
