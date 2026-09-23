@@ -92,14 +92,9 @@ module EchSpec
         def self.padding_encoded_ch_inner(s,
                                           server_name_length,
                                           maximum_name_length)
-          padding_len =
-            if server_name_length.positive?
-              [maximum_name_length - server_name_length, 0].max
-            else
-              9 + maximum_name_length
-            end
-
-          padding_len = 31 - ((s.length + padding_len - 1) % 32)
+          padding_len = super.length - s.length
+          # at least one non-zero byte is needed for this test case
+          padding_len = 32 if padding_len.zero?
           s + NON_ZERO * padding_len # padding with non-zero value
         end
       end
