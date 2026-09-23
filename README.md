@@ -68,6 +68,7 @@ TLS Encrypted Client Hello Server
         ✔ MUST abort with a "missing_extension" alert, if 2nd ClientHelloOuter does not contains the "encrypted_client_hello" extension. [7.1.1-2]
         ✔ MUST abort with an "illegal_parameter" alert, if 2nd ClientHelloOuter "encrypted_client_hello" enc is empty. [7.1.1-2]
         ✔ MUST abort with a "decrypt_error" alert, if fails to decrypt 2nd ClientHelloOuter. [7.1.1-5]
+        ✔ MUST confirm ECH acceptance in ServerHello, if it confirmed ECH acceptance in HelloRetryRequest. [7.2-1]
 
 Failures:
 

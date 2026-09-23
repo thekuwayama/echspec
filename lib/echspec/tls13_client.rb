@@ -195,6 +195,7 @@ module EchSpec
       # @return [TTTLS13::Message::ClientHello]
       # @return [TTTLS13::Message::ServerHello] HelloRetryRequest
       # @return [TTTLS13::EchState]
+      # @return [String] HelloRetryRequest as received, for the transcript hash
       # rubocop: disable Metrics/MethodLength
       def recv_hrr(socket, hostname, ech_config, stack)
         # send 1st ClientHello
@@ -233,14 +234,54 @@ module EchSpec
         stack << ch
 
         # receive HelloRetryRequest
-        recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        recv, orig_msg = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
         stack << recv
         raise Error::BeforeTargetSituationError, 'did not send expected handshake message: HelloRetryRequest' \
           unless recv.is_a?(TTTLS13::Message::ServerHello) && recv.hrr?
 
-        [conn, inner, ch, recv, ech_state]
+        [conn, inner, ch, recv, ech_state, orig_msg]
       end
       # rubocop: enable Metrics/MethodLength
+
+      # @param inner1 [TTTLS13::Message::ClientHello] ClientHelloInner1
+      # @param hrr [TTTLS13::Message::ServerHello] HelloRetryRequest
+      # @param hrr_bin [String] HelloRetryRequest as received
+      #
+      # @return [String]
+      def hrr_accept_confirmation(inner1, hrr, hrr_bin)
+        transcript = TTTLS13::Transcript.new
+        transcript[TTTLS13::CH1] = [inner1, inner1.serialize]
+        transcript[TTTLS13::HRR] = [hrr, hrr_bin]
+        key_schedule(hrr.cipher_suite, transcript).hrr_accept_confirmation
+      end
+
+      # @param inner1 [TTTLS13::Message::ClientHello] ClientHelloInner1
+      # @param hrr [TTTLS13::Message::ServerHello] HelloRetryRequest
+      # @param hrr_bin [String] HelloRetryRequest as received
+      # @param inner2 [TTTLS13::Message::ClientHello] ClientHelloInner2
+      # @param sh [TTTLS13::Message::ServerHello]
+      # @param sh_bin [String] ServerHello as received
+      #
+      # @return [String]
+      # rubocop: disable Metrics/ParameterLists
+      def accept_confirmation(inner1, hrr, hrr_bin, inner2, sh, sh_bin)
+        transcript = TTTLS13::Transcript.new
+        transcript[TTTLS13::CH1] = [inner1, inner1.serialize]
+        transcript[TTTLS13::HRR] = [hrr, hrr_bin]
+        transcript[TTTLS13::CH] = [inner2, inner2.serialize]
+        transcript[TTTLS13::SH] = [sh, sh_bin]
+        key_schedule(sh.cipher_suite, transcript).accept_confirmation
+      end
+      # rubocop: enable Metrics/ParameterLists
+
+      # @param cipher_suite [TTTLS13::CipherSuite]
+      # @param transcript [TTTLS13::Transcript]
+      #
+      # @return [TTTLS13::KeySchedule]
+      def key_schedule(cipher_suite, transcript)
+        # shared_secret is not used to compute (hrr_)accept_confirmation
+        TTTLS13::KeySchedule.new(shared_secret: nil, cipher_suite:, transcript:)
+      end
     end
   end
   # rubocop: enable Metrics/ModuleLength
