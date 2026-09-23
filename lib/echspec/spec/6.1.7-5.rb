@@ -2,21 +2,20 @@ module EchSpec
   module Spec
     class Spec6_1_7_5
       # Prior to attempting a connection, a client SHOULD validate the
-      # ECHConfig.contents.public_name.  Clients SHOULD ignore any ECHConfig
+      # ECHConfig.contents.public_name. Clients SHOULD ignore any ECHConfig
       # structure with a public_name that is not a valid host name in
-      # preferred name syntax (see Section 2 of [DNS-TERMS]).  That is, to be
+      # preferred name syntax (see Section 2 of [DNS-TERMS]). That is, to be
       # valid, the public_name needs to be a dot-separated sequence of LDH
       # labels, as defined in Section 2.3.1 of [RFC5890], where:
       #
-      # *  the sequence does not begin or end with an ASCII dot, and
-      #
-      # *  all labels are at most 63 octets.
+      # * the sequence does not begin or end with an ASCII dot, and
+      # * all labels are at most 63 octets.
       #
       # Clients additionally SHOULD ignore the structure if the final LDH
       # label either consists of all ASCII digits (i.e., '0' through '9') or
       # is "0x" or "0X" followed by some, possibly empty, sequence of ASCII
       # hexadecimal digits (i.e., '0' through '9', 'a' through 'f', and 'A'
-      # through 'F').  This avoids public_name values that may be interpreted
+      # through 'F'). This avoids public_name values that may be interpreted
       # as IPv4 literals.
       #
       # https://datatracker.ietf.org/doc/html/rfc9849#section-6.1.7-5
@@ -27,11 +26,11 @@ module EchSpec
           '6.1.7-5',
           [
             SpecCase.new(
-              'ECHConfig.contents.public_name MUST be a valid host name in preferred name syntax.',
+              'Clients SHOULD ignore any ECHConfig structure with a public_name that is not a valid host name in preferred name syntax.',
               method(:validate_preferred_name_syntax)
             ),
             SpecCase.new(
-              'ECHConfig.contents.public_name MUST NOT be interpreted as IPv4 literals.',
+              'Clients SHOULD ignore the structure if the final LDH label may be interpreted as IPv4 literals.',
               method(:validate_not_ipv4_like)
             )
           ]
@@ -70,7 +69,6 @@ module EchSpec
       #
       # @return [Boolean]
       def self.valid_public_name?(public_name)
-        # split with limit -1 keeps trailing empty labels, e.g., "example.com."
         labels = public_name.b.split('.', -1)
         !labels.empty? && labels.all? { |label| LDH_LABEL.match?(label) }
       end
