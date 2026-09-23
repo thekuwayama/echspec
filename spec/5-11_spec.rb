@@ -35,13 +35,13 @@ RSpec.describe EchSpec::Spec::Spec5_11 do
     it 'returns Err, if HelloRetryRequest includes 7-byte "encrypted_client_hello"' do
       result = EchSpec::Spec::Spec5_11.new.validate_hrr_ech(hrr_with_7byte_ech)
       expect(result).to be_a EchSpec::Err
-      expect(result.details).to include '7-byte'
+      expect(result.details).to eq 'HelloRetryRequest "encrypted_client_hello" extension has 7-byte payload, expected 8 bytes'
     end
 
     it 'returns Err, if HelloRetryRequest does not include "encrypted_client_hello"' do
       result = EchSpec::Spec::Spec5_11.new.validate_hrr_ech(hrr_without_ech)
       expect(result).to be_a EchSpec::Err
-      expect(result.details).to include 'did not include'
+      expect(result.details).to eq 'HelloRetryRequest did not include "encrypted_client_hello" extension'
     end
   end
 end
