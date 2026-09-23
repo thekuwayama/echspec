@@ -37,20 +37,11 @@ module EchSpec
       # @return [EchSpec::Ok | Err]
       def do_validate_sh_confirmation_after_hrr(hostname, port, ech_config)
         with_socket(hostname, port) do |socket|
-          conn, inner1, hrr, hrr_bin, ech_state = recv_hrr_accepting_ech(socket, hostname, ech_config)
-          inner2 = send_2nd_ch(conn, inner1, hrr, ech_state)
-
-          recv, orig_msg = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
-          @stack << recv
-          if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
-            recv, orig_msg = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
-            @stack << recv
-          end
+          recv, confirmation = send_2nd_ch_after_hrr(socket, hostname, ech_config)
           return Err.new('did not send expected handshake message: ServerHello', message_stack) \
             unless recv.is_a?(TTTLS13::Message::ServerHello) && !recv.hrr?
 
-          expected = TLS13Client.accept_confirmation(inner1, hrr, hrr_bin, inner2, recv, orig_msg)
-          validate_sh_confirmation(expected, recv)
+          validate_sh_confirmation(confirmation, recv)
         end
       end
 
@@ -64,37 +55,26 @@ module EchSpec
         Err.new('the last 8 bytes of ServerHello.random did not match accept_confirmation, although HelloRetryRequest confirmed ECH acceptance', message_stack)
       end
 
-      # @param socket [TCPSocket]
-      # @param hostname [String]
-      # @param ech_config [ECHConfig]
-      #
-      # @raise [EchSpec::Error::BeforeTargetSituationError]
-      #
-      # @return [EchSpec::TLS13Client::Connection]
-      # @return [TTTLS13::Message::ClientHello] ClientHelloInner1
-      # @return [TTTLS13::Message::ServerHello] HelloRetryRequest
-      # @return [String] HelloRetryRequest as received
-      # @return [TTTLS13::EchState]
-      def recv_hrr_accepting_ech(socket, hostname, ech_config)
-        conn, inner1, _ch1, hrr, ech_state, hrr_bin = TLS13Client.recv_hrr(socket, hostname, ech_config, @stack)
-        # Extensions#[] returns nil for UnknownExtension, so use super_fetch.
-        ex = hrr.extensions.super_fetch(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO, nil)
+      # rubocop: disable Metrics/AbcSize
+      # rubocop: disable Metrics/MethodLength
+      def send_2nd_ch_after_hrr(socket, hostname, ech_config)
+        conn, inner1, _ch1, hrr, ech_state = TLS13Client.recv_hrr(socket, hostname, ech_config, @stack)
+        transcript = TTTLS13::Transcript.new
+        transcript[TTTLS13::CH1] = [inner1, inner1.serialize]
+        transcript[TTTLS13::HRR] = [hrr, hrr.serialize]
+        # shared_secret is not used to compute (hrr_)accept_confirmation
+        key_schedule = TTTLS13::KeySchedule.new(
+          shared_secret: nil,
+          cipher_suite: hrr.cipher_suite,
+          transcript:
+        )
+        ex = hrr.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
         raise Error::BeforeTargetSituationError, 'HelloRetryRequest did not confirm ECH acceptance' \
-          unless ex.is_a?(TTTLS13::Message::Extension::ECHHelloRetryRequest) &&
-                 ex.confirmation == TLS13Client.hrr_accept_confirmation(inner1, hrr, hrr_bin)
+          if ex.nil? || ex.confirmation != key_schedule.hrr_accept_confirmation
 
-        [conn, inner1, hrr, hrr_bin, ech_state]
-      end
-
-      # @param conn [EchSpec::TLS13Client::Connection]
-      # @param inner1 [TTTLS13::Message::ClientHello] ClientHelloInner1
-      # @param hrr [TTTLS13::Message::ServerHello] HelloRetryRequest
-      # @param ech_state [TTTLS13::EchState]
-      #
-      # @return [TTTLS13::Message::ClientHello] ClientHelloInner2
-      def send_2nd_ch(conn, inner1, hrr, ech_state)
-        # ClientHelloInner2 is based on ClientHelloInner1, and its
-        # "encrypted_client_hello" extension of type inner is left unmodified.
+        # send 2nd ClientHello; ClientHelloInner2 is based on ClientHelloInner1,
+        # and its "encrypted_client_hello" extension of type inner is left
+        # unmodified.
         inner2 = TTTLS13::Message::ClientHello.new(
           legacy_version: inner1.legacy_version,
           random: inner1.random,
@@ -114,8 +94,19 @@ module EchSpec
         @stack << inner2
         @stack << ch
 
-        inner2
+        recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new)
+        recv, = conn.recv_message(TTTLS13::Cryptograph::Passer.new) \
+          if recv.is_a?(TTTLS13::Message::ChangeCipherSpec)
+        @stack << recv
+        return [recv, nil] unless recv.is_a?(TTTLS13::Message::ServerHello) && !recv.hrr?
+
+        transcript[TTTLS13::CH] = [inner2, inner2.serialize]
+        sh = recv
+        transcript[TTTLS13::SH] = [sh, sh.serialize]
+        [recv, key_schedule.accept_confirmation]
       end
+      # rubocop: enable Metrics/AbcSize
+      # rubocop: enable Metrics/MethodLength
     end
   end
 end
