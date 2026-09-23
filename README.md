@@ -56,6 +56,7 @@ Example output:
 $ echspec run research.cloudflare.com
 TLS Encrypted Client Hello Server
         ✔ MUST implement the following HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM. [9]
+        ✔ MUST include an "encrypted_client_hello" extension with an 8-byte confirmation payload in HelloRetryRequest, if ClientHello offers the inner variant. [5-11]
         ✔ MUST abort with an "illegal_parameter" alert, if EncodedClientHelloInner is padded with non-zero values. [5.1-9]
         ✔ MUST abort with an "illegal_parameter" alert, if any referenced extension is missing in ClientHelloOuter. [5.1-10]
         ✔ MUST abort with an "illegal_parameter" alert, if any extension is referenced in OuterExtensions more than once. [5.1-10]
