@@ -179,7 +179,7 @@ module EchSpec
         groups = [Spec5_1_9, Spec5_1_10]
 
         # https://datatracker.ietf.org/doc/html/rfc9849#section-7
-        groups += [Spec7_5, Spec7_1_11, Spec7_1_14_2_1, Spec7_1_1_2, Spec7_1_1_5]
+        groups += [Spec7_5, Spec7_1_11, Spec7_1_14_2_1, Spec7_1_1_2, Spec7_1_1_5, Spec7_2_1]
 
         groups.map(&:spec_group)
       end
