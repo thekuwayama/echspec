@@ -36,33 +36,38 @@ module EchSpec
       end
 
       def write(fpath)
+        key = OpenSSL::PKey.generate_key('X25519')
+        echconfigs = ECHConfigList.new([GenConfigs.gen_ech_config(key.raw_public_key)])
+        File.write(fpath, key.private_to_pem + echconfigs.to_pem)
+      end
+
+      # @param public_key [String]
+      # @param kem_id [Integer]
+      # @param aead_id [Integer]
+      #
+      # @return [ECHConfig]
+      def self.gen_ech_config(public_key, kem_id: HPKE::DHKEM_X25519_HKDF_SHA256, aead_id: HPKE::AES_128_GCM)
         hostname = 'localhost'
 
-        key = OpenSSL::PKey.generate_key('X25519')
-        echconfigs = ECHConfigList.new(
-          [
-            ECHConfig.new(
-              "\xfe\x0d".b,
-              ECHConfig::ECHConfigContents.new(
-                ECHConfig::ECHConfigContents::HpkeKeyConfig.new(
-                  123,
-                  ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkeKemId.new(HPKE::DHKEM_X25519_HKDF_SHA256),
-                  ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkePublicKey.new(key.raw_public_key),
-                  [
-                    ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkeSymmetricCipherSuite.new(
-                      ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkeSymmetricCipherSuite::HpkeKdfId.new(HPKE::HKDF_SHA256),
-                      ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkeSymmetricCipherSuite::HpkeAeadId.new(HPKE::AES_128_GCM)
-                    )
-                  ]
-                ),
-                32,
-                hostname.b,
-                ECHConfig::ECHConfigContents::Extensions.new('')
-              )
-            )
-          ]
+        ECHConfig.new(
+          "\xfe\x0d".b,
+          ECHConfig::ECHConfigContents.new(
+            ECHConfig::ECHConfigContents::HpkeKeyConfig.new(
+              123,
+              ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkeKemId.new(kem_id),
+              ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkePublicKey.new(public_key),
+              [
+                ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkeSymmetricCipherSuite.new(
+                  ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkeSymmetricCipherSuite::HpkeKdfId.new(HPKE::HKDF_SHA256),
+                  ECHConfig::ECHConfigContents::HpkeKeyConfig::HpkeSymmetricCipherSuite::HpkeAeadId.new(aead_id)
+                )
+              ]
+            ),
+            32,
+            hostname.b,
+            ECHConfig::ECHConfigContents::Extensions.new('')
+          )
         )
-        File.write(fpath, key.private_to_pem + echconfigs.to_pem)
       end
     end
   end
