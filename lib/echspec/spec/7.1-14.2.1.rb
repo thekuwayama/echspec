@@ -44,13 +44,29 @@ module EchSpec
       def do_validate_ee_retry_configs(hostname, port)
         with_socket(hostname, port) do |socket|
           recv = TLS13Client.send_ch_with_greased_ech(socket, hostname, @stack)
-          ex = recv.extensions[TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO]
-          return Err.new('did not send expected alert: encrypted_client_hello', message_stack) \
-            unless ex.is_a?(TTTLS13::Message::Extension::ECHEncryptedExtensions)
-          return Err.new('ECHConfigs did not have "retry_configs"', message_stack) \
+          validate_ee_ech(recv)
+        rescue ECHConfig::DecodeError
+          Err.new('EncryptedExtensions "encrypted_client_hello" extension could not be decoded', message_stack)
+        end
+      end
+
+      # @param ee [TTTLS13::Message::EncryptedExtensions]
+      #
+      # @return [EchSpec::Ok | Err]
+      def validate_ee_ech(ee)
+        # Extensions#[] returns nil for UnknownExtension, so use super_fetch.
+        ex = ee.extensions.super_fetch(TTTLS13::Message::ExtensionType::ENCRYPTED_CLIENT_HELLO, nil)
+        case ex
+        in TTTLS13::Message::Extension::ECHEncryptedExtensions
+          return Err.new('EncryptedExtensions "encrypted_client_hello" extension did not have "retry_configs"', message_stack) \
             if ex.retry_configs.nil? || ex.retry_configs.empty?
 
           Ok.new(nil)
+        in nil
+          Err.new('EncryptedExtensions did not include "encrypted_client_hello" extension', message_stack)
+        in TTTLS13::Message::Extension::UnknownExtension
+          # tttls1.3 deserializes the extension whose length field mismatches as UnknownExtension
+          Err.new('EncryptedExtensions "encrypted_client_hello" extension could not be decoded', message_stack)
         end
       end
     end
