@@ -6,7 +6,7 @@ RSpec.describe EchSpec::Spec::Spec9 do
   end
 
   let(:ech_config_list) do
-    ECHConfigList.new([EchSpec::CLI::GenConfigs.gen_ech_config(public_key)]).encode
+    ECHConfigList.new([EchSpec::EchConfig.gen_ech_config(public_key)]).encode
   end
 
   # ECHConfigList whose length field is 1 byte longer than its contents
@@ -61,15 +61,19 @@ RSpec.describe EchSpec::Spec::Spec9 do
 
   context 'validate_compliant_ech_configs' do
     let(:compliant) do
-      EchSpec::CLI::GenConfigs.gen_ech_config(public_key)
+      EchSpec::EchConfig.gen_ech_config(public_key)
     end
 
     let(:non_compliant_kem) do
-      EchSpec::CLI::GenConfigs.gen_ech_config(public_key, kem_id: HPKE::DHKEM_P256_HKDF_SHA256)
+      EchSpec::EchConfig.gen_ech_config(public_key, kem_id: HPKE::DHKEM_P256_HKDF_SHA256)
+    end
+
+    let(:non_compliant_kdf) do
+      EchSpec::EchConfig.gen_ech_config(public_key, kdf_id: HPKE::HKDF_SHA384)
     end
 
     let(:non_compliant_aead) do
-      EchSpec::CLI::GenConfigs.gen_ech_config(public_key, aead_id: HPKE::CHACHA20_POLY1305)
+      EchSpec::EchConfig.gen_ech_config(public_key, aead_id: HPKE::CHACHA20_POLY1305)
     end
 
     it 'returns Ok with the compliant ECHConfig' do
@@ -82,6 +86,10 @@ RSpec.describe EchSpec::Spec::Spec9 do
       result = EchSpec::Spec::Spec9.validate_compliant_ech_configs([non_compliant_kem])
       expect(result).to be_a EchSpec::Err
       expect(result.details).to eq 'ECHConfigs does NOT include HPKE cipher suite: KEM: DHKEM(X25519, HKDF-SHA256), KDF: HKDF-SHA256 and AEAD: AES-128-GCM.'
+    end
+
+    it 'returns Err, if KDF is not HKDF-SHA256' do
+      expect(EchSpec::Spec::Spec9.validate_compliant_ech_configs([non_compliant_kdf])).to be_a EchSpec::Err
     end
 
     it 'returns Err, if AEAD is not AES-128-GCM' do
