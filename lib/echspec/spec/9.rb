@@ -77,8 +77,8 @@ module EchSpec
           return Err.new("HTTPS resource record for #{hostname} does NOT have ech SvcParams.", nil) if rr.params[ech].nil?
 
           octet = rr.params[ech].value
-          Err.new('Failed to parse ECHConfig on HTTPS resource record.', nil) \
-            unless octet.length == octet.slice(0, 2).unpack1('n') + 2
+          return Err.new('Failed to parse ECHConfig on HTTPS resource record.', nil) \
+            unless octet.length >= 2 && octet.length == octet.slice(0, 2).unpack1('n') + 2
 
           Ok.new(ECHConfig.decode_vectors(octet.slice(2..)))
         end
@@ -135,6 +135,8 @@ module EchSpec
         # @param body [String]
         #
         # @return [EchSpec::Ok | Err]
+        # rubocop: disable Metrics/CyclomaticComplexity
+        # rubocop: disable Metrics/PerceivedComplexity
         def parse_origin_svcb(body)
           h = JSON.parse(body)
           echs = h['endpoints']&.filter_map { |e| e.dig('params', 'ech') }
@@ -143,6 +145,9 @@ module EchSpec
           # if parsing any one of the ech values fails, return Err
           ech_configs = echs.flat_map do |ech|
             octet = Base64.decode64(ech)
+            return Err.new('Failed to parse ECHConfig on the origin-svcb well-known resource.', nil) \
+              unless octet.length >= 2 && octet.length == octet.slice(0, 2).unpack1('n') + 2
+
             ECHConfig.decode_vectors(octet.slice(2..))
           end
 
@@ -150,6 +155,8 @@ module EchSpec
         rescue StandardError => e
           Err.new(e.message, nil)
         end
+        # rubocop: enable Metrics/CyclomaticComplexity
+        # rubocop: enable Metrics/PerceivedComplexity
 
         # @param pem [String]
         #
@@ -160,6 +167,9 @@ module EchSpec
                  .first
                  .gsub("\n", '')
           b = Base64.decode64(s)
+          return Err.new('Failed to parse ECHConfig on the PEM file.', nil) \
+            unless b.length >= 2 && b.length == b.slice(0, 2).unpack1('n') + 2
+
           ech_configs = ECHConfig.decode_vectors(b.slice(2..))
           Ok.new(ech_configs)
         rescue StandardError
